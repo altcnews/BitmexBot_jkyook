@@ -39,9 +39,9 @@ class BitMEXWebsocket():
 
     def __init__(self):
 
-        # global last_time
-        #
-        # last_time=0
+        global price, cgubun, cvolume, volume, time_str, timestamp
+        cgubun='n'
+        cvolume=0
 
         self.logger = logging.getLogger('root')
         self.__reset()
@@ -149,7 +149,16 @@ class BitMEXWebsocket():
         return pos[0]
 
     def recent_trades(self):
-        return self.data['trade']
+        global price, cgubun, cvolume, volume, time_str, timestamp
+
+        print 'cvolume: ', cvolume
+        cgubun = "buy"
+        if cvolume<0:
+            cgubun="sell"
+        print 'cgubun: ', cgubun
+
+        cvolume=0
+        return self.data['trade'] #, cvolume, price, cgubun
 
     #
     # Lifecycle methods
@@ -231,7 +240,7 @@ class BitMEXWebsocket():
 
     def __on_message(self, ws, message):
 
-        # global last_time
+        global price, cgubun, cvolume, volume, time_str, timestamp
 
         '''Handler for parsing WS messages.'''
         message = json.loads(message)
@@ -278,11 +287,20 @@ class BitMEXWebsocket():
                     # an item. We use it for updates.
                     self.keys[table] = message['keys']
                 elif action == 'insert':
-                    # self.logger.debug('%s: inserting %s' % (table, message['data']))
+                    self.logger.debug('%s: inserting %s' % (table, message['data']))
                     self.data[table] += message['data']
 
-                    # if table=="trade":
-                    #     last_time = time.time()
+                    # price, cgubun, cvolume, volume, time_str, timestamp
+                    if table=="trade":
+                        # print 'message= ',message['data']
+                        for i in range(len(message['data'])):
+                            ins_cvolume=message['data'][i]['size']
+                            if message['data'][i]['side'] == "Sell":
+                                ins_cvolume=ins_cvolume*-1
+                            print 'ins_cvolume', ins_cvolume
+                            cvolume+=ins_cvolume
+                        print 'total_cvolume', cvolume
+                        price=message['data'][i]['price']
 
                         # bitmex_bot.sanity_check()
 
