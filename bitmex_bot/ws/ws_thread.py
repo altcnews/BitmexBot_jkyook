@@ -2,11 +2,13 @@ import sys
 import websocket
 import threading
 import traceback
+import time
 import ssl
 from time import sleep
 import json
 import decimal
 import logging
+# from bitmex_bot import bitmex_bot
 from bitmex_bot.settings import settings
 from bitmex_bot.auth.APIKeyAuth import generate_nonce, generate_signature
 from bitmex_bot.utils.log import setup_custom_logger
@@ -16,6 +18,7 @@ from future.standard_library import hooks
 with hooks():  # Python 2/3 compat
     from urllib.parse import urlparse, urlunparse
 
+# global last_time
 
 # Connects to BitMEX websocket for streaming realtime data.
 # The Marketmaker still interacts with this as if it were a REST Endpoint, but now it can get
@@ -27,17 +30,26 @@ with hooks():  # Python 2/3 compat
 # poll as often as it wants.
 class BitMEXWebsocket():
 
+    # global buy1Prc, buy1Qty, buy2Prc, buy2Qty
+    # global sell1Prc, sell1Qty, sell2Prc, sell2Qty
+    # global last_tr
+
     # Don't grow a table larger than this amount. Helps cap memory usage.
     MAX_TABLE_LEN = 200
 
     def __init__(self):
+
+        # global last_time
+        #
+        # last_time=0
+
         self.logger = logging.getLogger('root')
         self.__reset()
 
     def __del__(self):
         self.exit()
 
-    def connect(self, endpoint="", symbol="XBTN15", shouldAuth=True):
+    def connect(self, endpoint="", symbol="XBTUSD", shouldAuth=False):
         '''Connect to the websocket and initialize data stores.'''
 
         self.logger.debug("Connecting WebSocket.")
@@ -46,7 +58,7 @@ class BitMEXWebsocket():
 
         # We can subscribe right in the connection querystring, so let's build that.
         # Subscribe to all pertinent endpoints
-        subscriptions = [sub + ':' + symbol for sub in ["quote", "trade"]]
+        subscriptions = [sub + ':' + symbol for sub in ["trade", "orderBook10"]]
         subscriptions += ["instrument"]  # We want all of them
         if self.shouldAuth:
             subscriptions += [sub + ':' + symbol for sub in ["order", "execution"]]
@@ -62,7 +74,7 @@ class BitMEXWebsocket():
         self.logger.info('Connected to WS. Waiting for data images, this may take a moment...')
 
         # Connected. Wait for partials
-        self.__wait_for_symbol(symbol)
+        # self.__wait_for_symbol(symbol)
         if self.shouldAuth:
             self.__wait_for_account()
         self.logger.info('Got all market data. Starting.')
@@ -102,7 +114,19 @@ class BitMEXWebsocket():
             }
 
         # The instrument has a tickSize. Use it to round values.
+        # print ticker
         return {k: toNearest(float(v or 0), instrument['tickSize']) for k, v in iteritems(ticker)}
+
+    def orderbook(self):
+
+        # global buy1Prc, buy1Qty, buy2Prc, buy2Qty
+        # global sell1Prc, sell1Qty, sell2Prc, sell2Qty
+        # global last_tr
+        #
+        # orderbook={"buy1Prc": buy1Prc,"buy1Qty": buy1Qty,"buy2Prc": buy2Prc,"buy2Qty": buy2Qty,
+        #            "sell1Prc": sell1Prc, "sell1Qty": sell1Qty, "sell2Prc": sell2Prc, "sell2Qty": sell2Qty}
+
+        return self.data['orderBook10']
 
     def funds(self):
         return self.data['margin'][0]
@@ -206,12 +230,17 @@ class BitMEXWebsocket():
         self.ws.send(json.dumps({"op": command, "args": args or []}))
 
     def __on_message(self, ws, message):
+
+        # global last_time
+
         '''Handler for parsing WS messages.'''
         message = json.loads(message)
-        self.logger.debug(json.dumps(message))
+        # self.logger.debug(json.dumps(message))
 
         table = message['table'] if 'table' in message else None
         action = message['action'] if 'action' in message else None
+        # print table, action
+
         try:
             if 'subscribe' in message:
                 if message['success']:
@@ -232,20 +261,30 @@ class BitMEXWebsocket():
                 if table not in self.keys:
                     self.keys[table] = []
 
+                # print(self.data['orderBook10'])
+                # print(self.data.keys())
+                # print("----")
+
                 # There are four possible actions from the WS:
                 # 'partial' - full table image
                 # 'insert'  - new row
                 # 'update'  - update row
                 # 'delete'  - delete row
                 if action == 'partial':
-                    self.logger.debug("%s: partial" % table)
+                    # self.logger.debug("%s: partial" % table)
                     self.data[table] += message['data']
+                    # print 'partial', message['data']
                     # Keys are communicated on partials to let you know how to uniquely identify
                     # an item. We use it for updates.
                     self.keys[table] = message['keys']
                 elif action == 'insert':
-                    self.logger.debug('%s: inserting %s' % (table, message['data']))
+                    # self.logger.debug('%s: inserting %s' % (table, message['data']))
                     self.data[table] += message['data']
+
+                    # if table=="trade":
+                    #     last_time = time.time()
+
+                        # bitmex_bot.sanity_check()
 
                     # Limit the max length of the table to avoid excessive memory usage.
                     # Don't trim orders because we'll lose valuable state if we do.
@@ -253,8 +292,28 @@ class BitMEXWebsocket():
                         self.data[table] = self.data[table][(BitMEXWebsocket.MAX_TABLE_LEN // 2):]
 
                 elif action == 'update':
-                    self.logger.debug('%s: updating %s' % (table, message['data']))
+                    # self.logger.debug('%s: updating %s' % (table, message['data']))
                     # Locate the item in the collection and update it.
+
+                    if table=='orderBook10':
+                        buy1Prc = message['data'][0]['bids'][0][0]
+                        buy1Qty = message['data'][0]['bids'][0][1]
+                        buy2Prc = message['data'][0]['bids'][1][0]
+                        buy2Qty = message['data'][0]['bids'][1][1]
+
+                        sell1Prc = message['data'][0]['asks'][0][0]
+                        sell1Qty = message['data'][0]['asks'][0][1]
+                        sell2Prc = message['data'][0]['asks'][1][0]
+                        sell2Qty = message['data'][0]['asks'][1][1]
+
+                    # if table=="orderBookL2":
+                    #     if message['data'][0]['side']=="Buy":
+                    #         buy = message['data'][0]['size']
+                    #     if message['data'][0]['side']=="Sell":
+                    #         sell = message['data'][0]['size']
+                    #     print 'buy :', buy
+                    #     print 'sell :', sell
+
                     for updateData in message['data']:
                         item = findItemByKeys(self.keys[table], self.data[table], updateData)
                         if not item:
@@ -279,7 +338,7 @@ class BitMEXWebsocket():
                             self.data[table].remove(item)
 
                 elif action == 'delete':
-                    self.logger.debug('%s: deleting %s' % (table, message['data']))
+                    # self.logger.debug('%s: deleting %s' % (table, message['data']))
                     # Locate the item in the collection and remove it.
                     for deleteData in message['data']:
                         item = findItemByKeys(self.keys[table], self.data[table], deleteData)

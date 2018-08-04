@@ -1,18 +1,27 @@
 from __future__ import absolute_import
 
+import warnings
+# warnings.filterwarnings("always")
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+
 import threading
 from time import sleep
 import sys
+import time
 from datetime import datetime
 from os.path import getmtime
 import atexit
 import signal
+import pandas as pd
+import numpy as np
+import scipy.stats as stat
 from bitmex_bot import bitmex, indicators
 from bitmex_bot.settings import settings
 from bitmex_bot.utils import log, constants, errors
 from bitmex_bot.bitmex_historical import Bitmex
-
 from bitmex_bot.bot_trade import BOT_TRADE
+
 
 # Used for reloading the bot - saves modified times of key files
 import os
@@ -61,8 +70,10 @@ class ExchangeInterface:
     def cancel_all_orders(self):
         logger.info("Resetting current position. Canceling all existing orders.")
         tickLog = self.get_instrument()['tickLog']
+        # print tickLog
 
         orders_1 = self.bitmex.http_open_orders()
+        # print len(orders_1)
 
         for order in orders_1:
             logger.info("Canceling: %s %d @ %.*f" % (order['side'], order['orderQty'], tickLog, order['price']))
@@ -71,6 +82,7 @@ class ExchangeInterface:
             self.bitmex.cancel([order['orderID'] for order in orders_1])
 
         sleep(settings.API_REST_INTERVAL)
+        # print "sleep"
 
     def get_portfolio(self):
         contracts = settings.CONTRACTS
@@ -172,6 +184,12 @@ class ExchangeInterface:
             symbol = self.symbol
         return self.bitmex.ticker_data(symbol)
 
+    def get_orderbook(self):
+        return self.bitmex.orderbook_data()
+
+    def last_trade(self):
+        return self.bitmex.recent_trades()
+
     def close_position(self):
         return self.bitmex.close_position()
 
@@ -244,6 +262,7 @@ class OrderManager:
         logger.info("Using symbol %s." % self.exchange.symbol)
 
     def init(self):
+
         if settings.DRY_RUN:
             logger.info("Initializing dry run. Orders printed below represent what would be posted to BitMEX.")
         else:
@@ -260,8 +279,11 @@ class OrderManager:
 
     def reset(self):
         self.exchange.cancel_all_orders()
+        # print 'cancel_over'
         self.sanity_check()
+        # print 'sanity_over'
         self.print_status()
+        # print 'stat_over'
         if settings.DRY_RUN:
             sys.exit()
 
@@ -277,9 +299,11 @@ class OrderManager:
     def macd_check(self):
         # print("yes macd")
         # as latest price is last one
+        # print 'macd_check'
         up_vote = 0
         down_vote = 0
         data = Bitmex().get_historical_data(tick=settings.TICK_INTERVAL)
+        # print 'data', data
 
         if data:
             price_list = list(map(lambda i: i['close'], data))
@@ -295,6 +319,121 @@ class OrderManager:
                 self.macd_signal = False
         else:
             logger.error("Tick interval not supported")
+
+    def nprob_check(self):
+
+        global nf, t1, orderbook
+        global price, cgubun, cvolume, volume, last_time, px1, py1
+        global lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v
+
+        orderbook = self.exchange.get_orderbook()
+
+        last_trade = self.exchange.last_trade()[-1]
+        price = last_trade['price']
+        cgubun = str(last_trade['side'])
+        cvolume = last_trade['size']
+        volume = last_trade['grossValue']
+        timestamp_u = last_trade['timestamp'].encode("UTF-8")
+        year = timestamp_u[0:4]
+        month = timestamp_u[5:7]
+        date = timestamp_u[8:10]
+        sec = timestamp_u[11:19]
+        mil = timestamp_u[20:23]
+        time_str = date+'.'+month+'.'+year+' '+sec+'.'+mil
+        dt_obj = datetime.strptime(time_str, '%d.%m.%Y %H:%M:%S.%f')
+        millisec = time.mktime(dt_obj.timetuple())*1000+int(mil)
+        timestamp=millisec
+        print(price, cgubun, cvolume, volume, time_str, timestamp)
+
+        lblSqty2v = orderbook[0]['asks'][1][1]
+        lblShoga2v = orderbook[0]['asks'][1][0]
+        lblSqty1v = orderbook[0]['asks'][0][1]
+        lblShoga1v = orderbook[0]['asks'][0][0]
+        lblBqty1v = orderbook[0]['bids'][0][1]
+        lblBhoga1v = orderbook[0]['bids'][0][0]
+        lblBqty2v = orderbook[0]['bids'][1][1]
+        lblBhoga2v = orderbook[0]['bids'][1][0]
+
+        # print(lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v)
+
+        # df.at[nf, 'nf'] = nf
+
+        # if nf < 5:
+        #     OrgMain = "n"
+        #     OrgMain1 = "n"
+        #     OrgMain2 = "n"
+        #     LstmMain = "n"
+        #     nfset = 0
+        #     inp = 0
+        #     inp_o = 0
+        #     outype = "n"
+        #     hit_type = "n"
+        #     profit = 0
+        #     profit_spot = 0
+        #     profit_o = 0
+        #     profit_spot_o = 0
+        #     InTrendv = 0
+        #     p_cum = 0  # prdict_cum
+        #     piox = 0
+        #     hit_peak = 0
+        #     hit_peak_lstm = 0
+        #     extra_indics = 1
+        #     org_in_cum = 0
+        #     stock = 0
+        #     forbid_set = 0
+        #     forbid = 0
+        #     cgu_m = 0
+        #     cgu_s = 0
+        #     send_msg = 0
+        #     touch_cri = 0
+        #     cri_ee_s = 0
+        #     # touch_out = 0
+        #     circulation = 0
+        #     rsi = []
+        #     rsi_i = 0
+        #     last_rsi_prc = 0
+        #     last_rsi_time = 0
+        #     Exed_time = []
+        #     Exed_last_time = 0
+        #     ee_s_sum = 0
+        #     org_test = 0
+        #     hit_type = "n"
+
+        # df.at[nf, "price"] = price
+        # df.at[nf, "cgubun"] = cgubun
+        # # df.at[nf, "drate"] = drate
+        # df.at[nf, "cvolume"] = cvolume
+        # df.at[nf, "volume"] = volume
+
+        # df.at[nf, "y2"] = int(lblSqty2v)
+        # df.at[nf, "py2"] = float(lblShoga2v)
+        # df.at[nf, "y1"] = int(lblSqty1v)
+        # df.at[nf, "py1"] = float(lblShoga1v)
+        # df.at[nf, "x1"] = int(lblBqty1v)
+        # df.at[nf, "px1"] = float(lblBhoga1v)
+        # df.at[nf, "x2"] = int(lblBqty2v)
+        # df.at[nf, "px2"] = float(lblBhoga2v)
+
+        # nowtime = time.time()
+        #
+        # dx1 = xnet(px1, n1px1, cvol, cgubun, x1, n1x1, x2, n1x2)
+        # dy1 = ynet(py1, n1py1, cvol, cgubun, y1, n1y1, y2, n1y2)
+
+        # if cgubun == "buy":
+        #     wx = 0
+        #     wy = cvol
+        #     cgu = 1
+        # elif cgubun == "sell":
+        #     wx = cvol
+        #     wy = 0
+        #     cgu = -1
+        # else:
+        #     wx = 0
+        #     wy = 0
+
+
+
+        # nf+=1
 
     def get_ticker(self):
         ticker = self.exchange.get_ticker()
@@ -336,6 +475,7 @@ class OrderManager:
         # if not (price == self.price_list[-1]):
         self.last_price = price
         self.macd_check()
+        self.nprob_check()
 
     ###
     # Sanity
@@ -349,12 +489,14 @@ class OrderManager:
 
         # Ensure market is still open.
         self.exchange.check_market_open()
-        self.get_exchange_price()
-        # print(self.exchange.get_orders())
-        logger.info("current BITMEX price is {}".format(self.last_price))
-        # self.get_exchange_price()
 
+        self.get_exchange_price()         # => macd_check = npob()
+
+        logger.info("current BITMEX price is {}".format(self.last_price))
+
+        # self.get_exchange_price()
         logger.info("Current Price is {} MACD signal {}".format(self.last_price, self.macd_signal))
+
         if not self.is_trade:
             if self.macd_signal:
                 if self.macd_signal == self.UP:
@@ -363,6 +505,7 @@ class OrderManager:
                     self.is_trade = True
                     self.sequence = self.BUY
 
+                    # place order
                     if not self.initial_order:
                         order = self.place_orders(side=self.BUY, orderType='Market', quantity=self.amount)
                         self.trade_signal = self.macd_signal
@@ -389,6 +532,7 @@ class OrderManager:
                     logger.info("-----------------------------------------")
                     self.is_trade = True
                     self.sequence = self.SELL
+
                     # place order
                     if not self.initial_order:
                         order = self.place_orders(side=self.SELL, orderType='Market', quantity=self.amount)
@@ -492,6 +636,7 @@ class OrderManager:
                 logger.error("Realtime data connection unexpectedly closed, restarting.")
                 self.restart()
 
+            print 'sanity_check'
             self.sanity_check()  # Ensures health of mm - several cut-out points here
             self.print_status()  # Print skew, delta, etc
 
@@ -518,9 +663,60 @@ def cost(instrument, quantity, price):
 def margin(instrument, quantity, price):
     return cost(instrument, quantity, price) * instrument["initMargin"]
 
+def ynet(nowp, t, W, sw, a, b, c, d):
+
+    if nowp == t:
+        if sw == "+":
+            result = (a - b + W)
+        else:
+            result = (a - b)
+
+    elif nowp < t:
+        if sw == "+":
+            result = (a + c - b) + W
+        else:
+            result = (a + c - b)
+
+    elif nowp > t:
+        if sw == "+":
+            result = W - b + a - d
+        else:
+            result = (a - d - b)
+
+    return result
+
+def xnet(nowp, t, W, sw, a, b, c, d):
+
+    if nowp == t:
+        if sw == "-":
+            result = (a - b + W)
+        else:
+            result = (a - b)
+
+    elif nowp > t:
+        if sw == "-":
+            result = (a + c - b) + W
+        else:
+            result = (a + c - b)
+
+    elif nowp < t:
+        if sw == "-":
+            result = W - b + a - d
+        else:
+            result = (a - d - b)
+
+    return result
+
 
 def run():
+    global df, t1
     logger.info('BitMEX bot Version: %s\n' % constants.VERSION)
+
+    t1 = time.time()
+    a = pd.read_csv("index_csv.csv").columns.values.tolist()
+    df = pd.DataFrame()
+    df = pd.DataFrame(index=range(0, 1), columns=a)
+    # print(a)
 
     om = OrderManager()
     # om.exchange.get_user_balance()
@@ -535,3 +731,5 @@ def run():
         logger.error(e)
     finally:
         sleep(1000)
+
+

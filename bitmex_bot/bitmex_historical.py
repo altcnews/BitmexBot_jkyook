@@ -10,15 +10,19 @@ class Bitmex(object):
         self.ask_price = 0
         self.bid_price = 0
         self.order_id_prefix = "lee_bot"
-        self.symbol = s.SYMBOL
+        # print 'symbol'
+        self.symbol = "XBTUSD" #s.SYMBOL
+        # print self.symbol
         self.BASE_URL = "https://www.bitmex.com/api/v1/"
 
     def get_historical_data(self, tick='1m', count=400):
         # last one hour data with latest one in the end
 
+        # print 'get_historial'
         url = self.BASE_URL + "trade/bucketed?binSize={}&partial=false&symbol={}&count={}&reverse=true". \
             format(tick, self.trade_currency, count)
         r = json.loads(requests.get(url).text)
+
 
         lst = []
         # configure result into suitable data type

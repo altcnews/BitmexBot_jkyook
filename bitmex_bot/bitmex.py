@@ -11,7 +11,6 @@ from bitmex_bot.auth import APIKeyAuthWithExpires
 from bitmex_bot.utils import constants, errors
 from bitmex_bot.ws.ws_thread import BitMEXWebsocket
 
-
 # https://www.bitmex.com/api/explorer/
 class BitMEX(object):
 
@@ -45,7 +44,6 @@ class BitMEX(object):
         # Create websocket for streaming data
         self.ws = BitMEXWebsocket()
         self.ws.connect(base_url, symbol, shouldAuth=shouldWSAuth)
-
     def __del__(self):
         self.exit()
 
@@ -60,6 +58,9 @@ class BitMEX(object):
         if symbol is None:
             symbol = self.symbol
         return self.ws.get_ticker(symbol)
+
+    def orderbook_data(self):
+        return self.ws.orderbook()
 
     def instrument(self, symbol):
         """Get an instrument's details."""
@@ -213,6 +214,10 @@ class BitMEX(object):
             },
             verb="GET"
         )
+
+        # print 'orders:', orders[0]
+        # print 'prefix', self.orderIDPrefix
+        # print 'id', str(orders[0]['clOrdID']).startswith(self.orderIDPrefix) #orders[0]['clOrdID']
         # Only return orders that start with our clOrdID prefix.
         return [o for o in orders if str(o['clOrdID']).startswith(self.orderIDPrefix)]
 
@@ -254,7 +259,9 @@ class BitMEX(object):
             max_retries = 0 if verb in ['POST', 'PUT'] else 3
 
         # Auth: API Key/Secret
+        # print self.apiKey, self.apiSecret
         auth = APIKeyAuthWithExpires(self.apiKey, self.apiSecret)
+        # print auth
 
         def exit_or_throw(e):
             if rethrow_errors:
@@ -277,6 +284,7 @@ class BitMEX(object):
             response = self.session.send(prepped, timeout=timeout)
             # Make non-200s throw
             response.raise_for_status()
+            # print "code:", response.status_code
 
         except requests.exceptions.HTTPError as e:
             if response is None:
