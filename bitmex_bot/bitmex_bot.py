@@ -16,7 +16,7 @@ import signal
 import pandas as pd
 import numpy as np
 import scipy.stats as stat
-from bitmex_bot import bitmex, indicators
+from . import bitmex, indicators
 from bitmex_bot.settings import settings
 from bitmex_bot.utils import log, constants, errors
 from bitmex_bot.bitmex_historical import Bitmex
@@ -326,9 +326,13 @@ class OrderManager:
         global price, cgubun, cvolume, volume, last_time, px1, py1
         global lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v
 
-        orderbook = self.exchange.get_orderbook()
-
-        last_trade = self.exchange.last_trade()[-1]
+        last_trade_raw = self.exchange.last_trade()
+        # print('last_trade in bot:', last_trade_raw)
+        last_trade = last_trade_raw[-3]
+        cgubun_sum = last_trade_raw[-2]
+        cvolume_sum = last_trade_raw[-1]
+        print('cvolume_sum in bot: ', cvolume_sum)
+        print('cgubun_sum in bot: ', cgubun_sum)
         price = last_trade['price']
         cgubun = str(last_trade['side'])
         cvolume = last_trade['size']
@@ -343,7 +347,10 @@ class OrderManager:
         dt_obj = datetime.strptime(time_str, '%d.%m.%Y %H:%M:%S.%f')
         millisec = time.mktime(dt_obj.timetuple())*1000+int(mil)
         timestamp=millisec
+        # print ('cgubun_sum', cgubun_sum)
         print(price, cgubun, cvolume, volume, time_str, timestamp)
+
+        orderbook = self.exchange.get_orderbook()
 
         lblSqty2v = orderbook[0]['asks'][1][1]
         lblShoga2v = orderbook[0]['asks'][1][0]
@@ -474,7 +481,7 @@ class OrderManager:
         price = data['buy']
         # if not (price == self.price_list[-1]):
         self.last_price = price
-        self.macd_check()
+        # self.macd_check()
         self.nprob_check()
 
     ###
@@ -673,15 +680,15 @@ def ynet(nowp, t, W, sw, a, b, c, d):
 
     elif nowp < t:
         if sw == "+":
-            result = (a + c - b) + W
+            result = (a - b + c) + W
         else:
-            result = (a + c - b)
+            result = (a - b + c)
 
     elif nowp > t:
         if sw == "+":
-            result = W - b + a - d
+            result = (a - b - d) + W #= W - b + a - d
         else:
-            result = (a - d - b)
+            result = (a - b - d)
 
     return result
 
@@ -695,15 +702,15 @@ def xnet(nowp, t, W, sw, a, b, c, d):
 
     elif nowp > t:
         if sw == "-":
-            result = (a + c - b) + W
+            result = (a - b + c) + W
         else:
-            result = (a + c - b)
+            result = (a - b + c)
 
     elif nowp < t:
         if sw == "-":
-            result = W - b + a - d
+            result = (a - b - d) + W #W - b + a - d
         else:
-            result = (a - d - b)
+            result = (a - b - d)
 
     return result
 
