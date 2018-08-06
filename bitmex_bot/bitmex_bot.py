@@ -13,16 +13,15 @@ from datetime import datetime
 from os.path import getmtime
 import atexit
 import signal
-import pandas as pd
-import numpy as np
-import scipy.stats as stat
+# import pandas as pd
+# import numpy as np
+# import scipy.stats as stat
 from . import bitmex, indicators
+# from . import nprob
 from bitmex_bot.settings import settings
 from bitmex_bot.utils import log, constants, errors
 from bitmex_bot.bitmex_historical import Bitmex
 from bitmex_bot.bot_trade import BOT_TRADE
-
-
 # Used for reloading the bot - saves modified times of key files
 import os
 
@@ -240,6 +239,7 @@ class OrderManager:
 
     def __init__(self):
         self.exchange = ExchangeInterface()
+        # self.np = nprob.Nprob()
         atexit.register(self.exit)
         signal.signal(signal.SIGTERM, self.exit)
         self.current_bitmex_price = 0
@@ -292,9 +292,9 @@ class OrderManager:
         margin1 = self.exchange.get_margin()
         self.running_qty = self.exchange.get_delta()
         self.start_XBt = margin1["marginBalance"]
-        logger.info("Current XBT Balance : %.6f" % XBt_to_XBT(self.start_XBt))
-        logger.info("Contracts Traded This Run by BOT: %d" % (self.running_qty - self.starting_qty1))
-        logger.info("Total Contract Delta: %.4f XBT" % self.exchange.calc_delta()['spot'])
+        # logger.info("Current XBT Balance : %.6f" % XBt_to_XBT(self.start_XBt))
+        # logger.info("Contracts Traded This Run by BOT: %d" % (self.running_qty - self.starting_qty1))
+        # logger.info("Total Contract Delta: %.4f XBT" % self.exchange.calc_delta()['spot'])
 
     def macd_check(self):
         # print("yes macd")
@@ -331,8 +331,8 @@ class OrderManager:
         last_trade = last_trade_raw[-3]
         cgubun_sum = last_trade_raw[-2]
         cvolume_sum = last_trade_raw[-1]
-        print('cvolume_sum in bot: ', cvolume_sum)
-        print('cgubun_sum in bot: ', cgubun_sum)
+        # print('cvolume_sum in bot: ', cvolume_sum)
+        # print('cgubun_sum in bot: ', cgubun_sum)
         price = last_trade['price']
         cgubun = str(last_trade['side'])
         cvolume = last_trade['size']
@@ -345,10 +345,10 @@ class OrderManager:
         mil = timestamp_u[20:23]
         time_str = date+'.'+month+'.'+year+' '+sec+'.'+mil
         dt_obj = datetime.strptime(time_str, '%d.%m.%Y %H:%M:%S.%f')
-        millisec = time.mktime(dt_obj.timetuple())*1000+int(mil)
-        timestamp=millisec
+        timestamp = time.mktime(dt_obj.timetuple())*1000+int(mil)
+        # timestamp=millisec
         # print ('cgubun_sum', cgubun_sum)
-        print(price, cgubun, cvolume, volume, time_str, timestamp)
+        # print(price, cgubun, cvolume, volume, time_str, timestamp)
 
         orderbook = self.exchange.get_orderbook()
 
@@ -361,86 +361,8 @@ class OrderManager:
         lblBqty2v = orderbook[0]['bids'][1][1]
         lblBhoga2v = orderbook[0]['bids'][1][0]
 
-        # print(lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v)
-
-        # df.at[nf, 'nf'] = nf
-
-        # if nf < 5:
-        #     OrgMain = "n"
-        #     OrgMain1 = "n"
-        #     OrgMain2 = "n"
-        #     LstmMain = "n"
-        #     nfset = 0
-        #     inp = 0
-        #     inp_o = 0
-        #     outype = "n"
-        #     hit_type = "n"
-        #     profit = 0
-        #     profit_spot = 0
-        #     profit_o = 0
-        #     profit_spot_o = 0
-        #     InTrendv = 0
-        #     p_cum = 0  # prdict_cum
-        #     piox = 0
-        #     hit_peak = 0
-        #     hit_peak_lstm = 0
-        #     extra_indics = 1
-        #     org_in_cum = 0
-        #     stock = 0
-        #     forbid_set = 0
-        #     forbid = 0
-        #     cgu_m = 0
-        #     cgu_s = 0
-        #     send_msg = 0
-        #     touch_cri = 0
-        #     cri_ee_s = 0
-        #     # touch_out = 0
-        #     circulation = 0
-        #     rsi = []
-        #     rsi_i = 0
-        #     last_rsi_prc = 0
-        #     last_rsi_time = 0
-        #     Exed_time = []
-        #     Exed_last_time = 0
-        #     ee_s_sum = 0
-        #     org_test = 0
-        #     hit_type = "n"
-
-        # df.at[nf, "price"] = price
-        # df.at[nf, "cgubun"] = cgubun
-        # # df.at[nf, "drate"] = drate
-        # df.at[nf, "cvolume"] = cvolume
-        # df.at[nf, "volume"] = volume
-
-        # df.at[nf, "y2"] = int(lblSqty2v)
-        # df.at[nf, "py2"] = float(lblShoga2v)
-        # df.at[nf, "y1"] = int(lblSqty1v)
-        # df.at[nf, "py1"] = float(lblShoga1v)
-        # df.at[nf, "x1"] = int(lblBqty1v)
-        # df.at[nf, "px1"] = float(lblBhoga1v)
-        # df.at[nf, "x2"] = int(lblBqty2v)
-        # df.at[nf, "px2"] = float(lblBhoga2v)
-
-        # nowtime = time.time()
-        #
-        # dx1 = xnet(px1, n1px1, cvol, cgubun, x1, n1x1, x2, n1x2)
-        # dy1 = ynet(py1, n1py1, cvol, cgubun, y1, n1y1, y2, n1y2)
-
-        # if cgubun == "buy":
-        #     wx = 0
-        #     wy = cvol
-        #     cgu = 1
-        # elif cgubun == "sell":
-        #     wx = cvol
-        #     wy = 0
-        #     cgu = -1
-        # else:
-        #     wx = 0
-        #     wy = 0
-
-
-
-        # nf+=1
+        if last_trade_raw != None:
+            self.np.nprob(price, timestamp, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v)
 
     def get_ticker(self):
         ticker = self.exchange.get_ticker()
@@ -482,7 +404,7 @@ class OrderManager:
         # if not (price == self.price_list[-1]):
         self.last_price = price
         # self.macd_check()
-        self.nprob_check()
+        # self.nprob_check()
 
     ###
     # Sanity
@@ -499,10 +421,10 @@ class OrderManager:
 
         self.get_exchange_price()         # => macd_check = npob()
 
-        logger.info("current BITMEX price is {}".format(self.last_price))
+        # logger.info("current BITMEX price is {}".format(self.last_price))
 
         # self.get_exchange_price()
-        logger.info("Current Price is {} MACD signal {}".format(self.last_price, self.macd_signal))
+        # logger.info("Current Price is {} MACD signal {}".format(self.last_price, self.macd_signal))
 
         if not self.is_trade:
             if self.macd_signal:
@@ -670,59 +592,14 @@ def cost(instrument, quantity, price):
 def margin(instrument, quantity, price):
     return cost(instrument, quantity, price) * instrument["initMargin"]
 
-def ynet(nowp, t, W, sw, a, b, c, d):
-
-    if nowp == t:
-        if sw == "+":
-            result = (a - b + W)
-        else:
-            result = (a - b)
-
-    elif nowp < t:
-        if sw == "+":
-            result = (a - b + c) + W
-        else:
-            result = (a - b + c)
-
-    elif nowp > t:
-        if sw == "+":
-            result = (a - b - d) + W #= W - b + a - d
-        else:
-            result = (a - b - d)
-
-    return result
-
-def xnet(nowp, t, W, sw, a, b, c, d):
-
-    if nowp == t:
-        if sw == "-":
-            result = (a - b + W)
-        else:
-            result = (a - b)
-
-    elif nowp > t:
-        if sw == "-":
-            result = (a - b + c) + W
-        else:
-            result = (a - b + c)
-
-    elif nowp < t:
-        if sw == "-":
-            result = (a - b - d) + W #W - b + a - d
-        else:
-            result = (a - b - d)
-
-    return result
-
-
 def run():
-    global df, t1
+    # global df, t1
     logger.info('BitMEX bot Version: %s\n' % constants.VERSION)
 
-    t1 = time.time()
-    a = pd.read_csv("index_csv.csv").columns.values.tolist()
-    df = pd.DataFrame()
-    df = pd.DataFrame(index=range(0, 1), columns=a)
+    # t1 = time.time()
+    # a = pd.read_csv("index_csv.csv").columns.values.tolist()
+    # df = pd.DataFrame()
+    # df = pd.DataFrame(index=range(0, 1), columns=a)
     # print(a)
 
     om = OrderManager()

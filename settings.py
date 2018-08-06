@@ -25,6 +25,7 @@ STOP_LOSS_FACTOR = 0.007
 STOP_PROFIT_FACTOR = 0.01
 # There is two mode one is TESTING and other is LIVE
 MODE = "TESTING"
+# MODE = "LIVE"
 
 INTERVAL = 0.005
 
@@ -137,7 +138,7 @@ DRY_RUN = False
 # How often to re-check and replace orders.
 # Generally, it's safe to make this short because we're fetching from websockets. But if too many
 # order amend/replaces are done, you may hit a ratelimit. If so, email BitMEX if you feel you need a higher limit.
-LOOP_INTERVAL = 5
+LOOP_INTERVAL = 3
 
 # Wait times between orders / errors
 API_REST_INTERVAL = 1
