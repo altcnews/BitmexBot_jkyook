@@ -451,10 +451,12 @@ class Nprob:
             self.df.at[self.nf, "ee_s_m"] = ee_s_m
 
             # ee_s slope(mtv-slope * -1 conversion)
-            if self.nf >= 755:
-                ee_s_y = self.df.ix[self.nf - 500:self.nf - 1, "ee_s_ave"]
+            if self.nf >= 515:
+                ee_s_y = self.df.ix[self.nf - 500:self.nf - 1, "ee_s"]
                 ee_s_x = self.df.ix[self.nf - 500:self.nf - 1, "nf"]
+                print ee_s_y
                 ee_s_slope = regr.fit(ee_s_y.values.reshape(-1, 1), ee_s_x.values.reshape(-1, 1)).coef_[0][0]
+                print ee_s_slope
             else:
                 ee_s_slope=0
             self.df.at[self.nf, "ee_s_slope"] = ee_s_slope
