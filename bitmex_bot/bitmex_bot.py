@@ -17,6 +17,7 @@ import pandas as pd
 import numpy as np
 import scipy.stats as stat
 from . import bitmex, indicators
+from . import nprob
 from bitmex_bot.settings import settings
 from bitmex_bot.utils import log, constants, errors
 from bitmex_bot.bitmex_historical import Bitmex
@@ -322,12 +323,15 @@ class OrderManager:
 
     def nprob_check(self):
 
-        global nf, t1, orderbook
+        global nf, df, t_start, orderbook
         global price, cgubun, cvolume, volume, last_time, px1, py1
         global lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v
 
+        # Start NProb
+        t_start = time.time()
+
+        # Last Trade information
         last_trade_raw = self.exchange.last_trade()
-        # print('last_trade in bot:', last_trade_raw)
         last_trade = last_trade_raw[-3]
         cgubun_sum = last_trade_raw[-2]
         cvolume_sum = last_trade_raw[-1]
@@ -347,9 +351,14 @@ class OrderManager:
         dt_obj = datetime.strptime(time_str, '%d.%m.%Y %H:%M:%S.%f')
         millisec = time.mktime(dt_obj.timetuple())*1000+int(mil)
         timestamp=millisec
-        # print ('cgubun_sum', cgubun_sum)
         print(price, cgubun, cvolume, volume, time_str, timestamp)
 
+        df.at[nf, "price"] = price
+        df.at[nf, "cgubun"] = cgubun_sum
+        df.at[nf, "cvolume"] = cvolume_sum
+        df.at[nf, "volume"] = volume
+
+        # OrderBook Information
         orderbook = self.exchange.get_orderbook()
 
         lblSqty2v = orderbook[0]['asks'][1][1]
@@ -361,7 +370,19 @@ class OrderManager:
         lblBqty2v = orderbook[0]['bids'][1][1]
         lblBhoga2v = orderbook[0]['bids'][1][0]
 
+        df.at[nf, "y2"] = int(lblSqty2v)
+        df.at[nf, "py2"] = float(lblShoga2v)
+        df.at[nf, "y1"] = int(lblSqty1v)
+        df.at[nf, "py1"] = float(lblShoga1v)
+        df.at[nf, "x1"] = int(lblBqty1v)
+        df.at[nf, "px1"] = float(lblBhoga1v)
+        df.at[nf, "x2"] = int(lblBqty2v)
+        df.at[nf, "px2"] = float(lblBhoga2v)
+
         # print(lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v)
+
+        # NProb()
+        NProb = nprob.nprob(price, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v)
 
         # df.at[nf, 'nf'] = nf
 
@@ -405,39 +426,6 @@ class OrderManager:
         #     ee_s_sum = 0
         #     org_test = 0
         #     hit_type = "n"
-
-        # df.at[nf, "price"] = price
-        # df.at[nf, "cgubun"] = cgubun
-        # # df.at[nf, "drate"] = drate
-        # df.at[nf, "cvolume"] = cvolume
-        # df.at[nf, "volume"] = volume
-
-        # df.at[nf, "y2"] = int(lblSqty2v)
-        # df.at[nf, "py2"] = float(lblShoga2v)
-        # df.at[nf, "y1"] = int(lblSqty1v)
-        # df.at[nf, "py1"] = float(lblShoga1v)
-        # df.at[nf, "x1"] = int(lblBqty1v)
-        # df.at[nf, "px1"] = float(lblBhoga1v)
-        # df.at[nf, "x2"] = int(lblBqty2v)
-        # df.at[nf, "px2"] = float(lblBhoga2v)
-
-        # nowtime = time.time()
-        #
-        # dx1 = xnet(px1, n1px1, cvol, cgubun, x1, n1x1, x2, n1x2)
-        # dy1 = ynet(py1, n1py1, cvol, cgubun, y1, n1y1, y2, n1y2)
-
-        # if cgubun == "buy":
-        #     wx = 0
-        #     wy = cvol
-        #     cgu = 1
-        # elif cgubun == "sell":
-        #     wx = cvol
-        #     wy = 0
-        #     cgu = -1
-        # else:
-        #     wx = 0
-        #     wy = 0
-
 
 
         # nf+=1
@@ -669,50 +657,6 @@ def cost(instrument, quantity, price):
 
 def margin(instrument, quantity, price):
     return cost(instrument, quantity, price) * instrument["initMargin"]
-
-def ynet(nowp, t, W, sw, a, b, c, d):
-
-    if nowp == t:
-        if sw == "+":
-            result = (a - b + W)
-        else:
-            result = (a - b)
-
-    elif nowp < t:
-        if sw == "+":
-            result = (a - b + c) + W
-        else:
-            result = (a - b + c)
-
-    elif nowp > t:
-        if sw == "+":
-            result = (a - b - d) + W #= W - b + a - d
-        else:
-            result = (a - b - d)
-
-    return result
-
-def xnet(nowp, t, W, sw, a, b, c, d):
-
-    if nowp == t:
-        if sw == "-":
-            result = (a - b + W)
-        else:
-            result = (a - b)
-
-    elif nowp > t:
-        if sw == "-":
-            result = (a - b + c) + W
-        else:
-            result = (a - b + c)
-
-    elif nowp < t:
-        if sw == "-":
-            result = (a - b - d) + W #W - b + a - d
-        else:
-            result = (a - b - d)
-
-    return result
 
 
 def run():
