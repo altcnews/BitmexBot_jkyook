@@ -13,17 +13,16 @@ from datetime import datetime
 from os.path import getmtime
 import atexit
 import signal
-import pandas as pd
-import numpy as np
-import scipy.stats as stat
+# import pandas as pd
+# import numpy as np
+# import scipy.stats as stat
 from . import bitmex, indicators
-from . import nprob
+if 1 == 1:
+    from . import nprob
 from bitmex_bot.settings import settings
 from bitmex_bot.utils import log, constants, errors
 from bitmex_bot.bitmex_historical import Bitmex
 from bitmex_bot.bot_trade import BOT_TRADE
-
-
 # Used for reloading the bot - saves modified times of key files
 import os
 
@@ -241,6 +240,9 @@ class OrderManager:
 
     def __init__(self):
         self.exchange = ExchangeInterface()
+        if 1==1:
+            self.np = nprob.Nprob()
+            self.last_time=0
         atexit.register(self.exit)
         signal.signal(signal.SIGTERM, self.exit)
         self.current_bitmex_price = 0
@@ -272,9 +274,10 @@ class OrderManager:
         self.instrument = self.exchange.get_instrument()
         self.starting_qty1 = self.exchange.get_delta()
         self.running_qty = self.starting_qty1
-        self.reset()
-        # set cross margin for the trade
-        self.exchange.set_isolate_margin()
+        if self.exchange.mode == "TESTING":
+            self.reset()
+            # set cross margin for the trade
+            self.exchange.set_isolate_margin()
 
     # self.place_orders()
 
@@ -293,9 +296,9 @@ class OrderManager:
         margin1 = self.exchange.get_margin()
         self.running_qty = self.exchange.get_delta()
         self.start_XBt = margin1["marginBalance"]
-        logger.info("Current XBT Balance : %.6f" % XBt_to_XBT(self.start_XBt))
-        logger.info("Contracts Traded This Run by BOT: %d" % (self.running_qty - self.starting_qty1))
-        logger.info("Total Contract Delta: %.4f XBT" % self.exchange.calc_delta()['spot'])
+        # logger.info("Current XBT Balance : %.6f" % XBt_to_XBT(self.start_XBt))
+        # logger.info("Contracts Traded This Run by BOT: %d" % (self.running_qty - self.starting_qty1))
+        # logger.info("Total Contract Delta: %.4f XBT" % self.exchange.calc_delta()['spot'])
 
     def macd_check(self):
         # print("yes macd")
@@ -323,112 +326,54 @@ class OrderManager:
 
     def nprob_check(self):
 
-        global nf, df, t_start, orderbook
-        global price, cgubun, cvolume, volume, last_time, px1, py1
-        global lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v
+        # global nf, t1, orderbook
+        # global price, cgubun, cvolume, volume, last_time, px1, py1
+        # global lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v
 
-        # Start NProb
-        t_start = time.time()
-
-        # Last Trade information
         last_trade_raw = self.exchange.last_trade()
-        last_trade = last_trade_raw[-3]
-        cgubun_sum = last_trade_raw[-2]
-        cvolume_sum = last_trade_raw[-1]
-        print('cvolume_sum in bot: ', cvolume_sum)
-        print('cgubun_sum in bot: ', cgubun_sum)
-        price = last_trade['price']
-        cgubun = str(last_trade['side'])
-        cvolume = last_trade['size']
-        volume = last_trade['grossValue']
+        last_trade = last_trade_raw[-5]
+        # print last_trade
         timestamp_u = last_trade['timestamp'].encode("UTF-8")
-        year = timestamp_u[0:4]
-        month = timestamp_u[5:7]
-        date = timestamp_u[8:10]
-        sec = timestamp_u[11:19]
-        mil = timestamp_u[20:23]
-        time_str = date+'.'+month+'.'+year+' '+sec+'.'+mil
-        dt_obj = datetime.strptime(time_str, '%d.%m.%Y %H:%M:%S.%f')
-        millisec = time.mktime(dt_obj.timetuple())*1000+int(mil)
-        timestamp=millisec
-        print(price, cgubun, cvolume, volume, time_str, timestamp)
+        # print self.last_time, timestamp_u
+        if self.last_time!=timestamp_u:
+            cgubun_sum = last_trade_raw[-4]
+            cvolume_sum = last_trade_raw[-3]
+            mt = last_trade_raw[-2]
+            count = last_trade_raw[-1]
+            price = last_trade['price']
+            cgubun = str(last_trade['side'])
+            cvolume = last_trade['size']
+            volume = last_trade['grossValue']
+            timestamp_u = last_trade['timestamp'].encode("UTF-8")
+            year = timestamp_u[0:4]
+            month = timestamp_u[5:7]
+            date = timestamp_u[8:10]
+            sec = timestamp_u[11:19]
+            mil = timestamp_u[20:23]
+            time_str = date+'.'+month+'.'+year+' '+sec+'.'+mil
+            dt_obj = datetime.strptime(time_str, '%d.%m.%Y %H:%M:%S.%f')
+            timestamp = time.mktime(dt_obj.timetuple())*1000+int(mil)
 
-        df.at[nf, "price"] = price
-        df.at[nf, "cgubun"] = cgubun_sum
-        df.at[nf, "cvolume"] = cvolume_sum
-        df.at[nf, "volume"] = volume
+            orderbook = self.exchange.get_orderbook()
 
-        # OrderBook Information
-        orderbook = self.exchange.get_orderbook()
+            lblSqty2v = orderbook[0]['asks'][1][1]
+            lblShoga2v = orderbook[0]['asks'][1][0]
+            lblSqty1v = orderbook[0]['asks'][0][1]
+            lblShoga1v = orderbook[0]['asks'][0][0]
+            lblBqty1v = orderbook[0]['bids'][0][1]
+            lblBhoga1v = orderbook[0]['bids'][0][0]
+            lblBqty2v = orderbook[0]['bids'][1][1]
+            lblBhoga2v = orderbook[0]['bids'][1][0]
 
-        lblSqty2v = orderbook[0]['asks'][1][1]
-        lblShoga2v = orderbook[0]['asks'][1][0]
-        lblSqty1v = orderbook[0]['asks'][0][1]
-        lblShoga1v = orderbook[0]['asks'][0][0]
-        lblBqty1v = orderbook[0]['bids'][0][1]
-        lblBhoga1v = orderbook[0]['bids'][0][0]
-        lblBqty2v = orderbook[0]['bids'][1][1]
-        lblBhoga2v = orderbook[0]['bids'][1][0]
+            t_start=time.time()
+            if last_trade_raw != None:
+                self.np.nprob(price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v)
+            print 'elap:', time.time() - t_start
 
-        df.at[nf, "y2"] = int(lblSqty2v)
-        df.at[nf, "py2"] = float(lblShoga2v)
-        df.at[nf, "y1"] = int(lblSqty1v)
-        df.at[nf, "py1"] = float(lblShoga1v)
-        df.at[nf, "x1"] = int(lblBqty1v)
-        df.at[nf, "px1"] = float(lblBhoga1v)
-        df.at[nf, "x2"] = int(lblBqty2v)
-        df.at[nf, "px2"] = float(lblBhoga2v)
+            self.last_time = timestamp_u
 
-        # print(lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v)
-
-        # NProb()
-        NProb = nprob.nprob(price, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v)
-
-        # df.at[nf, 'nf'] = nf
-
-        # if nf < 5:
-        #     OrgMain = "n"
-        #     OrgMain1 = "n"
-        #     OrgMain2 = "n"
-        #     LstmMain = "n"
-        #     nfset = 0
-        #     inp = 0
-        #     inp_o = 0
-        #     outype = "n"
-        #     hit_type = "n"
-        #     profit = 0
-        #     profit_spot = 0
-        #     profit_o = 0
-        #     profit_spot_o = 0
-        #     InTrendv = 0
-        #     p_cum = 0  # prdict_cum
-        #     piox = 0
-        #     hit_peak = 0
-        #     hit_peak_lstm = 0
-        #     extra_indics = 1
-        #     org_in_cum = 0
-        #     stock = 0
-        #     forbid_set = 0
-        #     forbid = 0
-        #     cgu_m = 0
-        #     cgu_s = 0
-        #     send_msg = 0
-        #     touch_cri = 0
-        #     cri_ee_s = 0
-        #     # touch_out = 0
-        #     circulation = 0
-        #     rsi = []
-        #     rsi_i = 0
-        #     last_rsi_prc = 0
-        #     last_rsi_time = 0
-        #     Exed_time = []
-        #     Exed_last_time = 0
-        #     ee_s_sum = 0
-        #     org_test = 0
-        #     hit_type = "n"
-
-
-        # nf+=1
+        else:
+            print 'No transaction'
 
     def get_ticker(self):
         ticker = self.exchange.get_ticker()
@@ -470,7 +415,8 @@ class OrderManager:
         # if not (price == self.price_list[-1]):
         self.last_price = price
         # self.macd_check()
-        self.nprob_check()
+        if 1==1:
+            self.nprob_check()
 
     ###
     # Sanity
@@ -487,10 +433,10 @@ class OrderManager:
 
         self.get_exchange_price()         # => macd_check = npob()
 
-        logger.info("current BITMEX price is {}".format(self.last_price))
+        # logger.info("current BITMEX price is {}".format(self.last_price))
 
         # self.get_exchange_price()
-        logger.info("Current Price is {} MACD signal {}".format(self.last_price, self.macd_signal))
+        # logger.info("Current Price is {} MACD signal {}".format(self.last_price, self.macd_signal))
 
         if not self.is_trade:
             if self.macd_signal:
@@ -501,26 +447,27 @@ class OrderManager:
                     self.sequence = self.BUY
 
                     # place order
-                    if not self.initial_order:
-                        order = self.place_orders(side=self.BUY, orderType='Market', quantity=self.amount)
-                        self.trade_signal = self.macd_signal
-                        self.initial_order = True
-                        if settings.STOP_PROFIT_FACTOR != "":
-                            self.profit_price = order['price'] + (order['price'] * settings.STOP_PROFIT_FACTOR)
-                        if settings.STOP_LOSS_FACTOR != "":
-                            self.stop_price = order['price'] - (order['price'] * settings.STOP_LOSS_FACTOR)
-                        print("Order price {} \tStop Price {} \tProfit Price {} ".
-                              format(order['price'], self.stop_price, self.profit_price))
-                        sleep(settings.API_REST_INTERVAL)
-                        if settings.STOP_LOSS_FACTOR != "":
-                            self.place_orders(side=self.SELL, orderType='StopLimit', quantity=self.amount,
-                                              price=int(self.stop_price), stopPx=int(self.stop_price) - 5.0)
+                    if 1==0:
+                        if not self.initial_order:
+                            order = self.place_orders(side=self.BUY, orderType='Market', quantity=self.amount)
+                            self.trade_signal = self.macd_signal
+                            self.initial_order = True
+                            if settings.STOP_PROFIT_FACTOR != "":
+                                self.profit_price = order['price'] + (order['price'] * settings.STOP_PROFIT_FACTOR)
+                            if settings.STOP_LOSS_FACTOR != "":
+                                self.stop_price = order['price'] - (order['price'] * settings.STOP_LOSS_FACTOR)
+                            print("Order price {} \tStop Price {} \tProfit Price {} ".
+                                  format(order['price'], self.stop_price, self.profit_price))
                             sleep(settings.API_REST_INTERVAL)
-                        if settings.STOP_PROFIT_FACTOR != "":
-                            self.place_orders(side=self.SELL, orderType='Limit', quantity=self.amount,
-                                              price=int(self.profit_price))
-                            sleep(settings.API_REST_INTERVAL)
-                        self.close_order = True
+                            if settings.STOP_LOSS_FACTOR != "":
+                                self.place_orders(side=self.SELL, orderType='StopLimit', quantity=self.amount,
+                                                  price=int(self.stop_price), stopPx=int(self.stop_price) - 5.0)
+                                sleep(settings.API_REST_INTERVAL)
+                            if settings.STOP_PROFIT_FACTOR != "":
+                                self.place_orders(side=self.SELL, orderType='Limit', quantity=self.amount,
+                                                  price=int(self.profit_price))
+                                sleep(settings.API_REST_INTERVAL)
+                            self.close_order = True
 
                 elif self.macd_signal == self.DOWN:
                     logger.info("Sell Trade Signal {}".format(self.last_price))
@@ -529,28 +476,29 @@ class OrderManager:
                     self.sequence = self.SELL
 
                     # place order
-                    if not self.initial_order:
-                        order = self.place_orders(side=self.SELL, orderType='Market', quantity=self.amount)
-                        self.trade_signal = self.macd_signal
-                        self.initial_order = True
-                        if settings.STOP_PROFIT_FACTOR != "":
-                            self.profit_price = order['price'] - (order['price'] * settings.STOP_PROFIT_FACTOR)
-                        if settings.STOP_LOSS_FACTOR != "":
-                            self.stop_price = order['price'] + (order['price'] * settings.STOP_LOSS_FACTOR)
+                    if 1==0:
+                        if not self.initial_order:
+                            order = self.place_orders(side=self.SELL, orderType='Market', quantity=self.amount)
+                            self.trade_signal = self.macd_signal
+                            self.initial_order = True
+                            if settings.STOP_PROFIT_FACTOR != "":
+                                self.profit_price = order['price'] - (order['price'] * settings.STOP_PROFIT_FACTOR)
+                            if settings.STOP_LOSS_FACTOR != "":
+                                self.stop_price = order['price'] + (order['price'] * settings.STOP_LOSS_FACTOR)
 
-                        print("Order price {} \tStop Price {} \tProfit Price {} ".
-                              format(order['price'], self.stop_price, self.profit_price))
-                        sleep(settings.API_REST_INTERVAL)
-                        if settings.STOP_LOSS_FACTOR != "":
-                            self.place_orders(side=self.BUY, orderType='StopLimit', quantity=self.amount,
-                                              price=int(self.stop_price), stopPx=int(self.stop_price) - 5.0)
+                            print("Order price {} \tStop Price {} \tProfit Price {} ".
+                                  format(order['price'], self.stop_price, self.profit_price))
                             sleep(settings.API_REST_INTERVAL)
-                        if settings.STOP_PROFIT_FACTOR != "":
-                            self.place_orders(side=self.BUY, orderType='Limit', quantity=self.amount,
-                                              price=int(self.profit_price))
-                            sleep(settings.API_REST_INTERVAL)
-                        self.close_order = True
-                        # set cross margin for the trade
+                            if settings.STOP_LOSS_FACTOR != "":
+                                self.place_orders(side=self.BUY, orderType='StopLimit', quantity=self.amount,
+                                                  price=int(self.stop_price), stopPx=int(self.stop_price) - 5.0)
+                                sleep(settings.API_REST_INTERVAL)
+                            if settings.STOP_PROFIT_FACTOR != "":
+                                self.place_orders(side=self.BUY, orderType='Limit', quantity=self.amount,
+                                                  price=int(self.profit_price))
+                                sleep(settings.API_REST_INTERVAL)
+                            self.close_order = True
+                            # set cross margin for the trade
 
         else:
             if self.macd_signal and self.macd_signal != self.trade_signal and self.trade_signal:
@@ -631,7 +579,7 @@ class OrderManager:
                 logger.error("Realtime data connection unexpectedly closed, restarting.")
                 self.restart()
 
-            print 'sanity_check'
+            # print 'sanity_check'
             self.sanity_check()  # Ensures health of mm - several cut-out points here
             self.print_status()  # Print skew, delta, etc
 
@@ -658,15 +606,14 @@ def cost(instrument, quantity, price):
 def margin(instrument, quantity, price):
     return cost(instrument, quantity, price) * instrument["initMargin"]
 
-
 def run():
-    global df, t1
+    # global df, t1
     logger.info('BitMEX bot Version: %s\n' % constants.VERSION)
 
-    t1 = time.time()
-    a = pd.read_csv("index_csv.csv").columns.values.tolist()
-    df = pd.DataFrame()
-    df = pd.DataFrame(index=range(0, 1), columns=a)
+    # t1 = time.time()
+    # a = pd.read_csv("index_csv.csv").columns.values.tolist()
+    # df = pd.DataFrame()
+    # df = pd.DataFrame(index=range(0, 1), columns=a)
     # print(a)
 
     om = OrderManager()

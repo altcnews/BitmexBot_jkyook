@@ -3,12 +3,14 @@ import websocket
 import threading
 import traceback
 import time
+from datetime import datetime
 import ssl
 from time import sleep
 import json
 import decimal
 import logging
 # from bitmex_bot import bitmex_bot
+from . import nprob
 from bitmex_bot.settings import settings
 from bitmex_bot.auth.APIKeyAuth import generate_nonce, generate_signature
 from bitmex_bot.utils.log import setup_custom_logger
@@ -39,12 +41,14 @@ class BitMEXWebsocket():
 
     def __init__(self):
 
-        global price, cgubun, cvolume, volume, time_str, timestamp, count
+        global cgubun, cvolume, timestamp, last_time, count
         cgubun='n'
         cvolume=0
         count = 0
+        last_time = 0
 
         self.logger = logging.getLogger('root')
+        self.np = nprob.Nprob()
         self.__reset()
 
     def __del__(self):
@@ -150,27 +154,31 @@ class BitMEXWebsocket():
         return pos[0]
 
     def recent_trades(self):
-        global price, cgubun, cvolume, volume, time_str, timestamp, count
+        global cgubun, cvolume, timestamp, count, last_time
 
-        # print 'cvolume: ', cvolume
         cvolume_sum=cvolume
         cgubun = "Buy"
         if cvolume<0:
             cgubun="Sell"
         if cvolume==0:
             cgubun="non"
-        # print 'cgubun: ', cgubun
 
-        print('count: ', count)
-        # if count<=1:
-        # print('cvolume_sum in ws: ', cvolume_sum)
-        # print('last_trade_before: ', type(self.data['trade']))
-        # print('last_trade_before: ', self.data['trade'])
-        last_trade=self.data['trade']+[cgubun]+[cvolume_sum]
-        # del self.data['trade'][-1]
-        # elif count > 1:
-        #     self.data['trade'][-1]=cvolume_sum
-            # self.data['trade'].append(cgubun)
+        ## timestamp
+        # timestamp_u = self.data['trade'][-1]['timestamp'].encode("UTF-8")
+        # year = timestamp_u[0:4]
+        # month = timestamp_u[5:7]
+        # date = timestamp_u[8:10]
+        # sec = timestamp_u[11:19]
+        # mil = timestamp_u[20:23]
+        # time_str = date + '.' + month + '.' + year + ' ' + sec + '.' + mil
+        # dt_obj = datetime.strptime(time_str, '%d.%m.%Y %H:%M:%S.%f')
+        # timestamp = time.mktime(dt_obj.timetuple()) * 1000 + int(mil)
+        if count==0:
+            count=1
+        mt = (time.time()-last_time)/count
+        # print timestamp, last_time, mt, count
+        # last_time = timestamp
+        last_trade=self.data['trade']+[cgubun]+[cvolume_sum]+[mt]+[count]
 
         cvolume=0
         count=0
@@ -257,7 +265,7 @@ class BitMEXWebsocket():
 
     def __on_message(self, ws, message):
 
-        global price, cgubun, cvolume, volume, time_str, timestamp, count
+        global cgubun, cvolume, timestamp, count, last_time
 
         '''Handler for parsing WS messages.'''
         message = json.loads(message)
@@ -309,18 +317,48 @@ class BitMEXWebsocket():
 
                     # price, cgubun, cvolume, volume, time_str, timestamp
                     if table=="trade":
-                        # print 'message= ',message['data']
-                        for i in range(len(message['data'])):
-                            ins_cvolume=message['data'][i]['size']
-                            if message['data'][i]['side'] == "Sell":
-                                ins_cvolume=ins_cvolume*-1
-                            print 'ins_cvolume', ins_cvolume
-                            cvolume+=ins_cvolume
-                        print 'cvolume_sum', cvolume
-                        price=message['data'][i]['price']
-                        count+=1
+                        if 1==1:  # bot_out_house mode
+                            for i in range(len(message['data'])):
 
-                        # bitmex_bot.sanity_check()
+                                ins_cvolume=message['data'][i]['size']
+                                if message['data'][i]['side'] == "Sell":
+                                    ins_cvolume=ins_cvolume*-1
+                                cvolume+=ins_cvolume
+                                last_time=time.time()
+                            # price = message['data'][i]['price']
+                            count+=1
+
+                        if 1==0:   # ws_in_house mode
+                            ##############################################
+                            ###                  Main                 ####
+                            ##############################################
+
+                            # print message['data']
+                            price = message['data'][0]['price']
+                            cgubun_sum = message['data'][0]['side']
+                            cvolume_sum = message['data'][0]['size']
+                            volume = message['data'][0]['grossValue']
+                            # timestamp
+                            timestamp_u = message['data'][0]['timestamp'].encode("UTF-8")
+                            year = timestamp_u[0:4]
+                            month = timestamp_u[5:7]
+                            date = timestamp_u[8:10]
+                            sec = timestamp_u[11:19]
+                            mil = timestamp_u[20:23]
+                            time_str = date + '.' + month + '.' + year + ' ' + sec + '.' + mil
+                            dt_obj = datetime.strptime(time_str, '%d.%m.%Y %H:%M:%S.%f')
+                            timestamp = time.mktime(dt_obj.timetuple()) * 1000 + int(mil)
+                            print (price, cgubun_sum, cvolume_sum,volume, timestamp)
+
+                            lblSqty2v = self.data['orderBook10'][0]['asks'][1][1]
+                            lblShoga2v = self.data['orderBook10'][0]['asks'][1][0]
+                            lblSqty1v = self.data['orderBook10'][0]['asks'][0][1]
+                            lblShoga1v = self.data['orderBook10'][0]['asks'][0][0]
+                            lblBqty1v = self.data['orderBook10'][0]['bids'][0][1]
+                            lblBhoga1v = self.data['orderBook10'][0]['bids'][0][0]
+                            lblBqty2v = self.data['orderBook10'][0]['bids'][1][1]
+                            lblBhoga2v = self.data['orderBook10'][0]['bids'][1][0]
+                            self.np.nprob(price, timestamp, cgubun_sum, cvolume_sum, volume, lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v)
 
                     # Limit the max length of the table to avoid excessive memory usage.
                     # Don't trim orders because we'll lose valuable state if we do.
@@ -423,7 +461,7 @@ if __name__ == "__main__":
     logger.addHandler(ch)
     ws = BitMEXWebsocket()
     ws.logger = logger
-    ws.connect("https://testnet.bitmex.com/api/v1")
+    ws.connect("https://www.bitmex.com/api/v1")
     while(ws.ws.sock.connected):
         sleep(1)
 

@@ -24,7 +24,8 @@ TICK_INTERVAL = '1m'
 STOP_LOSS_FACTOR = 0.007
 STOP_PROFIT_FACTOR = 0.01
 # There is two mode one is TESTING and other is LIVE
-MODE = "TESTING"
+# MODE = "TESTING"
+MODE = "LIVE"
 
 INTERVAL = 0.005
 
@@ -62,9 +63,12 @@ BASE_URL = "https://testnet.bitmex.com/api/v1/"
 # BASE_URL = "https://www.bitmex.com/api/v1/" # Once you're ready, uncomment this.
 
 # The BitMEX API requires permanent API keys. Go to https://testnet.bitmex.com/api/apiKeys to fill these out.
-API_KEY = "3_9ozC36G73tuqLP9pEaUg9b"
-API_SECRET = "ZwXjgm5bGiQlZBiTgEQRDt7BTQQrHeWPSMnla0JkztydScoG"
-
+if MODE == "TESTING":
+    API_KEY = "3_9ozC36G73tuqLP9pEaUg9b"
+    API_SECRET = "ZwXjgm5bGiQlZBiTgEQRDt7BTQQrHeWPSMnla0JkztydScoG"
+if MODE == "LIVE":
+    API_KEY = "8uoKvr-YFUyUDI9dLRI600Kq"
+    API_SECRET = "MH9S0jJhYFHGRXdXHmYdiwjmWrTHja3wBo4TJLkQyT2YFFIF"
 
 ########################################################################################################################
 # Target
@@ -137,7 +141,7 @@ DRY_RUN = False
 # How often to re-check and replace orders.
 # Generally, it's safe to make this short because we're fetching from websockets. But if too many
 # order amend/replaces are done, you may hit a ratelimit. If so, email BitMEX if you feel you need a higher limit.
-LOOP_INTERVAL = 5
+LOOP_INTERVAL = 0.5
 
 # Wait times between orders / errors
 API_REST_INTERVAL = 1
