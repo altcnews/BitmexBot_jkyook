@@ -4,7 +4,7 @@ import scipy.stats as stat
 from datetime import datetime
 from sklearn import datasets, linear_model
 import matplotlib
-matplotlib.use("Agg")
+# matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 # from bitmex_bot.settings import settings
 
