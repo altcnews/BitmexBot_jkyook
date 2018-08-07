@@ -4,10 +4,11 @@ import scipy.stats as stat
 from datetime import datetime
 from sklearn import datasets, linear_model
 # import matplotlib
-# # matplotlib.use("Agg")
+# matplotlib.use("qt4agg")
 import matplotlib.pyplot as plt
 # from bitmex_bot.settings import settings
 import threading
+import multiprocessing
 
 class Nprob:
 
@@ -25,12 +26,12 @@ class Nprob:
         self.min_1 = int(60 / self.loop)
         self.min_3 = int(180 / self.loop)
         self.min_5 = int(300 / self.loop)
-        print self.min_1, self.min_3
         print 'init Nprob', self.nf
         a = pd.read_csv("index_bot.csv").columns.values.tolist()
         self.df = pd.DataFrame()
         self.df = pd.DataFrame(index=range(0, 1), columns=a)
         print self.df
+        # self.thread_plot = multiprocessing.Process(target=self.btnPlot_Clicked, args=())
 
     def nprob(self, price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v): # lblShoga2v,, lblBhoga2v
         # global nf, df, nfset, OrgMain, nowtime
@@ -784,9 +785,16 @@ class Nprob:
             print self.df.ix[self.nf-9:self.nf-1,['dt', 'mt', 'sXY', 'cvolume', 'pindex', 'apindex_s', 'ee_s','bumpm','s3','OrgMain']]
             print '-----------'
 
-    def threadme(self, iteration=1):
-        thread_plot = threading.Thread(target=self.btnPlot_Clicked)
+    def threadme(self):
+        # thread_plot = threading.Thread(target=self.test,args=())
+        thread_plot = threading.Thread(target=self.btnPlot_Clicked, args=())
         thread_plot.start()
+        # thread_plot = multiprocessing.Process(target=self.btnPlot_Clicked,args=())
+        # self.thread_plot.start()
+
+    def test(self):
+        print 'a'
+
 
     def btnPlot_Clicked(self):
         global plt
@@ -834,8 +842,10 @@ class Nprob:
 
         # show
         plt.legend(loc='upper left', frameon=False)
+        print 'a'
         # plt.ion()
         plt.show()
+        time.sleep(4)
 
     def btnPlot_Close(self):
         global plt
