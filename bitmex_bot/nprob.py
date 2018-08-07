@@ -3,10 +3,11 @@ import pandas as pd
 import scipy.stats as stat
 from datetime import datetime
 from sklearn import datasets, linear_model
-import matplotlib
-# matplotlib.use("Agg")
+# import matplotlib
+# # matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 # from bitmex_bot.settings import settings
+import threading
 
 class Nprob:
 
@@ -38,10 +39,11 @@ class Nprob:
         print 'nf : ', self.nf
         nowtime=time.time()
 
-        if self.nf==100:
-            self.btnPlot_Clicked()
-        # if self.nf==250:
-        #     plt.close('all')
+        if self.nf==50:
+            self.threadme()
+            # self.btnPlot_Clicked()
+        # if self.nf==120:
+        #     self.btnPlot_Close()
 
         if self.nf%1000==0:
             self.btnSave_Clicked()
@@ -782,8 +784,12 @@ class Nprob:
             print self.df.ix[self.nf-9:self.nf-1,['dt', 'mt', 'sXY', 'cvolume', 'pindex', 'apindex_s', 'ee_s','bumpm','s3','OrgMain']]
             print '-----------'
 
+    def threadme(self, iteration=1):
+        thread_plot = threading.Thread(target=self.btnPlot_Clicked)
+        thread_plot.start()
+
     def btnPlot_Clicked(self):
-        # global df, nf, a, file_loaded
+        global plt
 
         ax1 = plt.subplot(511)
         ax2 = ax1.twinx()
@@ -830,6 +836,10 @@ class Nprob:
         plt.legend(loc='upper left', frameon=False)
         # plt.ion()
         plt.show()
+
+    def btnPlot_Close(self):
+        global plt
+        plt.clf()
 
     def btnSave_Clicked(self):
         #df.to_sql("Main_DB", con, if_exists='replace', index=True) #, index_label=None, chunksize=None, dtype=None)
