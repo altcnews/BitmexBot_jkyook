@@ -23,6 +23,7 @@ class Nprob:
     def nprob(self, price, timestamp, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v):
         # global nf, df, nfset, OrgMain, nowtime
 
+        self.df.at[self.nf, "nf"] = self.nf
         print 'nf : ', self.nf
         nowtime=time.time()
 
@@ -765,8 +766,8 @@ class Nprob:
                     prf_able = -1
 
         self.nf+=1
-        if self.nf>3:
-            print self.df.ix[self.nf-3:self.nf-1,['mt', 'sXY', 'pindex', 'apindex_s', 'ee_s','bumpm','s3']]
+        if self.nf>11:
+            print self.df.ix[self.nf-10:self.nf-1,['dt','mt', 'sXY', 'pindex', 'apindex_s', 'ee_s','bumpm','s3']]
 
 
     def btnPlot_Clicked(self):

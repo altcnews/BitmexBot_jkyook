@@ -367,7 +367,7 @@ class OrderManager:
 
             t_start=time.time()
             if last_trade_raw != None:
-                self.np.nprob(price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v)
+                self.np.nprob(price, timestamp, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v)
             print 'elap:', time.time() - t_start
 
             self.last_time = timestamp_u
