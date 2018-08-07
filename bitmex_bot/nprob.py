@@ -3,6 +3,8 @@ import pandas as pd
 import scipy.stats as stat
 from datetime import datetime
 from sklearn import datasets, linear_model
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 # from bitmex_bot.settings import settings
 
@@ -36,8 +38,10 @@ class Nprob:
         print 'nf : ', self.nf
         nowtime=time.time()
 
+        if self.nf==100:
+            self.btnPlot_Clicked()
         # if self.nf==250:
-        #     self.btnPlot_Clicked()
+        #     plt.close('all')
 
         if self.nf%1000==0:
             self.btnSave_Clicked()
@@ -824,6 +828,7 @@ class Nprob:
 
         # show
         plt.legend(loc='upper left', frameon=False)
+        # plt.ion()
         plt.show()
 
     def btnSave_Clicked(self):
