@@ -14,11 +14,11 @@ class Nprob:
         self.OrgMain='n'
         self.cri=0
         self.cri_r=0
-        print 'init Nprob', self.nf
-        a = pd.read_csv("index_csv.csv").columns.values.tolist()
-        self.df = pd.DataFrame()
-        self.df = pd.DataFrame(index=range(0, 1), columns=a)
-        print self.df
+        # print 'init Nprob', self.nf
+        # a = pd.read_csv("index_bot.csv").columns.values.tolist()
+        # self.df = pd.DataFrame()
+        # self.df = pd.DataFrame(index=range(0, 1), columns=a)
+        # print self.df
 
     def nprob(self, price, timestamp, mt, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v):
         # global nf, df, nfset, OrgMain, nowtime

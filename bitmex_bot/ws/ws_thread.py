@@ -10,7 +10,7 @@ import json
 import decimal
 import logging
 # from bitmex_bot import bitmex_bot
-from . import nprob
+# from . import nprob
 from bitmex_bot.settings import settings
 from bitmex_bot.auth.APIKeyAuth import generate_nonce, generate_signature
 from bitmex_bot.utils.log import setup_custom_logger
@@ -163,21 +163,22 @@ class BitMEXWebsocket():
         if cvolume==0:
             cgubun="non"
 
-        ## timestamp
-        # timestamp_u = self.data['trade'][-1]['timestamp'].encode("UTF-8")
-        # year = timestamp_u[0:4]
-        # month = timestamp_u[5:7]
-        # date = timestamp_u[8:10]
-        # sec = timestamp_u[11:19]
-        # mil = timestamp_u[20:23]
-        # time_str = date + '.' + month + '.' + year + ' ' + sec + '.' + mil
-        # dt_obj = datetime.strptime(time_str, '%d.%m.%Y %H:%M:%S.%f')
-        # timestamp = time.mktime(dt_obj.timetuple()) * 1000 + int(mil)
+        # timestamp
+        timestamp_u = self.data['trade'][-1]['timestamp'].encode("UTF-8")
+        year = timestamp_u[0:4]
+        month = timestamp_u[5:7]
+        date = timestamp_u[8:10]
+        sec = timestamp_u[11:19]
+        mil = timestamp_u[20:23]
+        time_str = date + '.' + month + '.' + year + ' ' + sec + '.' + mil
+        dt_obj = datetime.strptime(time_str, '%d.%m.%Y %H:%M:%S.%f')
+        timestamp = (time.mktime(dt_obj.timetuple()) * 1000 + int(mil))/1000
         if count==0:
             count=1
-        mt = (time.time()-last_time)/count
+        # mt = (time.time()-last_time)/count
+        mt = (timestamp-last_time)/count
         # print timestamp, last_time, mt, count
-        # last_time = timestamp
+        last_time = timestamp
         last_trade=self.data['trade']+[cgubun]+[cvolume_sum]+[mt]+[count]
 
         cvolume=0
@@ -324,7 +325,7 @@ class BitMEXWebsocket():
                                 if message['data'][i]['side'] == "Sell":
                                     ins_cvolume=ins_cvolume*-1
                                 cvolume+=ins_cvolume
-                                last_time=time.time()
+                                # last_time=time.time()
                             # price = message['data'][i]['price']
                             count+=1
 
