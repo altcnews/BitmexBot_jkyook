@@ -20,9 +20,10 @@ class Nprob:
         self.df = pd.DataFrame(index=range(0, 1), columns=a)
         print self.df
 
-    def nprob(self, price, timestamp, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v):
+    def nprob(self, price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v): # lblShoga2v,, lblBhoga2v
         # global nf, df, nfset, OrgMain, nowtime
 
+        self.df.at[self.nf, "nf"] = self.nf
         print 'nf : ', self.nf
         nowtime=time.time()
 
@@ -36,13 +37,13 @@ class Nprob:
         self.df.at[self.nf, "cvolume"] = cvolume_sum
         self.df.at[self.nf, "volume"] = volume
         self.df.at[self.nf, "y2"] = int(lblSqty2v)
-        self.df.at[self.nf, "py2"] = float(lblShoga2v)
+        # self.df.at[self.nf, "py2"] = float(lblShoga2v)
         self.df.at[self.nf, "y1"] = int(lblSqty1v)
         self.df.at[self.nf, "py1"] = float(lblShoga1v)
         self.df.at[self.nf, "x1"] = int(lblBqty1v)
         self.df.at[self.nf, "px1"] = float(lblBhoga1v)
         self.df.at[self.nf, "x2"] = int(lblBqty2v)
-        self.df.at[self.nf, "px2"] = float(lblBhoga2v)
+        # self.df.at[self.nf, "px2"] = float(lblBhoga2v)
 
         # trd_off
         if self.nf < 3:
@@ -57,7 +58,7 @@ class Nprob:
             dy1 = 0
             cvol = int(cvolume_sum)
         if self.nf >= 2:
-            print 'cvolume_sum', cvolume_sum
+            # print 'cvolume_sum', cvolume_sum
             py1 = float(lblShoga1v)
             px1 = float(lblBhoga1v)
             cvol = int(cvolume_sum)
@@ -110,7 +111,7 @@ class Nprob:
         self.df.at[self.nf, "sX"] = sX
         self.df.at[self.nf, "sY"] = sY
         self.df.at[self.nf, "sXY"] = sXY
-        print('sXY', sXY)
+        # print('sXY', sXY)
 
         # sXY_max_min
         # if self.nf >= 505:
@@ -161,46 +162,51 @@ class Nprob:
         if self.nf == 1:
             print("startime", self.startime)
         self.df.at[self.nf, "stime"] = timestamp #nowtime
-        print 'stime', timestamp/1000
+        # print 'stime', timestamp/1000
 
         # dt
         if self.nf < 2:
             dt = 0
         if self.nf >= 2:
-            dt = timestamp - self.df.ix[self.nf - 1, "stime"]
+            dt = (timestamp - self.df.ix[self.nf - 1, "stime"])/1000
             if dt==0:
-                dt = 1
-        self.df.at[self.nf, "dt"] = dt
+                dt = 0.5
+        # self.df.at[self.nf, "dt"] = dt
+        self.df.at[self.nf, "dt"] = count
 
         # mt
-        if self.nf < 15:
-            mtv = 0
-        if self.nf >= 15:
-            mtv = self.df.ix[self.nf - 10:self.nf - 1, "dt"].mean()
-        self.df.at[self.nf, "mt"] = mtv
+        if 1==0:
+            if self.nf < 15:
+                mtv = 0
+            if self.nf >= 15:
+                mtv = self.df.ix[self.nf - 10:self.nf - 1, "dt"].mean()
+            self.df.at[self.nf, "mt"] = mtv
+        if 1==1:
+            self.df.at[self.nf, "mt"] = mt
 
         # mtm
         if self.nf < 102:
             mtm = 0
         if self.nf >= 102:
-            mtm = self.df.ix[self.nf - 100:self.nf - 1, "dt"].mean()
+            mtm = self.df.ix[self.nf - 100:self.nf - 1, "mt"].mean()
         self.df.at[self.nf, "mtm"] = mtm
 
         # ns
-        lastime = nowtime - 20
-
-        if nowtime <= self.startime + 21:
-            ns = 0
-        if nowtime > self.startime + 21:
-            if self.nf >= 1005:
-                dfs = self.df[self.nf - 1000:self.nf - 1]
-            else:
-                dfs = self.df[0:self.nf - 1]
-            try:
-                ns = max(dfs[(dfs['stime'] <= lastime)].index.tolist())
-            except:
-                ns = self.nf-1
-
+        # lastime = nowtime - 20
+        #
+        # if nowtime <= self.startime + 21:
+        #     ns = 0
+        # if nowtime > self.startime + 21:
+        #     if self.nf >= 1005:
+        #         dfs = self.df[self.nf - 1000:self.nf - 1]
+        #     else:
+        #         dfs = self.df[0:self.nf - 1]
+        #     try:
+        #         ns = max(dfs[(dfs['stime'] <= lastime)].index.tolist())
+        #     except:
+        #         ns = self.nf-1
+        #
+        ns = self.nf-20
         self.df.at[self.nf, "ns"] = ns
 
         # nsf
@@ -213,7 +219,7 @@ class Nprob:
 
         # Wilcoxon Test
 
-        if ns != 0 & ns != (self.nf - 7) & self.nf > 20:
+        if self.nf > 50:
             y1_sX = self.df.ix[ns:self.nf - 1, "sX"]
             y2_sX = self.df.ix[self.nf - 7:self.nf - 1, "sX"]
             try:
@@ -256,8 +262,8 @@ class Nprob:
             except:
                 wc_sXY = 50
 
-            if self.nf>355:
-                y1_sXY_l = self.df.ix[self.nf - 350:self.nf - 1, "sXY"]
+            if self.nf>305:
+                y1_sXY_l = self.df.ix[self.nf - 300:self.nf - 1, "sXY"]
                 y2_sXY_l = self.df.ix[self.nf-50:self.nf - 1, "sXY"]
                 try:
                     if y1_sXY_l.equals(y2_sXY_l) == 1:
@@ -404,10 +410,10 @@ class Nprob:
 
             # ee
             if self.nf >= 55:
-                # e1 = mtv
-                if mtv <= 0.5:
-                    ee_mt = 1 + stat.norm.ppf(1*(1 - mtv) / float(1)) ** 1
-                if mtv > 0.5:
+                print 'mt', mt
+                if mt <= 0.5:
+                    ee_mt = 1 + stat.norm.ppf((1 - mt) / float(1))
+                if mt > 0.5:
                     ee_mt = 1
             else:
                 ee_mt = 1
@@ -417,44 +423,44 @@ class Nprob:
             c2 = range(0, 3000, 100)
 
             # ee_s
-            if self.nf >= 255:
-                ee_s = self.df.ix[self.nf - 200:self.nf, "ee_mt"].mean()
+            if self.nf >= 105:
+                ee_s = self.df.ix[self.nf - 50:self.nf-1, "ee_mt"].mean()
             else:
                 ee_s = 1
             self.df.at[self.nf, "ee_s"] = ee_s
 
             # ee_s_ave
-            if self.nf >= 1200:
-                ee_s_ave = self.df.ix[self.nf - 750:self.nf, "ee_s"].iloc[c1].mean()
+            if self.nf >= 305:
+                ee_s_ave = self.df.ix[self.nf - 250:self.nf, "ee_s"].iloc[c1].mean()
             else:
                 ee_s_ave = 1
             self.df.at[self.nf, "ee_s_ave"] = ee_s_ave
 
-            # ee_s_ave_long
-            if self.nf >= 3200:
-                ee_s_ave_long = self.df.ix[self.nf - 3000:self.nf, "ee_s"].iloc[c2].mean()
-            else:
-                ee_s_ave_long = 1
-            self.df.at[self.nf, "ee_s_ave_long"] = ee_s_ave_long
+            # # ee_s_ave_long
+            # if self.nf >= 3200:
+            #     ee_s_ave_long = self.df.ix[self.nf - 3000:self.nf, "ee_s"].iloc[c2].mean()
+            # else:
+            #     ee_s_ave_long = 1
+            # self.df.at[self.nf, "ee_s_ave_long"] = ee_s_ave_long
 
-            # ee_s_max_min
-            if self.nf >= 825:
-                ee_s_series=self.df.ix[self.nf - 500:self.nf-1, "ee_s"]
-                idmax = ee_s_series.values.argmax()+self.nf-500
-                idmin = ee_s_series.values.argmin()+self.nf-500
-                if idmax>idmin:
-                    ee_s_m = (3*self.df.ix[idmax, "ee_s"]+self.df.ix[idmin, "ee_s"])/4
-                else:
-                    ee_s_m = (self.df.ix[idmax, "ee_s"] + 3*self.df.ix[idmin, "ee_s"]) / 4
-            else:
-                ee_s_m = 1
-            self.df.at[self.nf, "ee_s_m"] = ee_s_m
+            # # ee_s_max_min
+            # if self.nf >= 825:
+            #     ee_s_series=self.df.ix[self.nf - 500:self.nf-1, "ee_s"]
+            #     idmax = ee_s_series.values.argmax()+self.nf-500
+            #     idmin = ee_s_series.values.argmin()+self.nf-500
+            #     if idmax>idmin:
+            #         ee_s_m = (3*self.df.ix[idmax, "ee_s"]+self.df.ix[idmin, "ee_s"])/4
+            #     else:
+            #         ee_s_m = (self.df.ix[idmax, "ee_s"] + 3*self.df.ix[idmin, "ee_s"]) / 4
+            # else:
+            #     ee_s_m = 1
+            # self.df.at[self.nf, "ee_s_m"] = ee_s_m
 
             # ee_s slope(mtv-slope * -1 conversion)
-            if self.nf >= 515:
-                ee_s_y = self.df.ix[self.nf - 500:self.nf - 1, "ee_s"]
-                ee_s_x = self.df.ix[self.nf - 500:self.nf - 1, "nf"]
-                print ee_s_y
+            if self.nf >= 205:
+                ee_s_y = self.df.ix[self.nf - 150:self.nf - 1, "ee_s"]
+                ee_s_x = self.df.ix[self.nf - 150:self.nf - 1, "nf"]
+                # print ee_s_y.values.reshape(-1, 1)
                 ee_s_slope = regr.fit(ee_s_y.values.reshape(-1, 1), ee_s_x.values.reshape(-1, 1)).coef_[0][0]
                 print ee_s_slope
             else:
@@ -462,13 +468,13 @@ class Nprob:
             self.df.at[self.nf, "ee_s_slope"] = ee_s_slope
 
             # ee_s_ox
-            if self.nf >= 525:
+            if self.nf >= 305:
                 ee_s_ox = 0
                 if ee_s_slope>0:
-                        if ee_s > ee_s_m and ee_s>1.6:
+                        if ee_s > ee_s_ave and ee_s>1.6:
                             ee_s_ox = 1
-                        if ee_s>2 and ee_s_m>2:
-                            ee_s_ox = 1
+                        # if ee_s>2 and ee_s_ave>2:
+                        #     ee_s_ox = 1
             else:
                 ee_s_ox = 0
             self.df.at[self.nf, "ee_s_ox"] = ee_s_ox
@@ -502,10 +508,10 @@ class Nprob:
             self.df.at[self.nf, "abumpm"] = abumpm
 
             # apindex
-            if self.nf >= 505:
-                c = range(0, 500, 5)
-                ry = self.df.ix[self.nf - 500:self.nf - 1, "sXY"].iloc[c]
-                rx = self.df.ix[self.nf - 500:self.nf - 1, "stime"].iloc[c]
+            if self.nf >= 305:
+                c = range(0, 300, 5)
+                ry = self.df.ix[self.nf - 300:self.nf - 1, "sXY"].iloc[c]
+                rx = self.df.ix[self.nf - 300:self.nf - 1, "stime"].iloc[c]
                 slope = regr.fit(rx.values.reshape(-1, 1), ry.values.reshape(-1, 1)).coef_[0][0]
             else:
                 slope = 0
@@ -654,8 +660,8 @@ class Nprob:
             self.cri_r=1
 
         if self.nf > 250 and s3_m != 0:
-            print ('s2_s, dt, wc_sXY_l, wc_sXY, s3_x, s3_y :', round(s2_s,2), round(dt,2), round(wc_sXY_l,2), round(wc_sXY,2), round(s3_x,2), round(s3_y,2))
-            if s2_s > 0.5 and dt < 1:
+            print ('s2_s, mt, wc_sXY_l, wc_sXY, s3_x, s3_y :', round(s2_s,2), round(mt,2), round(wc_sXY_l,2), round(wc_sXY,2), round(s3_x,2), round(s3_y,2))
+            if s2_s > 0.5 and mt < 1:
                 if wc_sXY_l > 40 and wc_sXY>99 and s3_x > 3+s3_x_ and s3_y < 0:
                     org_in_2 = 1
                 if wc_sXY_l < 60  and wc_sXY<1 and s3_y > 3+s3_y_ and s3_x < 0:
@@ -727,19 +733,19 @@ class Nprob:
                     if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
                         self.OrgMain = "s"
 
-            if ee_s > 1.8 and ee_s_m > 1.5 and ee_s_slope > 0:
+            if ee_s > 1.8 and ee_s_ave > 1.5 and ee_s_slope > 0:
                 if self.cri_r > 0.5 and self.df.ix[self.nf - 1, "cri_r"] >= self.df.ix[self.nf - 2, "cri_r"]:
                     if self.cri > -3 and self.df.ix[self.nf - 1, "apindex_s"] >= self.df.ix[self.nf - 3, "apindex_s"]:
-                        if ee_s_ave > 1.5 and ee_s > ee_s_m:
+                        if ee_s_ave > 1.5 and ee_s > ee_s_ave:
                             # if sXY_bns == 1:
                             self.OrgMain = "b"
                 if self.cri_r < 1.5 and self.df.ix[self.nf - 1, "cri_r"] <= self.df.ix[self.nf - 2, "cri_r"]:
                     if self.cri < 3 and self.df.ix[self.nf - 1, "apindex_s"] <= self.df.ix[self.nf - 3, "apindex_s"]:
-                        if ee_s_ave > 1.5 and ee_s > ee_s_m:
+                        if ee_s_ave > 1.5 and ee_s > ee_s_ave:
                             # if sXY_bns == 0:
                             self.OrgMain = "s"
         if 1 == 0:
-            if ee_s > 1.8 and ee_s_m > 1.5 and ee_s_slope > 0:
+            if ee_s > 1.8 and ee_s_ave > 1.5 and ee_s_slope > 0:
                 if self.cri_r >= 1.8 and self.cri == 5:
                     self.OrgMain = "b"
                 if self.cri_r <= 0.2 and self.cri == -5:
@@ -747,26 +753,18 @@ class Nprob:
             self.df.at[self.nf, "org_in_2"] = org_in_2
             self.df.at[self.nf, "org_in_3"] = org_in_3
 
-            # prf_able
-            prf_able = 0
-            if self.OrgMain == "b" and self.nfset != 0 and self.nfset < self.nf:
-                ex.lbl_Inp_o.setText(str(inp_o))
-                inst_p= 4+(o1px1 - inp_o)/float(tick_o)
-                ex.lbl_NowProfit_o.setText(str("%0.3f" % (o1px1 - inp_o)))
-                if dome_ab==1:
-                    if o1px1 >= inp_o + tick_o * 2:
-                        prf_able = 1
-                    else:
-                        prf_able = 0
-                elif dome_ab==0 or dome_ab==2:
-                    if o1px1 >= inp_o + tick_o *4:
-                        prf_able = 1
-                if o1px1 < inp_o - tick_o * 6:
-                    prf_able = -1
+            # # prf_able
+            # prf_able = 0
+            # if self.OrgMain == "b" and self.nfset != 0 and self.nfset < self.nf:
+            #     inst_p= 4+(o1px1 - inp_o)/float(tick_o)
+            #         if o1px1 >= inp_o + tick_o * 2:
+            #             prf_able = 1
+            #         else:
+            #             prf_able = 0
 
         self.nf+=1
-        if self.nf>3:
-            print self.df.ix[self.nf-3:self.nf-1,['mt', 'sXY', 'pindex', 'apindex_s', 'ee_s','bumpm','s3']]
+        if self.nf>10:
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'mt', 'sXY', 'cvolume', 'pindex', 'apindex_s', 'ee_s','bumpm','s3']]
 
 
     def btnPlot_Clicked(self):
