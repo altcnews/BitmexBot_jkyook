@@ -44,8 +44,8 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print 'nf : ', self.nf
-        nowtime=time.time()
+        print 'nf: %d prc: %0.1f ' & (self.nf, price)
+        # nowtime=time.time()
 
         # if self.nf==50:
         #     self.threadme()
@@ -798,7 +798,7 @@ class Nprob:
         # adj_market=ee_s_ave/1.8
         if self.OrgMain == "b":
             if self.hit_peak==0:
-                if self.cri_r>=1.8 and bumpm>=2*ee_s_ave and abumpm >= 2*ee_s_ave:
+                if self.cri_r>=1.8 and bumpm>=2.5*ee_s_ave and abumpm >= 2.5*ee_s_ave:
                     hit_type = "p_bump"
                     self.hit_peak = 2
                 if s7>=50:
@@ -821,7 +821,7 @@ class Nprob:
 
         elif self.OrgMain == "s":
             if self.hit_peak==0:
-                if self.cri_r <= 0.2 and bumpm>=2*ee_s_ave and abumpm >= 2*ee_s_ave:
+                if self.cri_r <= 0.2 and bumpm>=2.5*ee_s_ave and abumpm >= 2.5*ee_s_ave:
                     hit_type = "p_bump"
                     self.hit_peak = -2
                 if s7 <= --50:
@@ -853,7 +853,7 @@ class Nprob:
         if self.OrgMain == "b":
 
             # Condition 1
-            if ee_s>1.6  and ee_s_ave > 1.3 and slope < -150:
+            if ee_s>1.5  and ee_s_ave > 1.3 and slope < -150:
                 if self.cri_r<=0.1 and self.df.ix[self.nf-1, "ee_s"]>self.df.ix[self.nf-2, "ee_s"]:
                     #outype = "bad_out"
                     self.profit+=(price-self.inp)
@@ -861,7 +861,7 @@ class Nprob:
                     self.OrgMain='n'
 
             # Condition 2
-            if ee_s < ee_s_ave_long:
+            if ee_s > ee_s_ave_long and slope_s<0 and ee_s > 1.3:
                 #outype = "ee_s_long_out"
                 self.profit += (price - self.inp)
                 piox = 2
@@ -870,7 +870,7 @@ class Nprob:
             if prf_able == 1:
 
                 # Condition 4
-                if  ee_s<ee_s_ave:
+                if ee_s<ee_s_ave and slope_s<0:
                     #outype = "ee_s_out"
                     self.profit += (price - self.inp)
                     piox = 4
@@ -903,7 +903,7 @@ class Nprob:
                     self.OrgMain='n'
 
             # Condition 2
-            if ee_s < ee_s_ave_long:
+            if ee_s > ee_s_ave_long and slope_s>0 and ee_s > 1.3:
                 #outype = "ee_s_long_out"
                 self.profit += (self.inp-price)
                 piox = -2
