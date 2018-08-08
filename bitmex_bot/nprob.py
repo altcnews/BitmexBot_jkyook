@@ -75,12 +75,12 @@ class Nprob:
         self.df.at[self.nf, "x2"] = int(lblBqty2v)
         # self.df.at[self.nf, "px2"] = float(lblBhoga2v)
 
-        # trd_off
-        if self.nf < 3:
-            trdoff = 0
-        if self.nf >= 3:
-            trdoff = int(volume) - int(self.df.ix[self.nf - 1, "volume"])
-        self.df.at[self.nf, "trdoff"] = trdoff
+        # # trd_off
+        # if self.nf < 3:
+        #     trdoff = 0
+        # if self.nf >= 3:
+        #     trdoff = int(volume) - int(self.df.ix[self.nf - 1, "volume"])
+        # self.df.at[self.nf, "trdoff"] = trdoff
 
         # xnet, ynet
         if self.nf < 2:
@@ -201,6 +201,8 @@ class Nprob:
         self.df.at[self.nf, "dt"] = count
 
         # mt
+        if self.nf==0:
+            mt = 0.5
         self.df.at[self.nf, "mt"] = mt
 
         # mtm
@@ -295,12 +297,12 @@ class Nprob:
         self.df.at[self.nf, "PXY"] = wc_sXY
         # self.df.at[self.nf, "PXY_l"] = wc_sXY_l
 
-        # PXYm
-        if self.nf >= self.sec_30+1:
-            PXYm = self.df.ix[self.nf - self.sec_30:self.nf - 1, "PXY"].mean()
-        else:
-            PXYm = 0
-        self.df.at[self.nf, "PXYm"] = PXYm
+        # # PXYm
+        # if self.nf >= self.sec_30+1:
+        #     PXYm = self.df.ix[self.nf - self.sec_30:self.nf - 1, "PXY"].mean()
+        # else:
+        #     PXYm = 0
+        # self.df.at[self.nf, "PXYm"] = PXYm
 
         # nPX, nPY
         if self.nf < self.sec_15+1:
@@ -329,12 +331,12 @@ class Nprob:
             stPXY = 0
         self.df.at[self.nf, "stPXY"] = stPXY
 
-        # ststPXY
-        if self.nf >= self.min_1+1:
-            ststPXY = self.df.ix[self.nf - self.min_1:self.nf - 1, "stPXY"].std()
-        else:
-            ststPXY = 0
-        self.df.at[self.nf, "ststPXY"] = ststPXY
+        # # ststPXY
+        # if self.nf >= self.min_1+1:
+        #     ststPXY = self.df.ix[self.nf - self.min_1:self.nf - 1, "stPXY"].std()
+        # else:
+        #     ststPXY = 0
+        # self.df.at[self.nf, "ststPXY"] = ststPXY
 
         # PINDEX
         pindex = 0
@@ -407,10 +409,10 @@ class Nprob:
         self.df.at[self.nf, "aa_trd"] = aa
 
         # bb
-        if self.nf >= self.sec_15+1:
-            bb = float(lblBhoga1v) / 10000
-        else:
-            bb = 1
+        # if self.nf >= self.sec_15+1:
+        #     bb = float(lblBhoga1v) / 10000
+        # else:
+        bb = 1
         self.df.at[self.nf, "bb_prc"] = bb
 
         # cc
@@ -444,6 +446,8 @@ class Nprob:
                 ee_mt = 1
         else:
             ee_mt = 1
+        if ee_mt<0:
+            ee_mt=0.001
         self.df.at[self.nf, "ee_mt"] = ee_mt
 
         # c1 = range(0, 250, 50)
@@ -503,7 +507,7 @@ class Nprob:
             ee_s_ox = 0
         self.df.at[self.nf, "ee_s_ox"] = ee_s_ox
 
-        # bum_sum
+        # bump
         if self.nf >= self.sec_15+1:
             bump = 1 * (abs(aa * bb * cc * dd * ee_mt)) ** 0.5
         else:
@@ -616,9 +620,9 @@ class Nprob:
 
         # s7
         elst=1
-        if PXYm >= 60:
+        if wc_sXY >= 60:
             adj_s2 = 1
-        elif PXYm <= 40:
+        elif wc_sXY <= 40:
             adj_s2 = -1
         else:
             adj_s2 = 0
@@ -791,13 +795,13 @@ class Nprob:
         self.df.at[self.nf, "prf_able"] = prf_able
 
         # hit_peak
-        adj_market=ee_s_ave/1.8
+        # adj_market=ee_s_ave/1.8
         if self.OrgMain == "b":
             if self.hit_peak==0:
-                if self.cri_r>=1.8 and bumpm>=2*adj_market and abumpm >= 2*adj_market:
+                if self.cri_r>=1.8 and bumpm>=2*ee_s_ave and abumpm >= 2*ee_s_ave:
                     hit_type = "p_bump"
                     self.hit_peak = 2
-                if s7>=30:
+                if s7>=50:
                     hit_type = "p_s7_h"
                     self.hit_peak = 2
                 if ee_s<1.7 and s7>=20:
@@ -817,13 +821,13 @@ class Nprob:
 
         elif self.OrgMain == "s":
             if self.hit_peak==0:
-                if self.cri_r <= 0.2 and bumpm >= 2* adj_market and abumpm >= 2* adj_market:
+                if self.cri_r <= 0.2 and bumpm>=2*ee_s_ave and abumpm >= 2*ee_s_ave:
                     hit_type = "p_bump"
                     self.hit_peak = -2
-                if s7 >= 30:
+                if s7 <= --50:
                     hit_type = "p_s7_h"
                     self.hit_peak = -2
-                if ee_s < 1.7 and s7 >= 20:
+                if ee_s < 1.7 and s7 <= -20:
                     hit_type = "p_s7_l"
                     self.hit_peak = -2
             elif self.hit_peak == -2:
@@ -945,6 +949,7 @@ class Nprob:
             self.d_OMain = 0
             self.hit_peak = 0
             self.inp = 0
+            self.nfset = 0
 
         self.df.at[self.nf, "d_OMain"] = self.d_OMain
         self.df.at[self.nf, "OrgMain"] = self.OrgMain
