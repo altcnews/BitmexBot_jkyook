@@ -48,7 +48,7 @@ class BitMEXWebsocket():
         last_time = 0
 
         self.logger = logging.getLogger('root')
-        self.np = nprob.Nprob()
+        # self.np = nprob.Nprob()
         self.__reset()
 
     def __del__(self):
