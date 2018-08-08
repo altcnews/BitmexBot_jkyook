@@ -16,10 +16,15 @@ class Nprob:
         # global df , nf
         self.nf=1
         self.nfset=0
+        self.tick = 0.5
+        self.inp=0
+        self.profit=0
         self.startime=time.time()
         self.OrgMain='n'
+        self.org_in_2=0
         self.cri=0
         self.cri_r=0
+        self.hit_peak=0
         self.loop=0.2           #Loop_interval
         self.sec_15 = int(15 / self.loop)
         self.sec_30 = int(30 / self.loop)
@@ -33,23 +38,29 @@ class Nprob:
         print self.df
         # self.thread_plot = multiprocessing.Process(target=self.btnPlot_Clicked, args=())
 
+
     def nprob(self, price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v): # lblShoga2v,, lblBhoga2v
         # global nf, df, nfset, OrgMain, nowtime
 
+        t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
         print 'nf : ', self.nf
         nowtime=time.time()
 
-        if self.nf==50:
-            self.threadme()
+        # if self.nf==50:
+        #     self.threadme()
             # self.btnPlot_Clicked()
         # if self.nf==120:
         #     self.btnPlot_Close()
 
-        if self.nf%1000==0:
+        if self.nf%3000==0:
             self.btnSave_Clicked()
 
         regr = linear_model.LinearRegression()
+
+        ###############################
+        # Raw Data
+        ###############################
 
         self.df.at[self.nf, "price"] = price
         self.df.at[self.nf, "cgubun"] = cgubun_sum
@@ -77,7 +88,6 @@ class Nprob:
             dy1 = 0
             cvol = int(cvolume_sum)
         if self.nf >= 2:
-            # print 'cvolume_sum', cvolume_sum
             py1 = float(lblShoga1v)
             px1 = float(lblBhoga1v)
             cvol = int(cvolume_sum)
@@ -93,7 +103,6 @@ class Nprob:
             n1y2 = int(self.df.y2[self.nf - 1])
             dx1 = xnet(px1, n1px1, cvol, cgubun_sum, x1, n1x1, x2, n1x2)
             dy1 = ynet(py1, n1py1, cvol, cgubun_sum, y1, n1y1, y2, n1y2)
-            # print dx1,dy1
 
         self.df.at[self.nf, "dy1"] = dy1
         self.df.at[self.nf, "dx1"] = dx1
@@ -130,7 +139,6 @@ class Nprob:
         self.df.at[self.nf, "sX"] = sX
         self.df.at[self.nf, "sY"] = sY
         self.df.at[self.nf, "sXY"] = sXY
-        # print('sXY', sXY)
 
         # sXY_max_min
         # if self.nf >= 505:
@@ -181,15 +189,14 @@ class Nprob:
         if self.nf == 1:
             print("startime", self.startime)
         self.df.at[self.nf, "stime"] = timestamp #nowtime
-        # print 'stime', timestamp/1000
 
-        # dt
-        if self.nf < 2:
-            dt = 0
-        if self.nf >= 2:
-            dt = (timestamp - self.df.ix[self.nf - 1, "stime"])/1000
-            if dt==0:
-                dt = 0.5
+        # dt => count
+        # if self.nf < 2:
+        #     dt = 0
+        # if self.nf >= 2:
+        #     dt = (timestamp - self.df.ix[self.nf - 1, "stime"])/1000
+        #     if dt==0:
+        #         dt = 0.5
         # self.df.at[self.nf, "dt"] = dt
         self.df.at[self.nf, "dt"] = count
 
@@ -202,7 +209,6 @@ class Nprob:
         if self.nf >= self.sec_30+1:
             mtm = self.df.ix[self.nf - self.sec_30:self.nf - 1, "mt"].mean()
         self.df.at[self.nf, "mtm"] = mtm
-        # print 'mtm',mtm
 
         # ns
         ns = self.nf-self.sec_15
@@ -306,6 +312,8 @@ class Nprob:
 
         nPXY = float(nPX + nPY) / 2
         self.df.at[self.nf, "nPXY"] = nPXY
+        self.df.at[self.nf, "nPXY"] = nPXY
+        self.df.at[self.nf, "nPXY"] = nPXY
 
         # stXY
         if self.nf < self.sec_30+1:
@@ -329,10 +337,7 @@ class Nprob:
         self.df.at[self.nf, "ststPXY"] = ststPXY
 
         # PINDEX
-        if self.nf < self.sec_30+1:
-            pi1 = 0
-            pi2 = 0
-            pindex = 0
+        pindex = 0
         if self.nf >= self.sec_30+1:
             try:
                 pi1 = float(wc_sXY - 50) / 50
@@ -359,162 +364,161 @@ class Nprob:
         self.df.at[self.nf, "pindex"] = pindex
 
         # PINDEX2
-        if self.nf < self.min_1+1:
-            pindex2 = 0
+        pindex2 = 0
         if self.nf >= self.min_1+1:
             pindex2 = self.df.ix[self.nf - self.min_1:self.nf - 1, "pindex"].mean()
         self.df.at[self.nf, "pindex2"] = pindex2
 
-    # Extension
-        if 1== 1:
+        # apindex_s = slope
+        if self.nf >= self.sec_30+1:
+            # c = range(0, 300, 5)
+            ry = self.df.ix[self.nf - self.sec_30:self.nf - 1, "sXY"] #.iloc[c]
+            rx = self.df.ix[self.nf - self.sec_30:self.nf - 1, "stime"] #.iloc[c]
+            slope = regr.fit(rx.values.reshape(-1, 1), ry.values.reshape(-1, 1)).coef_[0][0]
+        else:
+            slope = 0
+            p_value = 0
+            std_err = 0
+        self.df.at[self.nf, "apindex_s"] = slope
 
-            # BUMP
+        ###############################
+        # Bump, S-seires
+        ###############################
 
-            # aa
-            if self.nf >= self.sec_15+1:
-                aa = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stXY"].mean()/1000000  #/ float(150) ) ** 0.5
-            else:
-                aa = 1
-            self.df.at[self.nf, "aa_trd"] = aa
+        # BUMP
 
-            # bb
-            if self.nf >= self.sec_15+1:
-                bb = float(lblBhoga1v) / 10000
-            else:
-                bb = 1
-            self.df.at[self.nf, "bb_prc"] = bb
+        # aa
+        if self.nf >= self.sec_15+1:
+            aa = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stXY"].mean()/1000000  #/ float(150) ) ** 0.5
+        else:
+            aa = 1
+        self.df.at[self.nf, "aa_trd"] = aa
 
-            # cc
-            cc=1
-            if self.nf >= self.sec_15+1 and self.df.ix[self.nf - 1, "pindex"]!=0:
-                c1 = self.df.ix[self.nf - self.sec_15:self.nf - 1, "pindex"].mean()
-                if c1 >= 50:
-                    cc = (1 + 2 * (c1 - 50) / float(50)) ** 0.5
-                if c1 < 50:
-                    cc = (1 - 2 * (c1 - 50) / float(50)) ** 0.5
-            else:
-                cc = 1
-            self.df.at[self.nf, "cc_pid"] = cc
+        # bb
+        if self.nf >= self.sec_15+1:
+            bb = float(lblBhoga1v) / 10000
+        else:
+            bb = 1
+        self.df.at[self.nf, "bb_prc"] = bb
 
-            # dd
-            if self.nf >= self.sec_15+1 and stPXY != 0:
-                d1 = stPXY
-                if d1 <= 50:
-                    dd = 1 + stat.norm.ppf((100 - d1) / float(100)) ** 0.6
-                if d1 > 50:
-                    dd = 1 + stat.norm.ppf((100 - 49.999) / float(100)) ** 0.6
-            else:
-                dd = 1
-            self.df.at[self.nf, "dd_sWC"] = dd
+        # cc
+        cc=1
+        if self.nf >= self.sec_15+1 and self.df.ix[self.nf - 1, "pindex"]!=0:
+            c1 = self.df.ix[self.nf - self.sec_15:self.nf - 1, "pindex"].mean()
+            if c1 >= 50:
+                cc = (1 + 2 * (c1 - 50) / float(50)) ** 0.5
+            if c1 < 50:
+                cc = (1 - 2 * (c1 - 50) / float(50)) ** 0.5
+        else:
+            cc = 1
+        self.df.at[self.nf, "cc_pid"] = cc
 
-            # ee
-            if self.nf >= self.sec_15+1:
-                if mt <= 1:
-                    ee_mt = 1 + stat.norm.ppf((1 - mt) / float(1))
-                if mt > 1:
-                    ee_mt = 1
-            else:
+        # dd
+        if self.nf >= self.sec_15+1 and stPXY != 0:
+            d1 = stPXY
+            if d1 <= 50:
+                dd = 1 + stat.norm.ppf((100 - d1) / float(100)) ** 0.6
+            if d1 > 50:
+                dd = 1 + stat.norm.ppf((100 - 49.999) / float(100)) ** 0.6
+        else:
+            dd = 1
+        self.df.at[self.nf, "dd_sWC"] = dd
+
+        # ee
+        if self.nf >= self.sec_15+1:
+            if mt < 1:
+                ee_mt = 1 + stat.norm.ppf((1 - mt) / float(1))
+            if mt >= 1:
                 ee_mt = 1
-            self.df.at[self.nf, "ee_mt"] = ee_mt
+        else:
+            ee_mt = 1
+        self.df.at[self.nf, "ee_mt"] = ee_mt
 
-            # c1 = range(0, 250, 50)
-            # c2 = range(0, 3000, 100)
+        # c1 = range(0, 250, 50)
+        # c2 = range(0, 3000, 100)
 
-            # ee_s
-            if self.nf >= self.sec_30+1:
-                ee_s = self.df.ix[self.nf - 50:self.nf-1, "ee_mt"].mean()
-            else:
-                ee_s = 1
-            self.df.at[self.nf, "ee_s"] = ee_s
+        # ee_s
+        if self.nf >= self.sec_30+1:
+            ee_s = self.df.ix[self.nf - 50:self.nf-1, "ee_mt"].mean()
+        else:
+            ee_s = 1
+        self.df.at[self.nf, "ee_s"] = ee_s
 
-            # ee_s_ave
-            if self.nf >= self.min_1+1:
-                ee_s_ave = self.df.ix[self.nf - self.min_1:self.nf, "ee_s"].mean()
-            else:
-                ee_s_ave = 1
-            self.df.at[self.nf, "ee_s_ave"] = ee_s_ave
+        # ee_s_ave
+        if self.nf >= self.min_1+1:
+            ee_s_ave = self.df.ix[self.nf - self.min_1:self.nf, "ee_s"].mean()
+        else:
+            ee_s_ave = 1
+        self.df.at[self.nf, "ee_s_ave"] = ee_s_ave
 
-            # # ee_s_ave_long
-            # if self.nf >= 3200:
-            #     ee_s_ave_long = self.df.ix[self.nf - 3000:self.nf, "ee_s"].iloc[c2].mean()
-            # else:
-            #     ee_s_ave_long = 1
-            # self.df.at[self.nf, "ee_s_ave_long"] = ee_s_ave_long
+        # ee_s_ave_long
+        if self.nf >= self.min_3+1:
+            ee_s_ave_long = self.df.ix[self.nf - self.min_3:self.nf, "ee_s"].mean()
+        else:
+            ee_s_ave_long = 1
+        self.df.at[self.nf, "ee_s_ave_long"] = ee_s_ave_long
 
-            # # ee_s_max_min
-            # if self.nf >= 825:
-            #     ee_s_series=self.df.ix[self.nf - 500:self.nf-1, "ee_s"]
-            #     idmax = ee_s_series.values.argmax()+self.nf-500
-            #     idmin = ee_s_series.values.argmin()+self.nf-500
-            #     if idmax>idmin:
-            #         ee_s_m = (3*self.df.ix[idmax, "ee_s"]+self.df.ix[idmin, "ee_s"])/4
-            #     else:
-            #         ee_s_m = (self.df.ix[idmax, "ee_s"] + 3*self.df.ix[idmin, "ee_s"]) / 4
-            # else:
-            #     ee_s_m = 1
-            # self.df.at[self.nf, "ee_s_m"] = ee_s_m
+        # # ee_s_max_min
+        # if self.nf >= 825:
+        #     ee_s_series=self.df.ix[self.nf - 500:self.nf-1, "ee_s"]
+        #     idmax = ee_s_series.values.argmax()+self.nf-500
+        #     idmin = ee_s_series.values.argmin()+self.nf-500
+        #     if idmax>idmin:
+        #         ee_s_m = (3*self.df.ix[idmax, "ee_s"]+self.df.ix[idmin, "ee_s"])/4
+        #     else:
+        #         ee_s_m = (self.df.ix[idmax, "ee_s"] + 3*self.df.ix[idmin, "ee_s"]) / 4
+        # else:
+        #     ee_s_m = 1
+        # self.df.at[self.nf, "ee_s_m"] = ee_s_m
 
-            # ee_s slope(mtv-slope * -1 conversion)
-            if self.nf >= self.sec_30+1:
-                ee_s_y = self.df.ix[self.nf - self.sec_30:self.nf - 1, "ee_s"]
-                ee_s_x = self.df.ix[self.nf - self.sec_30:self.nf - 1, "nf"]
-                # print ee_s_y.values.reshape(-1, 1)
-                ee_s_slope = regr.fit(ee_s_y.values.reshape(-1, 1), ee_s_x.values.reshape(-1, 1)).coef_[0][0]
-            else:
-                ee_s_slope=0
-            self.df.at[self.nf, "ee_s_slope"] = ee_s_slope
+        # ee_s slope(mtv-slope * -1 conversion)
+        if self.nf >= self.sec_30+1:
+            ee_s_y = self.df.ix[self.nf - self.sec_30:self.nf - 1, "ee_s"]
+            ee_s_x = self.df.ix[self.nf - self.sec_30:self.nf - 1, "nf"]
+            # print ee_s_y.values.reshape(-1, 1)
+            ee_s_slope = regr.fit(ee_s_y.values.reshape(-1, 1), ee_s_x.values.reshape(-1, 1)).coef_[0][0]
+        else:
+            ee_s_slope=0
+        self.df.at[self.nf, "ee_s_slope"] = ee_s_slope
 
-            # ee_s_ox
-            if self.nf >= self.min_1+1:
-                ee_s_ox = 0
-                if ee_s_slope>0:
-                        if ee_s > ee_s_ave and ee_s>1.6:
-                            ee_s_ox = 1
-                        # if ee_s>2 and ee_s_ave>2:
-                        #     ee_s_ox = 1
-            else:
-                ee_s_ox = 0
-            self.df.at[self.nf, "ee_s_ox"] = ee_s_ox
+        # ee_s_ox
+        if self.nf >= self.min_1+1:
+            ee_s_ox = 0
+            if ee_s_slope>0:
+                    if ee_s > ee_s_ave and ee_s>2:
+                        ee_s_ox = 1
+        else:
+            ee_s_ox = 0
+        self.df.at[self.nf, "ee_s_ox"] = ee_s_ox
 
-            # bum_sum
-            if self.nf >= self.sec_15+1:
-                bump = 1 * (abs(aa * bb * cc * dd * ee_mt)) ** 0.5
-            else:
-                bump = 0
-            self.df.at[self.nf, "bump"] = bump
+        # bum_sum
+        if self.nf >= self.sec_15+1:
+            bump = 1 * (abs(aa * bb * cc * dd * ee_mt)) ** 0.5
+        else:
+            bump = 0
+        self.df.at[self.nf, "bump"] = bump
 
-            # bumpm
-            if self.nf >= self.sec_15+1:
-                bumpm = self.df.ix[self.nf - self.sec_15:self.nf, "bump"].mean()
-            else:
-                bumpm = 0
-            self.df.at[self.nf, "bumpm"] = bumpm
+        # bumpm
+        if self.nf >= self.sec_15+1:
+            bumpm = self.df.ix[self.nf - self.sec_15:self.nf, "bump"].mean()
+        else:
+            bumpm = 0
+        self.df.at[self.nf, "bumpm"] = bumpm
 
-            # abump
-            if self.nf >= self.sec_15+1:
-                abump = 20 * (bump / float(20) + 0.2 * stPXY / float(100)) / 1.2
-            else:
-                abump = 0
-            self.df.at[self.nf, "abump"] = abump
+        # abump
+        if self.nf >= self.sec_15+1:
+            abump = 20 * (bump / float(20) + 0.2 * stPXY / float(100)) / 1.2
+        else:
+            abump = 0
+        self.df.at[self.nf, "abump"] = abump
 
-            # abumpm
-            if self.nf >= self.sec_15+1:
-                abumpm = self.df.ix[self.nf - self.sec_15:self.nf, "abump"].mean()
-            else:
-                abumpm = 0
-            self.df.at[self.nf, "abumpm"] = abumpm
+        # abumpm
+        if self.nf >= self.sec_15+1:
+            abumpm = self.df.ix[self.nf - self.sec_15:self.nf, "abump"].mean()
+        else:
+            abumpm = 0
+        self.df.at[self.nf, "abumpm"] = abumpm
 
-            # apindex
-            if self.nf >= self.sec_30+1:
-                # c = range(0, 300, 5)
-                ry = self.df.ix[self.nf - self.sec_30:self.nf - 1, "sXY"] #.iloc[c]
-                rx = self.df.ix[self.nf - self.sec_30:self.nf - 1, "stime"] #.iloc[c]
-                slope = regr.fit(rx.values.reshape(-1, 1), ry.values.reshape(-1, 1)).coef_[0][0]
-            else:
-                slope = 0
-                p_value = 0
-                std_err = 0
-            self.df.at[self.nf, "apindex_s"] = slope
 
         # s1
         if self.nf >= self.sec_15:
@@ -566,11 +570,9 @@ class Nprob:
             s3_c = 0
             s3_x_c = 0
             s3_y_c = 0
-
-        # self.df.ix[self.nf, "s3_x_c"] = s3_x_c
-        # self.df.ix[self.nf, "s3_y_c"] = s3_y_c
-        # self.df.ix[self.nf, "s3_c"] = s3_c
-
+        self.df.ix[self.nf, "s3_x_c"] = s3_x_c
+        self.df.ix[self.nf, "s3_y_c"] = s3_y_c
+        self.df.ix[self.nf, "s3_c"] = s3_c
 
         # s3
         if self.nf >= self.sec_15:
@@ -608,6 +610,7 @@ class Nprob:
             adj_s2 = -1
         else:
             adj_s2 = 0
+        s7 = 0
         if nPXY != 0:
             if self.OrgMain == "b":
                 s7 = 4 + self.df.ix[self.nf - 1, "s1"] * elst / float(nPY) + stXY * adj_s2 / float(nPY)
@@ -615,31 +618,18 @@ class Nprob:
                 s7 = 4 - self.df.ix[self.nf - 1, "s1"] * elst / float(nPX) - stXY * adj_s2 / float(nPX)
             elif self.OrgMain == "n":
                 s7 = 4 + stXY / float(nPXY)
-        else:
-            s7 = 0
         self.df.at[self.nf, "s7"] = s7
 
         ###############################
+        # Signal : dt_main, org_in, cri, cir_r
+        ###############################
 
-        # hit_peak setting
-        pi1_ = 10
-        s3m_ = 3  # (s3_m)
-        s3_ = 10  # (s3)
-        s2sm_ = 3
-        ees_ = 0
-        s3_x_ = 30000
-        s3_y_ = 30000
-
-        org_in_1 = 0
-        org_in_2 = 0
-        org_in_3 = 0
-
-        # dt_main
+        # dt_main_1, dt_main_2
         if self.nf > self.min_1+1 :
             dt_main_1=0
-            if s3>6.7 and slope>-1:
+            if s3>50000 and slope>-1:
                 dt_main_1= 1
-            if s3<-4.5 and slope<-0.5:
+            if s3<-50000 and slope<-0.5:
                 dt_main_1= -1
         else:
             dt_main_1 = 0
@@ -647,9 +637,9 @@ class Nprob:
 
         if self.nf > self.min_3+1 :
             dt_main_2 = 0
-            if slope > 0 and s3 > 0 and dt < 0.15:
+            if slope > 0 and s3 > 0 and mt < 0.15:
                 dt_main_2 = 1
-            if slope < 0 and s3 < 0 and dt < 0.15:
+            if slope < 0 and s3 < 0 and mt < 0.15:
                 dt_main_2 = -1
         else:
             dt_main_2 = 0
@@ -668,49 +658,47 @@ class Nprob:
             dt_sum_2=0
         self.df.at[self.nf, "dt_sum_2"] = dt_sum_2
 
-        ###############################
-        #  IN Strategy
-        if  self.nf< self.min_3+1:
-            self.cri=0
-            self.cri_r=1
-
-        if self.nf >  self.min_3+1 and s3_m != 0:
-            print ('s2_s, mt, wc_sXY, s3_x, s3_y :', round(s2_s,2), round(mt,2), round(wc_sXY,2), round(s3_x,2), round(s3_y,2))
+        # org_in_2
+        if self.nf > self.min_3+1:
             if s2_s > 0.5 and mt < 1: #wc_sXY_<40
-                if wc_sXY>99 and s3_x > s3_x_ and s3_y < 0:
-                    org_in_2 = 1
-                if wc_sXY<1 and s3_y > s3_y_ and s3_x < 0:
-                    org_in_2 = -1
-            # Out Signal
-            print ('cri, cri_r, s3_m, s3_m_short :', round(self.cri,2), round(self.cri_r,2), round(s3_m,2), round(s3_m_short,2))
+                if wc_sXY>99 and s3_x > 30000 and s3_y < 0:
+                    self.org_in_2 = 1
+                if wc_sXY<1 and s3_y > 30000 and s3_x < 0:
+                    self.org_in_2 = -1
             if self.cri > 0 and self.cri_r > 1 and s3_m > 0 and s3_m_short > 0:
-                if org_in_2 == 1:
-                    org_in_2 = 3
-                elif org_in_2 != 1:
-                    org_in_2 = 2
+                if self.org_in_2 == 1:
+                    self.org_in_2 = 3
+                elif self.org_in_2 != 1:
+                    self.org_in_2 = 2
             if self.cri < 0 and self.cri_r < 1 and s3_m < 0 and s3_m_short < 0:
-                if org_in_2 == -1:
-                    org_in_2 = -3
-                elif org_in_2 != -1:
-                    org_in_2 = -2
+                if self.org_in_2 == -1:
+                    self.org_in_2 = -3
+                elif self.org_in_2 != -1:
+                    self.org_in_2 = -2
+            # print ('cri, cri_r, s3_m, s3_m_short :', round(self.cri, 2), round(self.cri_r, 2), round(s3_m, 2),round(s3_m_short, 2))
+            # print ('s2_s, mt, wc_sXY, s3_x, s3_y :', round(s2_s, 2), round(mt, 2), round(wc_sXY, 2), round(s3_x, 2),round(s3_y, 2))
+        else:
+            self.org_in_2 = 0
+        self.df.at[self.nf, "org_in_2"] = self.org_in_2
 
-        if org_in_2 == 1 or org_in_2 == 3:
-            self.cri = self.cri + 1
-        if org_in_2 == -1 or org_in_2 == -3:
-            self.cri = self.cri - 1
+        #cri
+        if self.org_in_2 == 1 or self.org_in_2 == 3:
+            self.cri += 1
+        if self.org_in_2 == -1 or self.org_in_2 == -3:
+            self.cri -= 1
         if self.cri>5:
             self.cri=5
         if self.cri<-5:
             self.cri=-5
+        self.df.at[self.nf, "cri"] = self.cri
 
         #cri_r
         if self.nf >  self.min_3+1:
-
-            if ee_s>=1.8 and ee_s<2.2:
+            if ee_s>=1.7 and ee_s<2.2:
                 len_cri_r = int(500 + (ee_s-1.8) * 1250)
             if ee_s>=2.2:
                 len_cri_r = 1000
-            if ee_s<1.8:
+            if ee_s<1.7:
                 len_cri_r = 500
 
             df_r = self.df.ix[self.nf - min(self.nf,len_cri_r):self.nf - 1, "org_in_2"]
@@ -727,8 +715,6 @@ class Nprob:
                     self.cri_r=1
         else:
             self.cri_r=1
-
-        self.df.at[self.nf, "cri"] = self.cri
         self.df.at[self.nf, "cri_r"] = self.cri_r
 
         # ee_s * cri
@@ -738,52 +724,226 @@ class Nprob:
             cri_ee_s = 0
         self.df.at[self.nf, "cri_ee_s"] = cri_ee_s
 
-        # In Decision
-        if self.nf >  self.min_3+1 :
-            if ee_s > 1.7 and ee_s_ave > 1.4 and ee_s >= ee_s_ave:
+        ###############################
+        #  // In Decision //
+        ###############################
+
+        if self.OrgMain == 'n' and self.nf >  self.min_3+1 :
+
+            # ee_s, slope_in
+            if ee_s > 1.8 and ee_s_ave > 1.5 and ee_s >= ee_s_ave:
                 if slope > 200 and dt_sum_2 > 0:
                     if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
                         self.OrgMain = "b"
+                        self.nfset = self.nf
+                        self.inp = price
                 if slope < -200 and dt_sum_2 < 0:
                     if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
                         self.OrgMain = "s"
+                        self.nfset = self.nf
+                        self.inp = price
+        self.df.at[self.nf, "inp"] = self.inp
 
-            if ee_s > 1.8 and ee_s_ave > 1.5 and ee_s_slope > 0:
-                if self.cri_r > 0.5 and self.df.ix[self.nf - 1, "cri_r"] >= self.df.ix[self.nf - 2, "cri_r"]:
-                    if self.cri > -3 and self.df.ix[self.nf - 1, "apindex_s"] >= self.df.ix[self.nf - 3, "apindex_s"]:
-                        if ee_s_ave > 1.5 and ee_s > ee_s_ave:
-                            # if sXY_bns == 1:
-                            self.OrgMain = "b"
-                if self.cri_r < 1.5 and self.df.ix[self.nf - 1, "cri_r"] <= self.df.ix[self.nf - 2, "cri_r"]:
-                    if self.cri < 3 and self.df.ix[self.nf - 1, "apindex_s"] <= self.df.ix[self.nf - 3, "apindex_s"]:
-                        if ee_s_ave > 1.5 and ee_s > ee_s_ave:
-                            # if sXY_bns == 0:
-                            self.OrgMain = "s"
+            # cri_in only
+            # if ee_s > 1.8 and ee_s_ave > 1.5 and ee_s_slope > 0:
+            #     if self.cri_r > 0.5 and self.df.ix[self.nf - 1, "cri_r"] >= self.df.ix[self.nf - 2, "cri_r"]:
+            #         if self.cri > -3 and self.df.ix[self.nf - 1, "apindex_s"] >= self.df.ix[self.nf - 3, "apindex_s"]:
+            #             if ee_s_ave > 1.5 and ee_s > ee_s_ave:
+            #                 # if sXY_bns == 1:
+            #                 self.OrgMain = "b"
+            #                 self.nfset = self.nf
+            #                 self.inp = price
+            #     if self.cri_r < 1.5 and self.df.ix[self.nf - 1, "cri_r"] <= self.df.ix[self.nf - 2, "cri_r"]:
+            #         if self.cri < 3 and self.df.ix[self.nf - 1, "apindex_s"] <= self.df.ix[self.nf - 3, "apindex_s"]:
+            #             if ee_s_ave > 1.5 and ee_s > ee_s_ave:
+            #                 # if sXY_bns == 0:
+            #                 self.OrgMain = "s"
+            #                 self.nfset = self.nf
+            #                 self.inp = price
 
-        if 1 == 0:
-            if ee_s > 1.8 and ee_s_ave > 1.5 and ee_s_slope > 0:
-                if self.cri_r >= 1.8 and self.cri == 5:
-                    self.OrgMain = "b"
-                if self.cri_r <= 0.2 and self.cri == -5:
-                    self.OrgMain = "s"
-            self.df.at[self.nf, "org_in_2"] = org_in_2
-            self.df.at[self.nf, "org_in_3"] = org_in_3
+        ###############################
+        # hit_peak setting
+        ###############################
 
-            # # prf_able
-            # prf_able = 0
-            # if self.OrgMain == "b" and self.nfset != 0 and self.nfset < self.nf:
-            #     inst_p= 4+(o1px1 - inp_o)/float(tick_o)
-            #         if o1px1 >= inp_o + tick_o * 2:
-            #             prf_able = 1
-            #         else:
-            #             prf_able = 0
+        # prf_able
+        prf_able = 0
+        if self.OrgMain == "b":
+            if price >= self.inp + self.tick * 12:
+                prf_able = 1
+        if self.OrgMain == "s":
+            if price <= self.inp - self.tick * 12:
+                prf_able = 1
 
-        print "OrgMain", self.OrgMain
+        # hit_peak
+        adj_market=ee_s_ave/1.8
+        if self.OrgMain == "b":
+            if self.hit_peak==0:
+                if self.cri_r>=1.8 and bumpm>=2*adj_market and abumpm >= 2*adj_market:
+                    hit_type = "p_bump"
+                    self.hit_peak = 2
+                if s7>=30:
+                    hit_type = "p_s7_h"
+                    self.hit_peak = 2
+                if ee_s<1.7 and s7>=20:
+                    hit_type = "p_s7_l"
+                    self.hit_peak = 2
+            elif self.hit_peak==2:
+                if ee_s_ox==1:
+                    hit_type = "the_peak_ee_s"
+                    self.hit_peak = 4
+                if slope>=300 and ee_s>2.5:
+                    hit_type = "the_peak_slope"
+                    self.hit_peak = 4
+            elif self.hit_peak==4:
+                if ee_s_ox==0:
+                    hit_type = "peak_out"
+                    self.hit_peak = 6
+
+        elif self.OrgMain == "s":
+            if self.hit_peak==0:
+                if self.cri_r <= 0.2 and bumpm >= 2* adj_market and abumpm >= 2* adj_market:
+                    hit_type = "p_bump"
+                    self.hit_peak = -2
+                if s7 >= 30:
+                    hit_type = "p_s7_h"
+                    self.hit_peak = -2
+                if ee_s < 1.7 and s7 >= 20:
+                    hit_type = "p_s7_l"
+                    self.hit_peak = -2
+            elif self.hit_peak == -2:
+                if ee_s_ox == 1:
+                    hit_type = "the_peak_ee_s"
+                    self.hit_peak = -4
+                if slope<=-300 and ee_s>2.5:
+                    hit_type = "the_peak_slope"
+                    self.hit_peak = -4
+            elif self.hit_peak == -4:
+                if ee_s_ox == 0:  # ee_s>=1.8 and
+                    hit_type = "peak_out"
+                    self.hit_peak = -6
+
+        self.df.at[self.nf, "hit_peak"] = self.hit_peak
+
+        ###############################
+        #  // Out Decision //
+        ###############################
+
+        # piox
+        piox=0
+        if self.OrgMain == "b":
+
+            # Condition 1
+            if ee_s>1.8  and ee_s_ave > 1.5 and slope < -200:
+                if self.cri_r<=0.1 and self.df.ix[self.nf-1, "ee_s"]>self.df.ix[self.nf-2, "ee_s"]:
+                    #outype = "bad_out"
+                    self.profit+=(price-self.inp)
+                    piox = 1
+                    self.OrgMain='n'
+
+            # Condition 2
+                if ee_s < ee_s_ave_long:
+                    #outype = "ee_s_long_out"
+                    self.profit += (price - self.inp)
+                    piox = 2
+                    self.OrgMain='n'
+
+            if prf_able == 1:
+
+                # Condition 4
+                if  ee_s<ee_s_ave:
+                    #outype = "ee_s_out"
+                    self.profit += (price - self.inp)
+                    piox = 4
+                    self.OrgMain='n'
+
+                # Condition 5
+                if self.hit_peak == 2:
+                    if self.cri<5 and slope<0 and s3_m_short<0:
+                        if self.df.ix[self.nf-1, "ee_s"]<self.df.ix[self.nf-2, "ee_s"] and ee_s<1.8:
+                            #outype = "low_peak"
+                            self.profit += (price - self.inp)
+                            piox = 5
+                            self.OrgMain='n'
+
+                # Condition 6
+                if self.hit_peak == 6:
+                    #outype = "high_peak"
+                    self.profit += (price - self.inp)
+                    piox = 6
+                    self.OrgMain='n'
+
+        elif self.OrgMain == "s": #  and lstm_mean>0.75:
+
+            # Condition 1
+            if 1 == 1 and ee_s > 1.8 and ee_s_ave > 1.5 and slope > 200:
+                if self.cri_r>=1.9 and self.df.ix[self.nf - 1, "ee_s"] > self.df.ix[self.nf - 2, "ee_s"]:
+                    # outype = "bad_out"
+                    self.profit += (self.inp-price)
+                    piox = -1
+                    self.OrgMain='n'
+
+            # Condition 2
+                if ee_s < ee_s_ave_long:
+                    #outype = "ee_s_long_out"
+                    self.profit += (self.inp-price)
+                    piox = -2
+                    self.OrgMain='n'
+
+            if prf_able == 1:
+
+                # Condition 4
+                if ee_s < ee_s_ave:
+                    #outype = "ee_s_out"
+                    self.profit += (self.inp-price)
+                    piox = -4
+                    self.OrgMain='n'
+
+                # Condition 5
+                if self.hit_peak == -2 :
+                    if self.cri > 0 and slope > 0 and s3_m_short > 0:
+                        if self.df.ix[self.nf - 1, "ee_s"] < self.df.ix[self.nf - 2, "ee_s"] and ee_s < 1.8:
+                            #outype = "low_peak"
+                            self.profit += (self.inp-price)
+                            piox = -5
+                            self.OrgMain='n'
+
+                # Condition 6
+                if self.hit_peak == -6:
+                    #outype = "high_peak"
+                    self.profit += (self.inp-price)
+                    piox = -6
+                    self.OrgMain='n'
+
+        self.df.at[self.nf, "piox"] = piox
+        self.df.at[self.nf, "profit"] = self.profit
+
+        ###############################
+        #  // RESET & ETC //
+        ###############################
+
+        if self.OrgMain=="b":
+            self.d_OMain = 1
+        elif self.OrgMain=="s":
+            self.d_OMain = -1
+        elif self.OrgMain == "n":
+            self.d_OMain = 0
+            self.hit_peak = 0
+            self.inp = 0
+
+        self.df.at[self.nf, "d_OMain"] = self.d_OMain
         self.df.at[self.nf, "OrgMain"] = self.OrgMain
+        print "OrgMain", self.OrgMain
+
         self.nf+=1
+
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'mt', 'sXY', 'cvolume', 'pindex', 'apindex_s', 'ee_s','bumpm','s3','OrgMain']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'sXY', 'apindex_s', 'ee_s','bumpm','s3_m_m','OrgMain', 'inp']]
             print '-----------'
+
+        elap = time.time() - t_start
+        self.df.at[self.nf, "elap"] = elap
+        print "elap", elap
+
 
     def threadme(self):
         # thread_plot = threading.Thread(target=self.test,args=())
