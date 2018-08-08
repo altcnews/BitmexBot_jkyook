@@ -940,7 +940,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'sXY', 'apindex_s', 'ee_s','bumpm','cri','OrgMain', 'inp']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'sXY', 'apindex_s', 'ee_s','bumpm','cri','OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
@@ -1025,19 +1025,19 @@ class Nprob:
 def ynet(p, t, W, sw, a, b, c, d):
 
     if p == t:
-        if sw == "Buy":
+        if sw == "Sell":
             result = (a - b + W)
         else:
             result = (a - b)
 
     elif p < t:
-        if sw == "Buy":
+        if sw == "Sell":
             result = (a - b + c) + W
         else:
             result = (a - b + c)
 
     elif p > t:
-        if sw == "Buy":
+        if sw == "Sell":
             result = (a - b - d) + W #= W - b + a - d
         else:
             result = (a - b - d)
@@ -1047,19 +1047,19 @@ def ynet(p, t, W, sw, a, b, c, d):
 def xnet(p, t, W, sw, a, b, c, d):
 
     if p == t:
-        if sw == "Sell":
+        if sw == "Buy":
             result = (a - b + W)
         else:
             result = (a - b)
 
     elif p > t:
-        if sw == "Sell":
+        if sw == "Buy":
             result = (a - b + c) + W
         else:
             result = (a - b + c)
 
     elif p < t:
-        if sw == "Sell":
+        if sw == "Buy":
             result = (a - b - d) + W
         else:
             result = (a - b - d)
