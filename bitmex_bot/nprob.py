@@ -369,7 +369,7 @@ class Nprob:
             pindex2 = self.df.ix[self.nf - self.min_1:self.nf - 1, "pindex"].mean()
         self.df.at[self.nf, "pindex2"] = pindex2
 
-        # apindex_s = slope
+        # slope = slope
         if self.nf >= self.sec_30+1:
             # c = range(0, 300, 5)
             ry = self.df.ix[self.nf - self.sec_30:self.nf - 1, "sXY"] #.iloc[c]
@@ -379,7 +379,19 @@ class Nprob:
             slope = 0
             p_value = 0
             std_err = 0
-        self.df.at[self.nf, "apindex_s"] = slope
+        self.df.at[self.nf, "slope"] = slope
+
+        # slope_s
+        if self.nf >= self.min_1+1:
+            ry = self.df.ix[self.nf - self.sec_30:self.nf - 1, "slope"] #.iloc[c]
+            rx = self.df.ix[self.nf - self.sec_30:self.nf - 1, "stime"] #.iloc[c]
+            slope_s = regr.fit(rx.values.reshape(-1, 1), ry.values.reshape(-1, 1)).coef_[0][0] * 1000
+        else:
+            slope_s = 0
+            p_value_s = 0
+            std_err_s = 0
+        self.df.at[self.nf, "slope_s"] = slope_s
+
 
         ###############################
         # Bump, S-seires
@@ -734,13 +746,13 @@ class Nprob:
         if self.OrgMain == 'n' and self.nf >  self.min_1+1 :
 
             # ee_s, slope_in
-            if ee_s > 1.8 and ee_s_ave > 1.5 and ee_s >= ee_s_ave:
-                if slope > 100 and dt_sum_2 > 0:
+            if ee_s > 1.4 and ee_s >= ee_s_ave:  #and ee_s_ave > 1.5
+                if slope_s>0 and dt_main_2==1: #slope > 100 and and dt_sum_2 > 0
                     if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = price
-                if slope < -100 and dt_sum_2 < 0:
+                if slope_s<0 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
                     if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
                         self.OrgMain = "s"
                         self.nfset = self.nf
@@ -940,7 +952,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'sXY', 'apindex_s', 'ee_s','bumpm','cri','OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope', 'slope_s', 'ee_s','bumpm','cri','OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
@@ -1025,19 +1037,19 @@ class Nprob:
 def ynet(p, t, W, sw, a, b, c, d):
 
     if p == t:
-        if sw == "Sell":
+        if sw == "Buy":
             result = (a - b + W)
         else:
             result = (a - b)
 
     elif p < t:
-        if sw == "Sell":
+        if sw == "Buy":
             result = (a - b + c) + W
         else:
             result = (a - b + c)
 
     elif p > t:
-        if sw == "Sell":
+        if sw == "Buy":
             result = (a - b - d) + W #= W - b + a - d
         else:
             result = (a - b - d)
@@ -1047,19 +1059,19 @@ def ynet(p, t, W, sw, a, b, c, d):
 def xnet(p, t, W, sw, a, b, c, d):
 
     if p == t:
-        if sw == "Buy":
+        if sw == "Sell":
             result = (a - b + W)
         else:
             result = (a - b)
 
     elif p > t:
-        if sw == "Buy":
+        if sw == "Sell":
             result = (a - b + c) + W
         else:
             result = (a - b + c)
 
     elif p < t:
-        if sw == "Buy":
+        if sw == "Sell":
             result = (a - b - d) + W
         else:
             result = (a - b - d)
