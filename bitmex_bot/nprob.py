@@ -26,11 +26,11 @@ class Nprob:
         self.cri_r=0
         self.hit_peak=0
         self.loop=0.2           #Loop_interval
-        self.sec_15 = int(15 / self.loop)
-        self.sec_30 = int(30 / self.loop)
-        self.min_1 = int(60 / self.loop)
-        self.min_3 = int(180 / self.loop)
-        self.min_5 = int(300 / self.loop)
+        self.sec_15 = int(15 / self.loop)  # = 75  ns, nPXY, stPXY, a~e, ee_s, bump, abump, s1, s2_s, s3, s3_m_m
+        self.sec_30 = int(30 / self.loop)  # = 150  mtm, PXYm, stXY, pindex, slope, ee_s_slope, s2_c_m, s3_c, s3_m_short
+        self.min_1 = int(60 / self.loop)  # = 300  ststPXY, pindex2, ee_s_ave, ee_s_ox, s3_m_m, dt_main1,2, org_in_2, cri, cri_r, ee_s_cri
+        self.min_3 = int(180 / self.loop) # = 900  ee_s_ave_long
+        # self.min_5 = int(300 / self.loop)
         print 'init Nprob', self.nf
         a = pd.read_csv("index_bot.csv").columns.values.tolist()
         self.df = pd.DataFrame()
@@ -53,7 +53,7 @@ class Nprob:
         # if self.nf==120:
         #     self.btnPlot_Close()
 
-        if self.nf%3000==0:
+        if self.nf%1500==0:
             self.btnSave_Clicked()
 
         regr = linear_model.LinearRegression()
@@ -426,9 +426,9 @@ class Nprob:
 
         # ee
         if self.nf >= self.sec_15+1:
-            if mt < 1:
+            if mt < 0.99:
                 ee_mt = 1 + stat.norm.ppf((1 - mt) / float(1))
-            if mt >= 1:
+            if mt >= 0.99:
                 ee_mt = 1
         else:
             ee_mt = 1
@@ -438,8 +438,8 @@ class Nprob:
         # c2 = range(0, 3000, 100)
 
         # ee_s
-        if self.nf >= self.sec_30+1:
-            ee_s = self.df.ix[self.nf - 50:self.nf-1, "ee_mt"].mean()
+        if self.nf >= self.sec_15+1:
+            ee_s = self.df.ix[self.nf - self.sec_15:self.nf-1, "ee_mt"].mean()
         else:
             ee_s = 1
         self.df.at[self.nf, "ee_s"] = ee_s
@@ -548,7 +548,7 @@ class Nprob:
         self.df.at[self.nf, "s2_s"] = s2_s
 
         # s3_x, s3_y
-        span = int(self.sec_15/2)
+        span = self.sec_15
         if self.nf >= self.sec_15+1:
             s3_x = self.df.ix[self.nf - span:self.nf-1, "dx1"].mean() - self.df.ix[self.nf - span:self.nf-1, "dyy"].mean() + self.df.ix[self.nf - span:self.nf-1, "dy1"].mean()
             s3_y = self.df.ix[self.nf - span:self.nf-1, "dy1"].mean() - self.df.ix[self.nf - span:self.nf-1, "dxx"].mean() + self.df.ix[self.nf - span:self.nf-1, "dx1"].mean()
@@ -611,7 +611,7 @@ class Nprob:
         else:
             adj_s2 = 0
         s7 = 0
-        if nPXY != 0:
+        if s1 != 0 and self.nf >= self.sec_15+1 and nPXY != 0:
             if self.OrgMain == "b":
                 s7 = 4 + self.df.ix[self.nf - 1, "s1"] * elst / float(nPY) + stXY * adj_s2 / float(nPY)
             elif self.OrgMain == "s":
@@ -635,7 +635,7 @@ class Nprob:
             dt_main_1 = 0
         self.df.at[self.nf, "dt_main_1"] = dt_main_1
 
-        if self.nf > self.min_3+1 :
+        if self.nf > self.min_1+1 :
             dt_main_2 = 0
             if slope > 0 and s3 > 0 and mt < 0.15:
                 dt_main_2 = 1
@@ -646,20 +646,20 @@ class Nprob:
         self.df.at[self.nf, "dt_main_2"] = dt_main_2
 
         # dt_sum
-        if self.nf > self.min_3+1:
-            dt_sum_1 = self.df.ix[self.nf - self.min_3:self.nf-1, "dt_main_1"].mean()
+        if self.nf > self.min_1+1:
+            dt_sum_1 = self.df.ix[self.nf - self.min_1:self.nf-1, "dt_main_1"].mean()
         else:
             dt_sum_1=0
         self.df.at[self.nf, "dt_sum_1"] = dt_sum_1
 
-        if self.nf >  self.min_3+1:
-            dt_sum_2 = self.df.ix[self.nf -  self.min_3:self.nf-1, "dt_main_2"].mean()
+        if self.nf >  self.min_1+1:
+            dt_sum_2 = self.df.ix[self.nf -  self.min_1:self.nf-1, "dt_main_2"].mean()
         else:
             dt_sum_2=0
         self.df.at[self.nf, "dt_sum_2"] = dt_sum_2
 
         # org_in_2
-        if self.nf > self.min_3+1:
+        if self.nf > self.min_1+1:
             if s2_s > 0.5 and mt < 1: #wc_sXY_<40
                 if wc_sXY>99 and s3_x > 30000 and s3_y < 0:
                     self.org_in_2 = 1
@@ -693,13 +693,16 @@ class Nprob:
         self.df.at[self.nf, "cri"] = self.cri
 
         #cri_r
-        if self.nf >  self.min_3+1:
-            if ee_s>=1.7 and ee_s<2.2:
-                len_cri_r = int(500 + (ee_s-1.8) * 1250)
-            if ee_s>=2.2:
-                len_cri_r = 1000
-            if ee_s<1.7:
-                len_cri_r = 500
+        if self.nf >  self.min_1+1:
+            if self.nf>500:
+                if ee_s>=1.7 and ee_s<2.2:
+                    len_cri_r = int(500 + (ee_s-1.8) * 1250)
+                if ee_s>=2.2:
+                    len_cri_r = 1000
+                if ee_s<1.7:
+                    len_cri_r = 500
+            else:
+                len_cri_r = self.nf - 1
 
             df_r = self.df.ix[self.nf - min(self.nf,len_cri_r):self.nf - 1, "org_in_2"]
             df_r_y = df_r[df_r < 0].count()
@@ -718,7 +721,7 @@ class Nprob:
         self.df.at[self.nf, "cri_r"] = self.cri_r
 
         # ee_s * cri
-        if self.nf>= self.min_3+1:
+        if self.nf>= self.min_1+1:
             cri_ee_s = self.cri * ee_s
         else:
             cri_ee_s = 0
@@ -728,16 +731,16 @@ class Nprob:
         #  // In Decision //
         ###############################
 
-        if self.OrgMain == 'n' and self.nf >  self.min_3+1 :
+        if self.OrgMain == 'n' and self.nf >  self.min_1+1 :
 
             # ee_s, slope_in
             if ee_s > 1.8 and ee_s_ave > 1.5 and ee_s >= ee_s_ave:
-                if slope > 200 and dt_sum_2 > 0:
+                if slope > 100 and dt_sum_2 > 0:
                     if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = price
-                if slope < -200 and dt_sum_2 < 0:
+                if slope < -100 and dt_sum_2 < 0:
                     if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
                         self.OrgMain = "s"
                         self.nfset = self.nf
@@ -937,7 +940,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'sXY', 'apindex_s', 'ee_s','bumpm','s3_m_m','OrgMain', 'inp']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'sXY', 'apindex_s', 'ee_s','bumpm','cri','OrgMain', 'inp']]
             print '-----------'
 
         elap = time.time() - t_start
