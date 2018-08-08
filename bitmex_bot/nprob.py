@@ -14,7 +14,7 @@ class Nprob:
 
     def __init__(self):
         # global df , nf
-        self.nf=1
+        self.nf=0
         self.nfset=0
         self.tick = 0.5
         self.inp=0
@@ -53,7 +53,7 @@ class Nprob:
         # if self.nf==120:
         #     self.btnPlot_Close()
 
-        if self.nf%1500==0:
+        if self.nf!=0 and self.nf%1500==0:
             self.btnSave_Clicked()
 
         regr = linear_model.LinearRegression()
@@ -127,7 +127,7 @@ class Nprob:
         self.df.at[self.nf, "dxy"] = dxy
 
         # sX, sY, sXY
-        if self.nf == 1:
+        if self.nf == 0:
             sX = 0
             sY = 0
             sXY = 0
@@ -311,8 +311,8 @@ class Nprob:
             nPY = float(3*self.df.ix[self.nf - self.sec_15:self.nf - 1, "y1"].mean() + self.df.ix[self.nf - self.sec_15:self.nf - 1, "y2"].mean()) / 4
 
         nPXY = float(nPX + nPY) / 2
-        self.df.at[self.nf, "nPXY"] = nPXY
-        self.df.at[self.nf, "nPXY"] = nPXY
+        self.df.at[self.nf, "nPX"] = nPX
+        self.df.at[self.nf, "nPY"] = nPY
         self.df.at[self.nf, "nPXY"] = nPXY
 
         # stXY
@@ -788,6 +788,7 @@ class Nprob:
         if self.OrgMain == "s":
             if price <= self.inp - self.tick * 15:
                 prf_able = 1
+        self.df.at[self.nf, "prf_able"] = prf_able
 
         # hit_peak
         adj_market=ee_s_ave/1.8
