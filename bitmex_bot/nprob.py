@@ -44,7 +44,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print 'nf: %d prc: %0.1f ' & (self.nf, price)
+        print 'nf: %d   prc: %0.1f' % (self.nf, price)
         # nowtime=time.time()
 
         # if self.nf==50:
