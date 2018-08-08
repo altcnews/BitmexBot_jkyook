@@ -31,7 +31,8 @@ class Nprob:
         self.df = pd.DataFrame()
         self.df = pd.DataFrame(index=range(0, 1), columns=a)
         print self.df
-        # self.thread_plot = multiprocessing.Process(target=self.btnPlot_Clicked, args=())
+        self.thread_plot = multiprocessing.Process(target=self.btnPlot_Clicked, args=())
+        # self.thread_plot.start()
 
     def nprob(self, price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v): # lblShoga2v,, lblBhoga2v
         # global nf, df, nfset, OrgMain, nowtime
@@ -40,8 +41,8 @@ class Nprob:
         print 'nf : ', self.nf
         nowtime=time.time()
 
-        if self.nf==50:
-            self.threadme()
+        # if self.nf%150==0:
+        #     self.threadme()
             # self.btnPlot_Clicked()
         # if self.nf==120:
         #     self.btnPlot_Close()
@@ -787,10 +788,10 @@ class Nprob:
 
     def threadme(self):
         # thread_plot = threading.Thread(target=self.test,args=())
-        thread_plot = threading.Thread(target=self.btnPlot_Clicked, args=())
-        thread_plot.start()
-        # thread_plot = multiprocessing.Process(target=self.btnPlot_Clicked,args=())
-        # self.thread_plot.start()
+        # thread_plot = threading.Thread(target=self.btnPlot_Clicked, args=())
+        # thread_plot.start()
+        # self.thread_plot = multiprocessing.Process(target=self.btnPlot_Clicked,args=())
+        self.thread_plot.start()
 
     def test(self):
         print 'a'
@@ -845,7 +846,7 @@ class Nprob:
         print 'a'
         # plt.ion()
         plt.show()
-        time.sleep(4)
+        # time.sleep(4)
 
     def btnPlot_Close(self):
         global plt
