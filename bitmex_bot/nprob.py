@@ -490,11 +490,11 @@ class Nprob:
         # self.df.at[self.nf, "ee_s_m"] = ee_s_m
 
         # ee_s slope(mtv-slope * -1 conversion)
-        if self.nf >= self.sec_30+1:
+        if self.nf >= self.min_1+1:
             ee_s_y = self.df.ix[self.nf - self.sec_30:self.nf - 1, "ee_s"]
-            ee_s_x = self.df.ix[self.nf - self.sec_30:self.nf - 1, "nf"]
+            ee_s_x = self.df.ix[self.nf - self.sec_30:self.nf - 1, "stime"]
             # print ee_s_y.values.reshape(-1, 1)
-            ee_s_slope = regr.fit(ee_s_y.values.reshape(-1, 1), ee_s_x.values.reshape(-1, 1)).coef_[0][0]
+            ee_s_slope = regr.fit(ee_s_y.values.reshape(-1, 1), ee_s_x.values.reshape(-1, 1)).coef_[0][0]/100000
         else:
             ee_s_slope=0
         self.df.at[self.nf, "ee_s_slope"] = ee_s_slope
@@ -1007,7 +1007,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope', 'slope_s', 'ee_s','ee_slope','OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope', 'slope_s', 'ee_s','ee_s_slope','OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
