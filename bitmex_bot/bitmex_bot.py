@@ -234,7 +234,9 @@ class ExchangeInterface:
 
 class OrderManager:
     UP = "up"
+    UP2 = "up2"
     DOWN = "down"
+    DOWN2 = "down2"
     SELL = "sell"
     BUY = "buy"
 
@@ -326,15 +328,9 @@ class OrderManager:
 
     def nprob_check(self):
 
-        # global nf, t1, orderbook
-        # global price, cgubun, cvolume, volume, last_time, px1, py1
-        # global lblSqty2v, lblShoga2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v, lblBhoga2v
-
         last_trade_raw = self.exchange.last_trade()
         last_trade = last_trade_raw[-5]
-        # print last_trade
         timestamp_u = last_trade['timestamp'].encode("UTF-8")
-        # print self.last_time, timestamp_u
         if self.last_time!=timestamp_u:
             cgubun_sum = last_trade_raw[-4]
             cvolume_sum = last_trade_raw[-3]
@@ -367,7 +363,17 @@ class OrderManager:
 
             # t_start=time.time()
             if last_trade_raw != None:
-                self.np.nprob(price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v)
+                np = self.np.nprob(price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v)
+
+                if np == 1:
+                    self.macd_signal = self.UP
+                if np == 2:
+                    self.macd_signal = self.UP2
+                if np == -1:
+                    self.macd_signal = self.DOWN
+                if np == -2:
+                    self.macd_signal = self.DOWN2
+
             # print 'elap:', time.time() - t_start
 
             self.last_time = timestamp_u
@@ -433,6 +439,7 @@ class OrderManager:
         self.exchange.check_market_open()
 
         self.get_exchange_price()         # => macd_check = npob()
+        print 'MACD: ', self.macd_signal
 
         # logger.info("current BITMEX price is {}".format(self.last_price))
 
@@ -441,7 +448,7 @@ class OrderManager:
 
         if not self.is_trade:
             if self.macd_signal:
-                if self.macd_signal == self.UP:
+                if self.macd_signal == self.UP or self.macd_signal == self.UP2:
                     logger.info("Buy Trade Signal {}".format(self.last_price))
                     logger.info("-----------------------------------------")
                     self.is_trade = True
@@ -470,7 +477,7 @@ class OrderManager:
                                 sleep(settings.API_REST_INTERVAL)
                             self.close_order = True
 
-                elif self.macd_signal == self.DOWN:
+                elif self.macd_signal == self.DOWN or self.macd_signal == self.DOWN2:
                     logger.info("Sell Trade Signal {}".format(self.last_price))
                     logger.info("-----------------------------------------")
                     self.is_trade = True
