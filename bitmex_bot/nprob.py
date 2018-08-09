@@ -21,7 +21,7 @@ class Nprob:
         self.profit=0
         self.startime=time.time()
         self.OrgMain='n'
-        self.ord_count = 0
+        self.ord_count = 1
         self.org_in_2=0
         self.cri=0
         self.cri_r=0
@@ -864,14 +864,14 @@ class Nprob:
                 if ee_s>1.5  and ee_s_ave > 1.3 and slope < -150:
                     if self.cri_r<=0.1 and self.df.ix[self.nf-1, "ee_s"]>self.df.ix[self.nf-2, "ee_s"]:
                         #outype = "bad_out"
-                        self.profit+=(float(lblBhoga1v)-self.inp) - (float(lblBhoga1v)+self.inp)*0.00075
+                        self.profit+=((float(lblBhoga1v)-self.inp) - (float(lblBhoga1v)+self.inp)*0.00075)* self.ord_count
                         piox = 1
                         self.OrgMain='n'
 
                 # Condition 2
                 if ee_s > ee_s_ave_long and slope_s<0 and ee_s > 1.6:
                     #outype = "ee_s_long_out"
-                    self.profit += (float(lblBhoga1v) - self.inp) - (float(lblBhoga1v)+self.inp)*0.00075
+                    self.profit += ((float(lblBhoga1v) - self.inp) - (float(lblBhoga1v)+self.inp)*0.00075)* self.ord_count
                     piox = 2
                     self.OrgMain='n'
 
@@ -888,7 +888,8 @@ class Nprob:
                 # Condition 4
                 if ee_s<ee_s_ave and slope_s<0:
                     #outype = "ee_s_out"
-                    self.profit += (float(lblBhoga1v) - self.inp) - (float(lblBhoga1v)+self.inp)*0.00075
+                    self.profit += ((float(lblBhoga1v) - self.inp) - (
+                                float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     piox = 4
                     self.OrgMain='n'
 
@@ -897,21 +898,24 @@ class Nprob:
                     if self.cri<5 and slope<0 and s3_m_short<0:
                         if self.df.ix[self.nf-1, "ee_s"]<self.df.ix[self.nf-2, "ee_s"] and ee_s<1.8:
                             #outype = "low_peak"
-                            self.profit += (float(lblBhoga1v) - self.inp) - (float(lblBhoga1v)+self.inp)*0.00075
+                            self.profit += ((float(lblBhoga1v) - self.inp) - (
+                                        float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                             piox = 5
                             self.OrgMain='n'
 
                 # Condition 6
                 if self.hit_peak == 6:
                     #outype = "high_peak"
-                    self.profit += (float(lblBhoga1v) - self.inp) - (float(lblBhoga1v)+self.inp)*0.00075
+                    self.profit += ((float(lblBhoga1v) - self.inp) - (
+                                float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     piox = 6
                     self.OrgMain='n'
 
                 # Condition 7
                 if ee_s<1 and slope<0 and slope_s<0:
                     #outype = "dead after peak"
-                    self.profit += (float(lblBhoga1v) - self.inp) - (float(lblBhoga1v)+self.inp)*0.00075
+                    self.profit += ((float(lblBhoga1v) - self.inp) - (
+                                float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     piox = 3
                     self.OrgMain='n'
 
@@ -923,14 +927,14 @@ class Nprob:
                 if ee_s > 1.5 and ee_s_ave > 1.3 and slope > 150:
                     if self.cri_r>=1.9 and self.df.ix[self.nf - 1, "ee_s"] > self.df.ix[self.nf - 2, "ee_s"]:
                         # outype = "bad_out"
-                        self.profit += (self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075
+                        self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
                         piox = -1
                         self.OrgMain='n'
 
                 # Condition 2
                 if ee_s > ee_s_ave_long and slope_s>0 and ee_s > 1.6:
                     #outype = "ee_s_long_out"
-                    self.profit += (self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075
+                    self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
                     piox = -2
                     self.OrgMain='n'
 
@@ -947,7 +951,7 @@ class Nprob:
                 # Condition 4
                 if ee_s < ee_s_ave:
                     #outype = "ee_s_out"
-                    self.profit += (self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075
+                    self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
                     piox = -4
                     self.OrgMain='n'
 
@@ -956,21 +960,21 @@ class Nprob:
                     if self.cri > 0 and slope > 0 and s3_m_short > 0:
                         if self.df.ix[self.nf - 1, "ee_s"] < self.df.ix[self.nf - 2, "ee_s"] and ee_s < 1.8:
                             #outype = "low_peak"
-                            self.profit += (self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075
+                            self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
                             piox = -5
                             self.OrgMain='n'
 
                 # Condition 6
                 if self.hit_peak == -6:
                     #outype = "high_peak"
-                    self.profit += (self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075
+                    self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
                     piox = -6
                     self.OrgMain='n'
 
                 # Condition 7
                 if ee_s<1 and slope>0 and slope_s>0:
                     #outype = "dead after peak"
-                    self.profit += (self.inp - float(lblBhoga1v)) - (float(lblBhoga1v) + self.inp) * 0.00075
+                    self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
                     piox = 3
                     self.OrgMain='n'
 
@@ -987,7 +991,7 @@ class Nprob:
             self.d_OMain = -1
         elif self.OrgMain == "n":
             self.d_OMain = 0
-            self.ord_count = 0
+            self.ord_count = 1
             self.hit_peak = 0
             self.inp = 0
             self.nfset = 0
