@@ -373,6 +373,8 @@ class OrderManager:
                     self.macd_signal = self.DOWN
                 if np == -2:
                     self.macd_signal = self.DOWN2
+                if np == 0:
+                    self.macd_signal = False
 
             # print 'elap:', time.time() - t_start
 
