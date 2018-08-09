@@ -6,5 +6,10 @@ pyparsing==2.2.0
 requests==2.13.0
 six==1.10.0
 numpy
+pandas
+scipy
+datetime
+sklearn
+matplotlib
 websocket-client>=0.44.0
 gunicorn
