@@ -54,6 +54,7 @@ class Nprob:
         #     self.btnPlot_Close()
 
         if self.nf!=0 and self.nf%1500==0:
+            self.df=self.df[self.nf-self.min_3:self.nf-1]
             self.btnSave_Clicked()
 
         regr = linear_model.LinearRegression()
@@ -385,8 +386,8 @@ class Nprob:
 
         # slope_s
         if self.nf >= self.min_1+1:
-            ry = self.df.ix[self.nf - self.sec_30:self.nf - 1, "slope"] #.iloc[c]
-            rx = self.df.ix[self.nf - self.sec_30:self.nf - 1, "stime"] #.iloc[c]
+            ry = self.df.ix[self.nf - self.sec_15:self.nf - 1, "slope"] #.iloc[c]
+            rx = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stime"] #.iloc[c]
             slope_s = regr.fit(rx.values.reshape(-1, 1), ry.values.reshape(-1, 1)).coef_[0][0] * 1000
         else:
             slope_s = 0
@@ -750,17 +751,17 @@ class Nprob:
         if self.OrgMain == 'n' and self.nf >  self.min_1+1 :
 
             # ee_s, slope_in
-            if ee_s > 1.4 and ee_s >= ee_s_ave:  #and ee_s_ave > 1.5
+            if ee_s > 1.7 and ee_s >= ee_s_ave:  #and ee_s_ave > 1.5
                 if slope_s>0 and dt_main_2==1: #slope > 100 and and dt_sum_2 > 0
                     if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
                         self.OrgMain = "b"
                         self.nfset = self.nf
-                        self.inp = price
+                        self.inp = float(lblShoga1v)
                 if slope_s<0 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
                     if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
                         self.OrgMain = "s"
                         self.nfset = self.nf
-                        self.inp = price
+                        self.inp = float(lblBhoga1v)
         self.df.at[self.nf, "inp"] = self.inp
 
             # cri_in only
@@ -787,14 +788,14 @@ class Nprob:
         # prf_able
         prf_able = 0
         if self.OrgMain == "b":
-            if price >= self.inp + self.tick * 15:
+            if price >= self.inp + self.tick * 30:
                 prf_able = 1
-            if price <= self.inp - self.tick * 10:
+            if price <= self.inp - self.tick * 40:
                 prf_able = -1
         if self.OrgMain == "s":
-            if price <= self.inp - self.tick * 15:
+            if price <= self.inp - self.tick * 30:
                 prf_able = 1
-            if price >= self.inp + self.tick * 10:
+            if price >= self.inp + self.tick * 40:
                 prf_able = -1
         self.df.at[self.nf, "prf_able"] = prf_able
 
@@ -862,14 +863,14 @@ class Nprob:
                 if ee_s>1.5  and ee_s_ave > 1.3 and slope < -150:
                     if self.cri_r<=0.1 and self.df.ix[self.nf-1, "ee_s"]>self.df.ix[self.nf-2, "ee_s"]:
                         #outype = "bad_out"
-                        self.profit+=(price-self.inp) - (price+self.inp)*0.00075
+                        self.profit+=(float(lblBhoga1v)-self.inp) - (float(lblBhoga1v)+self.inp)*0.00075
                         piox = 1
                         self.OrgMain='n'
 
                 # Condition 2
-                if ee_s > ee_s_ave_long and slope_s<0 and ee_s > 1.3:
+                if ee_s > ee_s_ave_long and slope_s<0 and ee_s > 1.6:
                     #outype = "ee_s_long_out"
-                    self.profit += (price - self.inp) - (price+self.inp)*0.00075
+                    self.profit += (float(lblBhoga1v) - self.inp) - (float(lblBhoga1v)+self.inp)*0.00075
                     piox = 2
                     self.OrgMain='n'
 
@@ -878,7 +879,7 @@ class Nprob:
                 # Condition 4
                 if ee_s<ee_s_ave and slope_s<0:
                     #outype = "ee_s_out"
-                    self.profit += (price - self.inp) - (price+self.inp)*0.00075
+                    self.profit += (float(lblBhoga1v) - self.inp) - (float(lblBhoga1v)+self.inp)*0.00075
                     piox = 4
                     self.OrgMain='n'
 
@@ -887,14 +888,14 @@ class Nprob:
                     if self.cri<5 and slope<0 and s3_m_short<0:
                         if self.df.ix[self.nf-1, "ee_s"]<self.df.ix[self.nf-2, "ee_s"] and ee_s<1.8:
                             #outype = "low_peak"
-                            self.profit += (price - self.inp) - (price+self.inp)*0.00075
+                            self.profit += (float(lblBhoga1v) - self.inp) - (float(lblBhoga1v)+self.inp)*0.00075
                             piox = 5
                             self.OrgMain='n'
 
                 # Condition 6
                 if self.hit_peak == 6:
                     #outype = "high_peak"
-                    self.profit += (price - self.inp) - (price+self.inp)*0.00075
+                    self.profit += (float(lblBhoga1v) - self.inp) - (float(lblBhoga1v)+self.inp)*0.00075
                     piox = 6
                     self.OrgMain='n'
 
@@ -906,14 +907,14 @@ class Nprob:
                 if ee_s > 1.5 and ee_s_ave > 1.3 and slope > 150:
                     if self.cri_r>=1.9 and self.df.ix[self.nf - 1, "ee_s"] > self.df.ix[self.nf - 2, "ee_s"]:
                         # outype = "bad_out"
-                        self.profit += (self.inp-price) - (price+self.inp)*0.00075
+                        self.profit += (self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075
                         piox = -1
                         self.OrgMain='n'
 
                 # Condition 2
-                if ee_s > ee_s_ave_long and slope_s>0 and ee_s > 1.3:
+                if ee_s > ee_s_ave_long and slope_s>0 and ee_s > 1.6:
                     #outype = "ee_s_long_out"
-                    self.profit += (self.inp-price) - (price+self.inp)*0.00075
+                    self.profit += (self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075
                     piox = -2
                     self.OrgMain='n'
 
@@ -922,7 +923,7 @@ class Nprob:
                 # Condition 4
                 if ee_s < ee_s_ave:
                     #outype = "ee_s_out"
-                    self.profit += (self.inp-price) - (price+self.inp)*0.00075
+                    self.profit += (self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075
                     piox = -4
                     self.OrgMain='n'
 
@@ -931,14 +932,14 @@ class Nprob:
                     if self.cri > 0 and slope > 0 and s3_m_short > 0:
                         if self.df.ix[self.nf - 1, "ee_s"] < self.df.ix[self.nf - 2, "ee_s"] and ee_s < 1.8:
                             #outype = "low_peak"
-                            self.profit += (self.inp-price) - (price+self.inp)*0.00075
+                            self.profit += (self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075
                             piox = -5
                             self.OrgMain='n'
 
                 # Condition 6
                 if self.hit_peak == -6:
                     #outype = "high_peak"
-                    self.profit += (self.inp-price) - (price+self.inp)*0.00075
+                    self.profit += (self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075
                     piox = -6
                     self.OrgMain='n'
 
@@ -973,6 +974,7 @@ class Nprob:
         self.df.at[self.nf, "elap"] = elap
         print "elap", elap
 
+        return self.d_OMain
 
     def threadme(self):
         # thread_plot = threading.Thread(target=self.test,args=())
