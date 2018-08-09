@@ -54,7 +54,7 @@ class Nprob:
         # if self.nf==120:
         #     self.btnPlot_Close()
 
-        if self.nf!=0 and self.nf%500==0: # and self.nf>self.min_5
+        if self.nf!=0 and self.nf%1500==0: # and self.nf>self.min_5
             # self.df=self.df[self.nf-self.min_/3-1:self.nf]
             self.btnSave_Clicked()
 
@@ -218,13 +218,13 @@ class Nprob:
         ns = self.nf-self.sec_15
         self.df.at[self.nf, "ns"] = ns
 
-        # # nsf
-        # if ns == 0:
-        #     nsf = 0
-        # if ns != 0:
-        #     nsf = self.nf - ns
-        # self.df.at[self.nf, "nsf"] = nsf
-        #
+        # nsf
+        if ns == 0:
+            nsf = 0
+        if ns != 0:
+            nsf = self.nf - ns
+        self.df.at[self.nf, "nsf"] = nsf
+
 
         # Wilcoxon Test
 
@@ -621,19 +621,13 @@ class Nprob:
         self.df.at[self.nf, "s3_m"] = s3_m
 
         # s7
-        elst=1
-        if wc_sXY >= 60:
-            adj_s2 = 1
-        elif wc_sXY <= 40:
-            adj_s2 = -1
-        else:
-            adj_s2 = 0
+        adj_s2 = (wc_sXY-50) / 50
         s7 = 0
         if s1 != 0 and self.nf >= self.sec_15+1 and nPXY != 0:
             if self.OrgMain == "b":
-                s7 = 4 + self.df.ix[self.nf - 1, "s1"] * elst / float(nPY) + stXY * adj_s2 / float(nPY)
+                s7 = 4 + self.df.ix[self.nf - 1, "s1"] / float(nPY) + adj_s2 * stXY / float(nPY)
             elif self.OrgMain == "s":
-                s7 = 4 - self.df.ix[self.nf - 1, "s1"] * elst / float(nPX) - stXY * adj_s2 / float(nPX)
+                s7 = 4 - self.df.ix[self.nf - 1, "s1"] / float(nPX) - adj_s2 * stXY / float(nPY)
             elif self.OrgMain == "n":
                 s7 = 4 + stXY / float(nPXY)
         self.df.at[self.nf, "s7"] = s7
@@ -768,6 +762,7 @@ class Nprob:
                             self.nfset = self.nf
                             self.inp = float(lblBhoga1v)
         self.df.at[self.nf, "inp"] = self.inp
+        self.df.at[self.nf, "nfset"] = self.nfset
 
             # cri_in only
             # if ee_s > 1.8 and ee_s_ave > 1.5 and ee_s_slope > 0:
@@ -793,12 +788,12 @@ class Nprob:
         # prf_able
         prf_able = 0
         if self.OrgMain == "b":
-            if price >= self.inp + self.tick * 30:
+            if price >= self.inp + self.tick * 25:
                 prf_able = 1
             if price <= self.inp - self.tick * 40:
                 prf_able = -1
         if self.OrgMain == "s":
-            if price <= self.inp - self.tick * 30:
+            if price <= self.inp - self.tick * 25:
                 prf_able = 1
             if price >= self.inp + self.tick * 40:
                 prf_able = -1
@@ -834,7 +829,7 @@ class Nprob:
                 if self.cri_r <= 0.2 and bumpm>=2.5*ee_s_ave and abumpm >= 2.5*ee_s_ave:
                     hit_type = "p_bump"
                     self.hit_peak = -2
-                if s7 <= --50:
+                if s7 <= -50:
                     hit_type = "p_s7_h"
                     self.hit_peak = -2
                 if ee_s < 1.7 and s7 <= -20:
@@ -861,6 +856,14 @@ class Nprob:
         # piox
         piox=0
         if self.OrgMain == "b":
+
+            # Condition 6
+            if self.hit_peak == 6:
+                # outype = "high_peak"
+                self.profit += ((float(lblBhoga1v) - self.inp) - (
+                    float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                piox = 6
+                self.OrgMain = 'n'
 
             if prf_able == -1:
 
@@ -907,14 +910,6 @@ class Nprob:
                             piox = 5
                             self.OrgMain='n'
 
-                # Condition 6
-                if self.hit_peak == 6:
-                    #outype = "high_peak"
-                    self.profit += ((float(lblBhoga1v) - self.inp) - (
-                                float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                    piox = 6
-                    self.OrgMain='n'
-
                 # Condition 7
                 if ee_s<1 and slope<0 and slope_s<0:
                     #outype = "dead after peak"
@@ -924,6 +919,14 @@ class Nprob:
                     self.OrgMain='n'
 
         elif self.OrgMain == "s": #  and lstm_mean>0.75:
+
+            # Condition 6
+            if self.hit_peak == -6:
+                # outype = "high_peak"
+                self.profit += ((self.inp - float(lblBhoga1v)) - (
+                float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                piox = -6
+                self.OrgMain = 'n'
 
             if prf_able == -1:
 
@@ -967,13 +970,6 @@ class Nprob:
                             self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
                             piox = -5
                             self.OrgMain='n'
-
-                # Condition 6
-                if self.hit_peak == -6:
-                    #outype = "high_peak"
-                    self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
-                    piox = -6
-                    self.OrgMain='n'
 
                 # Condition 7
                 if ee_s<1 and slope>0 and slope_s>0:
