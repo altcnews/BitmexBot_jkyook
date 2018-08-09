@@ -752,7 +752,7 @@ class Nprob:
         if self.nf >  self.min_1+1 :
 
             # ee_s, slope_in
-            if ee_s > 1.7 and ee_s >= ee_s_ave:  #and ee_s_ave > 1.5
+            if ee_s > 1.7 and ee_s >= ee_s_ave and ee_s_slope>0:  #and ee_s_ave > 1.5
                 if slope_s>0 and dt_main_2==1: #slope > 100 and and dt_sum_2 > 0
                     if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
                         self.df.at[self.nf, "sig"] = 1
@@ -1007,7 +1007,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope', 'slope_s', 'ee_s','bumpm','cri','OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope', 'slope_s', 'ee_s','ee_slope','OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
