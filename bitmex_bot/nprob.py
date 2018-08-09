@@ -20,6 +20,7 @@ class Nprob:
         self.inp=0
         self.profit=0
         self.startime=time.time()
+        self.sig = 0
         self.OrgMain='n'
         self.ord_count = 1
         self.org_in_2=0
@@ -442,9 +443,9 @@ class Nprob:
 
         # ee
         if self.nf >= self.sec_15+1:
-            if mt < 0.99:
+            if mt < 0.98:
                 ee_mt = 1 + stat.norm.ppf((1 - mt) / float(1))
-            if mt >= 0.99:
+            if mt >= 0.98:
                 ee_mt = 1
         else:
             ee_mt = 1
@@ -746,22 +747,24 @@ class Nprob:
         if self.nf >  self.min_1+1 :
 
             # ee_s, slope_in
+            self.sig=0
             if ee_s > 1.7 and ee_s >= ee_s_ave and ee_s_slope>0:  #and ee_s_ave > 1.5
                 if slope_s>0 and dt_main_2==1: #slope > 100 and and dt_sum_2 > 0
                     if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
-                        self.df.at[self.nf, "sig"] = 1
+                        self.sig = 1
                         if self.OrgMain == 'n':
                             self.OrgMain = "b"
                             self.nfset = self.nf
                             self.inp = float(lblShoga1v)
                 if slope_s<0 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
                     if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
-                        self.df.at[self.nf, "sig"] = -1
+                        self.sig = -1
                         if self.OrgMain == 'n':
                             self.OrgMain = "s"
                             self.nfset = self.nf
                             self.inp = float(lblBhoga1v)
         self.df.at[self.nf, "inp"] = self.inp
+        self.df.at[self.nf, "sig"] = self.sig
         self.df.at[self.nf, "nfset"] = self.nfset
 
             # cri_in only
@@ -1003,7 +1006,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope', 'slope_s', 'ee_s','ee_s_slope', 'sig''OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope', 'slope_s', 'ee_s','ee_s_slope', 'sig', 'OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
