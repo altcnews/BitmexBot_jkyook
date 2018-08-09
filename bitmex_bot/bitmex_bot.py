@@ -374,7 +374,6 @@ class OrderManager:
                 if np == -2:
                     self.macd_signal = self.DOWN2
 
-
             # print 'elap:', time.time() - t_start
 
             self.last_time = timestamp_u
@@ -440,6 +439,7 @@ class OrderManager:
         self.exchange.check_market_open()
 
         self.get_exchange_price()         # => macd_check = npob()
+        print 'MACD: ', self.macd_signal
 
         # logger.info("current BITMEX price is {}".format(self.last_price))
 
@@ -448,7 +448,7 @@ class OrderManager:
 
         if not self.is_trade:
             if self.macd_signal:
-                if self.macd_signal == self.UP:
+                if self.macd_signal == self.UP or self.macd_signal == self.UP2:
                     logger.info("Buy Trade Signal {}".format(self.last_price))
                     logger.info("-----------------------------------------")
                     self.is_trade = True
@@ -477,7 +477,7 @@ class OrderManager:
                                 sleep(settings.API_REST_INTERVAL)
                             self.close_order = True
 
-                elif self.macd_signal == self.DOWN:
+                elif self.macd_signal == self.DOWN or self.macd_signal == self.DOWN2:
                     logger.info("Sell Trade Signal {}".format(self.last_price))
                     logger.info("-----------------------------------------")
                     self.is_trade = True
