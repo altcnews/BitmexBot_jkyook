@@ -21,6 +21,7 @@ class Nprob:
         self.profit=0
         self.startime=time.time()
         self.OrgMain='n'
+        self.ord_count = 0
         self.org_in_2=0
         self.cri=0
         self.cri_r=0
@@ -30,7 +31,7 @@ class Nprob:
         self.sec_30 = int(30 / self.loop)  # = 150  mtm, PXYm, stXY, pindex, slope, ee_s_slope, s2_c_m, s3_c, s3_m_short
         self.min_1 = int(60 / self.loop)  # = 300  ststPXY, pindex2, ee_s_ave, ee_s_ox, s3_m_m, dt_main1,2, org_in_2, cri, cri_r, ee_s_cri
         self.min_3 = int(180 / self.loop) # = 900  ee_s_ave_long
-        # self.min_5 = int(300 / self.loop)
+        self.min_5 = int(300 / self.loop)
         print 'init Nprob', self.nf
         a = pd.read_csv("index_bot.csv").columns.values.tolist()
         self.df = pd.DataFrame()
@@ -53,8 +54,8 @@ class Nprob:
         # if self.nf==120:
         #     self.btnPlot_Close()
 
-        if self.nf!=0 and self.nf%1500==0:
-            self.df=self.df[self.nf-self.min_3:self.nf-1]
+        if self.nf!=0 and self.nf%500==0: # and self.nf>self.min_5
+            # self.df=self.df[self.nf-self.min_/3-1:self.nf]
             self.btnSave_Clicked()
 
         regr = linear_model.LinearRegression()
@@ -386,8 +387,8 @@ class Nprob:
 
         # slope_s
         if self.nf >= self.min_1+1:
-            ry = self.df.ix[self.nf - self.sec_15:self.nf - 1, "slope"] #.iloc[c]
-            rx = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stime"] #.iloc[c]
+            ry = self.df.ix[self.nf - self.sec_30:self.nf - 1, "slope"] #.iloc[c]
+            rx = self.df.ix[self.nf - self.sec_30:self.nf - 1, "stime"] #.iloc[c]
             slope_s = regr.fit(rx.values.reshape(-1, 1), ry.values.reshape(-1, 1)).coef_[0][0] * 1000
         else:
             slope_s = 0
@@ -874,6 +875,14 @@ class Nprob:
                     piox = 2
                     self.OrgMain='n'
 
+                #### Condition 3 (Additional Order) ####
+                if ee_s > ee_s_ave_long and slope_s>0 and ee_s > 1.8:
+                    if self.ord_count<=3 and price<self.inp-self.tick*10:
+                        piox = 10
+                        self.ord_count += 1
+                        self.inp = (self.inp + float(lblShoga1v))/self.ord_count
+                        return 2
+
             if prf_able == 1:
 
                 # Condition 4
@@ -918,6 +927,14 @@ class Nprob:
                     piox = -2
                     self.OrgMain='n'
 
+                #### Condition 3 (Additional Order) ####
+                if ee_s > ee_s_ave_long and slope_s<0 and ee_s > 1.8:
+                    if self.ord_count<=3 and price>self.inp+self.tick*10:
+                        piox = -10
+                        self.ord_count += 1
+                        self.inp = (self.inp + float(lblBhoga1v))/self.ord_count
+                        return -2
+
             if prf_able == 1:
 
                 # Condition 4
@@ -956,6 +973,7 @@ class Nprob:
             self.d_OMain = -1
         elif self.OrgMain == "n":
             self.d_OMain = 0
+            self.ord_count = 0
             self.hit_peak = 0
             self.inp = 0
             self.nfset = 0
