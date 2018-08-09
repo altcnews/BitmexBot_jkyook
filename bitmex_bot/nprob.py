@@ -749,20 +749,24 @@ class Nprob:
         #  // In Decision //
         ###############################
 
-        if self.OrgMain == 'n' and self.nf >  self.min_1+1 :
+        if self.nf >  self.min_1+1 :
 
             # ee_s, slope_in
             if ee_s > 1.7 and ee_s >= ee_s_ave:  #and ee_s_ave > 1.5
                 if slope_s>0 and dt_main_2==1: #slope > 100 and and dt_sum_2 > 0
                     if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
-                        self.OrgMain = "b"
-                        self.nfset = self.nf
-                        self.inp = float(lblShoga1v)
+                        self.df.at[self.nf, "sig"] = 1
+                        if self.OrgMain == 'n':
+                            self.OrgMain = "b"
+                            self.nfset = self.nf
+                            self.inp = float(lblShoga1v)
                 if slope_s<0 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
                     if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
-                        self.OrgMain = "s"
-                        self.nfset = self.nf
-                        self.inp = float(lblBhoga1v)
+                        self.df.at[self.nf, "sig"] = -1
+                        if self.OrgMain == 'n':
+                            self.OrgMain = "s"
+                            self.nfset = self.nf
+                            self.inp = float(lblBhoga1v)
         self.df.at[self.nf, "inp"] = self.inp
 
             # cri_in only
@@ -975,7 +979,7 @@ class Nprob:
                 if ee_s<1 and slope>0 and slope_s>0:
                     #outype = "dead after peak"
                     self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
-                    piox = 3
+                    piox = -3
                     self.OrgMain='n'
 
         self.df.at[self.nf, "piox"] = piox
