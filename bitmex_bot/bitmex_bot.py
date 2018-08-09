@@ -365,10 +365,10 @@ class OrderManager:
             lblBqty2v = orderbook[0]['bids'][1][1]
             lblBhoga2v = orderbook[0]['bids'][1][0]
 
-            t_start=time.time()
+            # t_start=time.time()
             if last_trade_raw != None:
                 self.np.nprob(price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v)
-            print 'elap:', time.time() - t_start
+            # print 'elap:', time.time() - t_start
 
             self.last_time = timestamp_u
 
