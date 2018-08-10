@@ -907,10 +907,11 @@ class Nprob:
 
                 #### Condition 3 (Additional Order) ####
                 if ee_s > ee_s_ave and slope_s>0 and ee_s > 1.8:
-                    if self.ord_count<=3 and price<self.inp-self.tick*10:
+                    if self.ord_count<=3 and price<self.inp-self.tick*(10*self.ord_count):
                         piox = 10
                         self.ord_count += 1
                         self.inp = (self.inp + float(lblShoga1v))/self.ord_count
+                        print self.ord_count
                         return 2
 
             if prf_able == 1:
@@ -970,10 +971,11 @@ class Nprob:
 
                 #### Condition 3 (Additional Order) ####
                 if ee_s > ee_s_ave and slope_s<0 and ee_s > 1.8:
-                    if self.ord_count<=3 and price>self.inp+self.tick*10:
+                    if self.ord_count<=3 and price>self.inp+self.tick*(10*self.ord_count):
                         piox = -10
                         self.ord_count += 1
                         self.inp = (self.inp + float(lblBhoga1v))/self.ord_count
+                        print self.ord_count
                         return -2
 
             if prf_able == 1:
