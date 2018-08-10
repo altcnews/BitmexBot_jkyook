@@ -28,7 +28,7 @@ class Nprob:
         self.cri=0
         self.cri_r=0
         self.hit_peak=0
-        self.loop=0.5           #Loop_interval
+        self.loop=0.5           #Loop_interval(0.25)
         self.sec_15 = int(15 / self.loop)  # = 75  ns, nPXY, stPXY, a~e, ee_s, bump, abump, s1, s2_s, s3, s3_m_m
         self.sec_30 = int(30 / self.loop)  # = 150  mtm, PXYm, stXY, pindex, slope, ee_s_slope, s2_c_m, s3_c, s3_m_short
         self.min_1 = int(60 / self.loop)  # = 300  ststPXY, pindex2, ee_s_ave, ee_s_ox, s3_m_m, dt_main1,2, org_in_2, cri, cri_r, ee_s_cri
@@ -47,7 +47,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print 'nf: %d   ,prc: %0.1f  ,hit_peak: %d   ,turn_over: %d' % (self.nf, price, self.hit_peak, self.turnover)
+        print 'nf: %d   /prc: %0.1f  /hit_peak: %d   /turn_over: %d' % (self.nf, price, self.hit_peak, self.turnover)
         # nowtime=time.time()
 
         # if self.nf==50:
@@ -386,6 +386,14 @@ class Nprob:
             p_value = 0
             std_err = 0
         self.df.at[self.nf, "slope"] = slope
+
+        # slope_m
+        if self.nf < self.min_1+1:
+            slope_m = 0
+        if self.nf >= self.min_1+1:
+            slope_m = self.df.ix[self.nf - self.min_1:self.nf - 1, "slope"].mean()
+        self.df.at[self.nf, "slope_m"] = slope_m
+
 
         # slope_s
         if self.nf >= self.min_1+1:
@@ -750,7 +758,7 @@ class Nprob:
             # ee_s, slope_in
             self.sig=0
             if ee_s > 1.7 and ee_s >= ee_s_ave and ee_s_slope>0:  #and ee_s_ave > 1.5
-                if slope_s>0 and dt_main_2==1: #slope > 100 and and dt_sum_2 > 0
+                if slope_s>0 and slope_m>25 and dt_main_2==1: #slope > 100 and and dt_sum_2 > 0
                     if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
                         if ee_s >= 2 or count>=20:
                             if nPY < 300000:
@@ -764,7 +772,7 @@ class Nprob:
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
-                if slope_s<0 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
+                if slope_s<0 and slope_m<-25 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
                     if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
                         if ee_s >= 2 or count >= 20:
                             if nPY < 300000:
@@ -841,11 +849,14 @@ class Nprob:
                 if ee_s<1.7 and s7>=20:
                     hit_type = "p_s7_l"
                     self.hit_peak = 2
+                if slope>=100 or slope_s>=5:
+                    hit_type = "slope"
+                    self.hit_peak = 6
             elif self.hit_peak==2:
                 if ee_s_ox==1:
                     hit_type = "the_peak_ee_s"
                     self.hit_peak = 4
-                if slope>=300 and ee_s>2.5:
+                if slope>=300 or ee_s>2.5 or slope_s>=10:
                     hit_type = "the_peak_slope"
                     self.hit_peak = 4
             elif self.hit_peak==4:
@@ -864,11 +875,14 @@ class Nprob:
                 if ee_s < 1.7 and s7 <= -20:
                     hit_type = "p_s7_l"
                     self.hit_peak = -2
+                if slope<=-100 or slope_s<=-5:
+                    hit_type = "slope"
+                    self.hit_peak = -6
             elif self.hit_peak == -2:
                 if ee_s_ox == 1:
                     hit_type = "the_peak_ee_s"
                     self.hit_peak = -4
-                if slope<=-300 and ee_s>2.5:
+                if slope<=-300 or ee_s>2.5 or slope_s<=-10:
                     hit_type = "the_peak_slope"
                     self.hit_peak = -4
             elif self.hit_peak == -4:
@@ -923,7 +937,7 @@ class Nprob:
                         print self.ord_count
                         return 2
 
-            if prf_able == 1:
+            if prf_able == 1 and ee_s<2:
 
                 # Condition 4
                 if self.OrgMain == "b" and ee_s<ee_s_ave and slope_s<0:
@@ -993,7 +1007,7 @@ class Nprob:
                         print self.ord_count
                         return -2
 
-            if prf_able == 1:
+            if prf_able == 1 and ee_s<2:
 
                 # Condition 4
                 if self.OrgMain == "s" and ee_s < ee_s_ave:
@@ -1047,7 +1061,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope', 'slope_s', 'ee_s','ee_s_slope', 'sig', 'OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope_m', 'slope_s', 'ee_s','ee_s_slope', 'sig', 'OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
