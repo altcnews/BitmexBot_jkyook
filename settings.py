@@ -67,12 +67,6 @@ BASE_URL = "https://testnet.bitmex.com/api/v1/"
 ########################################################################################################################
 ########################################################################################################################
 
-if MODE == "TESTING":
-    API_KEY = "3_9ozC36G73tuqLP9pEaUg9b"
-    API_SECRET = "ZwXjgm5bGiQlZBiTgEQRDt7BTQQrHeWPSMnla0JkztydScoG"
-if MODE == "LIVE":
-    API_KEY = "I8MYug9WkMyugUiOBpVCt6tV"
-    API_SECRET = "Y2tn5q6kqMmKHRjh9WKaFVJYOU4BfNcUsOQay3CrgaRx4bla"
 
 
 ########################################################################################################################
