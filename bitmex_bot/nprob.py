@@ -55,7 +55,7 @@ class Nprob:
         # if self.nf==120:
         #     self.btnPlot_Close()
 
-        if self.nf!=0 and self.nf%1500==0: # and self.nf>self.min_5
+        if self.nf!=0 and self.nf%2000==0: # and self.nf>self.min_5
             # self.df=self.df[self.nf-self.min_/3-1:self.nf]
             self.btnSave_Clicked()
 
@@ -757,8 +757,7 @@ class Nprob:
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
-                        if ee_s < 2.3:
-                            self.sig = -1
+                        else:
                             if self.OrgMain == 'n':
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
@@ -771,7 +770,7 @@ class Nprob:
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
-                        if ee_s < 2.3:
+                        else:
                             self.sig = 1
                             if self.OrgMain == 'n':
                                 self.OrgMain = "b"
