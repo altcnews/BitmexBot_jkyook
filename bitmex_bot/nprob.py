@@ -804,12 +804,16 @@ class Nprob:
 
         # prf_able
         prf_able = 0
-        profit_band = 25 * ee_s
-        loss_band = 40 * ee_s
-        if profit_band>60:
-            profit_band=50
-        if loss_band>80:
-            loss_band=80
+        profit_band = 15 * ee_s
+        loss_band = 20 * ee_s
+        if profit_band>40:
+            profit_band=40
+        if profit_band<20:
+            profit_band=20
+        if loss_band>50:
+            loss_band=50
+        if loss_band<30:
+            loss_band=30
         if self.OrgMain == "b":
             if price >= self.inp + self.tick * profit_band:
                 prf_able = 1
