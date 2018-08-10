@@ -752,13 +752,13 @@ class Nprob:
                 if slope_s>0 and dt_main_2==1: #slope > 100 and and dt_sum_2 > 0
                     if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
                         if ee_s < 2.3:
-                            self.df.at[self.nf, "sig"] = -1
+                            self.sig = -1
                             if self.OrgMain == 'n':
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
                         if ee_s >= 2.3:
-                            self.df.at[self.nf, "sig"] = 1
+                            self.sig = 1
                             if self.OrgMain == 'n':
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
@@ -766,13 +766,13 @@ class Nprob:
                 if slope_s<0 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
                     if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
                         if ee_s < 2.3:
-                            self.df.at[self.nf, "sig"] = 1
+                            self.sig = 1
                             if self.OrgMain == 'n':
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
                         if ee_s >= 2.3:
-                            self.df.at[self.nf, "sig"] = -1
+                            self.sig = -1
                             if self.OrgMain == 'n':
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
