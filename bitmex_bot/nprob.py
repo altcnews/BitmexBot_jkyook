@@ -752,13 +752,13 @@ class Nprob:
                 if slope_s>0 and dt_main_2==1: #slope > 100 and and dt_sum_2 > 0
                     if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
                         if ee_s < 2.3:
-                            self.df.at[self.nf, "sig"] = -1
+                            self.sig = -1
                             if self.OrgMain == 'n':
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
                         if ee_s >= 2.3:
-                            self.df.at[self.nf, "sig"] = 1
+                            self.sig = 1
                             if self.OrgMain == 'n':
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
@@ -766,29 +766,17 @@ class Nprob:
                 if slope_s<0 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
                     if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
                         if ee_s < 2.3:
-                            self.df.at[self.nf, "sig"] = 1
+                            self.sig = 1
                             if self.OrgMain == 'n':
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
                         if ee_s >= 2.3:
-                            self.df.at[self.nf, "sig"] = -1
+                            self.sig = -1
                             if self.OrgMain == 'n':
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
-                        if self.OrgMain == 'n':
-                            self.OrgMain = "b"
-                            self.nfset = self.nf
-                            self.inp = float(lblShoga1v)
-                if slope_s<0 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
-                    if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
-                        self.sig = -1
-                        if self.OrgMain == 'n':
-                            self.OrgMain = "s"
-                            self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)
->>>>>>> github/jkyook
         self.df.at[self.nf, "inp"] = self.inp
         self.df.at[self.nf, "sig"] = self.sig
         self.df.at[self.nf, "nfset"] = self.nfset
@@ -816,15 +804,25 @@ class Nprob:
 
         # prf_able
         prf_able = 0
+        profit_band = 15 * ee_s
+        loss_band = 20 * ee_s
+        if profit_band>40:
+            profit_band=40
+        if profit_band<20:
+            profit_band=20
+        if loss_band>50:
+            loss_band=50
+        if loss_band<30:
+            loss_band=30
         if self.OrgMain == "b":
-            if price >= self.inp + self.tick * 25:
+            if price >= self.inp + self.tick * profit_band:
                 prf_able = 1
-            if price <= self.inp - self.tick * 40:
+            if price <= self.inp - self.tick * loss_band:
                 prf_able = -1
         if self.OrgMain == "s":
-            if price <= self.inp - self.tick * 25:
+            if price <= self.inp - self.tick * profit_band:
                 prf_able = 1
-            if price >= self.inp + self.tick * 40:
+            if price >= self.inp + self.tick * loss_band:
                 prf_able = -1
         self.df.at[self.nf, "prf_able"] = prf_able
 
@@ -913,10 +911,11 @@ class Nprob:
 
                 #### Condition 3 (Additional Order) ####
                 if ee_s > ee_s_ave and slope_s>0 and ee_s > 1.8:
-                    if self.ord_count<=3 and price<self.inp-self.tick*10:
+                    if self.ord_count<=3 and price<self.inp-self.tick*(10*self.ord_count):
                         piox = 10
                         self.ord_count += 1
                         self.inp = (self.inp + float(lblShoga1v))/self.ord_count
+                        print self.ord_count
                         return 2
 
             if prf_able == 1:
@@ -976,10 +975,11 @@ class Nprob:
 
                 #### Condition 3 (Additional Order) ####
                 if ee_s > ee_s_ave and slope_s<0 and ee_s > 1.8:
-                    if self.ord_count<=3 and price>self.inp+self.tick*10:
+                    if self.ord_count<=3 and price>self.inp+self.tick*(10*self.ord_count):
                         piox = -10
                         self.ord_count += 1
                         self.inp = (self.inp + float(lblBhoga1v))/self.ord_count
+                        print self.ord_count
                         return -2
 
             if prf_able == 1:
