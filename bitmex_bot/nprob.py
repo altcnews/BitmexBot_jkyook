@@ -893,7 +893,7 @@ class Nprob:
             #     if ee_s_ox==0:
             #         hit_type = "peak_out"
             #         self.hit_peak = 6
-                if slope>=300 or slope_s>=20 or slope_m<=200:
+                if slope>=200 or slope_s>=10 or slope_m>=150 or ee_s>2.2:
                     hit_type = "the_peak_slope"
                     self.hit_peak = 6
 
@@ -920,7 +920,7 @@ class Nprob:
             #     if ee_s_ox == 0:  # ee_s>=1.8 and
             #         hit_type = "peak_out"
             #         self.hit_peak = -6
-                if slope<=-300 or slope_s<=-20 or slope_m<=-200:
+                if slope<=-200 or slope_s<=-10 or slope_m<=-150 or ee_s>2.2:
                     hit_type = "the_peak_slope"
                     self.hit_peak = -6
 
