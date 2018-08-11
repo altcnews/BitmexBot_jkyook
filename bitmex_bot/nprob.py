@@ -779,77 +779,77 @@ class Nprob:
 
         if self.nf >  self.min_1+1 :
 
-            # count_in_peak
-            if count_m>20 and slope>300:
-                if slope_m>0:
-                    if self.OrgMain == 'n':
-                        self.sig = 3
-                        self.OrgMain = "b"
-                        self.nfset = self.nf
-                        self.inp = float(lblShoga1v)
-                if slope_m < 0:
-                    if self.OrgMain == 'n':
-                        self.sig = -3
-                        self.OrgMain = "s"
-                        self.nfset = self.nf
-                        self.inp = float(lblBhoga1v)
+            # # count_in_peak
+            # if count_m>20:
+            #     if slope_m>150 and slope>300:
+            #         if self.OrgMain == 'n':
+            #             self.sig = 3
+            #             self.OrgMain = "b"
+            #             self.nfset = self.nf
+            #             self.inp = float(lblShoga1v)
+            #     if slope_m < -150 and slope<-300:
+            #         if self.OrgMain == 'n':
+            #             self.sig = -3
+            #             self.OrgMain = "s"
+            #             self.nfset = self.nf
+            #             self.inp = float(lblBhoga1v)
 
             # count_in_middle
             if count_m > 5:
-                if nPY_m<400000:  #cvol_m>100000 and
+                if nPY_m!=0 and nPY_m<400000:  #cvol_m>100000 and
                     if self.OrgMain == 'n':
                         self.sig = 2
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
-                if nPX_m<400000:  #cvol_m<-100000 and
+                if nPX_m!=0 and nPX_m<400000:  #cvol_m<-100000 and
                     if self.OrgMain == 'n':
                         self.sig = -2
                         self.OrgMain = "s"
                         self.nfset = self.nf
                         self.inp = float(lblBhoga1v)
 
-            # orginal in decision
-            if count_m<20:
-                if ee_s > 1.5 and ee_s >= ee_s_ave and ee_s_slope>0:  #and ee_s_ave > 1.5
-                    if dt_sum_1>0 and slope_m>25 and dt_main_2==1: #  slope > 100 and and dt_sum_2 > 0  slope_s>0
-                        # if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
-                        # if ee_s >= 2 or count_m>=20:
-                        #     if nPY < 500000:
-                        #         if self.OrgMain == 'n':
-                        #             self.sig = 2
-                        #             self.OrgMain = "b"
-                        #             self.nfset = self.nf
-                        #             self.inp = float(lblShoga1v)
-                        # else:
-                        self.inp_preset = float(lblBhoga1v)
-                    if self.inp_preset!=0 and slope_m>0 and float(lblBhoga1v)<self.inp_preset:
-                        if self.OrgMain == 'n':
-                            self.sig = 1
-                            self.OrgMain = "s"
-                            self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)
-                            self.inp_preset = 0
-                    if dt_sum_1<0 and slope_m<-25 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
-                        # if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
-                        # if ee_s >= 2 or count_m >= 20:
-                        #     if nPX < 500000:
-                        #         if self.OrgMain == 'n':
-                        #             self.sig = -2
-                        #             self.OrgMain = "s"
-                        #             self.nfset = self.nf
-                        #             self.inp = float(lblBhoga1v)
-                        # else:
-                        self.inp_preset = float(lblShoga1v)
-                    if self.inp_preset!=0 and slope_m<0 and float(lblShoga1v)>self.inp_preset:
-                        if self.OrgMain == 'n':
-                            self.sig = -1
-                            self.OrgMain = "b"
-                            self.nfset = self.nf
-                            self.inp = float(lblShoga1v)
-                            self.inp_preset = 0
-                else:
-                    self.inp_preset = 0
+            # # orginal in decision
+            # if count_m<20:
+            #     if ee_s > 1.5 and ee_s >= ee_s_ave and ee_s_slope>0:  #and ee_s_ave > 1.5
+            #         if dt_sum_1>0 and slope_m>25 and dt_main_2==1: #  slope > 100 and and dt_sum_2 > 0  slope_s>0
+            #             # if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
+            #             # if ee_s >= 2 or count_m>=20:
+            #             #     if nPY < 500000:
+            #             #         if self.OrgMain == 'n':
+            #             #             self.sig = 2
+            #             #             self.OrgMain = "b"
+            #             #             self.nfset = self.nf
+            #             #             self.inp = float(lblShoga1v)
+            #             # else:
+            #             self.inp_preset = float(lblBhoga1v)
+            #         if self.inp_preset!=0 and slope_m>0 and float(lblBhoga1v)<self.inp_preset:
+            #             if self.OrgMain == 'n':
+            #                 self.sig = 1
+            #                 self.OrgMain = "s"
+            #                 self.nfset = self.nf
+            #                 self.inp = float(lblBhoga1v)
+            #                 self.inp_preset = 0
+            #         if dt_sum_1<0 and slope_m<-25 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
+            #             # if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
+            #             # if ee_s >= 2 or count_m >= 20:
+            #             #     if nPX < 500000:
+            #             #         if self.OrgMain == 'n':
+            #             #             self.sig = -2
+            #             #             self.OrgMain = "s"
+            #             #             self.nfset = self.nf
+            #             #             self.inp = float(lblBhoga1v)
+            #             # else:
+            #             self.inp_preset = float(lblShoga1v)
+            #         if self.inp_preset!=0 and slope_m<0 and float(lblShoga1v)>self.inp_preset:
+            #             if self.OrgMain == 'n':
+            #                 self.sig = -1
+            #                 self.OrgMain = "b"
+            #                 self.nfset = self.nf
+            #                 self.inp = float(lblShoga1v)
+            #                 self.inp_preset = 0
+            #     else:
+            #         self.inp_preset = 0
         self.df.at[self.nf, "inp"] = self.inp
         self.df.at[self.nf, "inp_preset"] = self.inp_preset
         self.df.at[self.nf, "sig"] = self.sig
@@ -965,108 +965,111 @@ class Nprob:
         self.piox=0
         if self.OrgMain == "b":
 
-            if self.sig==3 or self.sig==2 or self.hit_peak == 6:
-                # Condition 6
-                if count_m<20 and slope_m<0:
-                    # outype = "high_peak"
+            if prf_able != 0:
+
+                # # high_peak
+                # if self.sig==3 and count_m<20 and slope<0:
+                #     self.profit += ((float(lblBhoga1v) - self.inp) - (
+                #         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                #     self.piox = 6
+                #     self.emergency=1
+                #     self.OrgMain = 'n'
+                #     self.turnover += 1
+
+                #  high peak (same direction)
+                if count_m>10 and slope_m>100 and slope>200:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.piox = 6
                     self.OrgMain = 'n'
                     self.turnover += 1
 
-            if self.sig==-1 or self.sig==2:
-
-                # clear at turbulance
-                if count_m>20 and slope_m<0:
+                # high peak (opposite direction)
+                if self.OrgMain == "b" and count_m>10 and slope_m<0:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                     float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                    self.piox = 1
+                    self.piox = 9
                     self.OrgMain = 'n'
                     self.turnover += 1
 
-                if prf_able == -1:
-
-                    # Condition 1
-                    if self.OrgMain == "b" and ee_s > ee_s_ave_long and ee_s>1.5  and ee_s_ave > 1.3:
-                        if slope_s<0 and slope_m < -100:
-                            #outype = "bad_out"
-                            self.profit+=((float(lblBhoga1v)-self.inp) - (float(lblBhoga1v)+self.inp)*0.00075)* self.ord_count
-                            self.piox = 1
-                            self.OrgMain='n'
-                            self.turnover += 1
-
-                    #### Condition 3 (Additional Order) ####
-                    if self.OrgMain == "b" and ee_s > ee_s_ave and slope_s>0 and ee_s > 1.8:
-                        if self.ord_count==1 and price<self.inp-self.tick*(20*self.ord_count):
-                            self.piox = 10
-                            self.ord_count += 1
-                            self.inp = (self.inp + float(lblShoga1v))/self.ord_count
-                            print self.ord_count
-                            return 2
-
-                if prf_able == 1:
-
-                    # Condition 4
-                    if self.OrgMain == "b" and ee_s<ee_s_ave and slope_m<0:
-                        #outype = "ee_s_out"
-                        self.profit += ((float(lblBhoga1v) - self.inp) - (
-                                    float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                        self.piox = 4
+                # bad_out
+                if self.OrgMain == "b" and ee_s > ee_s_ave_long and ee_s>1.5  and ee_s_ave > 1.3:
+                    if slope_s<0 and slope_m < -100:
+                        self.profit+=((float(lblBhoga1v)-self.inp) - (float(lblBhoga1v)+self.inp)*0.00075)* self.ord_count
+                        self.piox = 1
                         self.OrgMain='n'
                         self.turnover += 1
 
+                # good_out
+                if self.OrgMain == "b" and ee_s<ee_s_ave:
+                    if slope<0:
+                        self.profit += ((float(lblBhoga1v) - self.inp) - (
+                                    float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                        self.piox = 2
+                        self.OrgMain='n'
+                        self.turnover += 1
+
+                #### Additional Order ####
+                if self.OrgMain == "b" and ee_s > ee_s_ave and slope_s>0 and ee_s > 1.8:
+                    if self.ord_count==1 and price<self.inp-self.tick*(20*self.ord_count):
+                        self.piox = 10
+                        self.ord_count += 1
+                        self.inp = (self.inp + float(lblShoga1v))/self.ord_count
+                        print self.ord_count
+                        return 2
+
         elif self.OrgMain == "s": #  and lstm_mean>0.75:
 
-            if self.sig==-3 or self.sig==-2 or self.hit_peak == -6:
-                # Condition 6
-                if count_m<20 and slope_m>0:
-                    # outype = "high_peak"
+            if prf_able != 0:
+
+                # # high_peak
+                # if self.sig==-3 and count_m<20 and slope>0:
+                #     self.profit += ((self.inp - float(lblBhoga1v)) - (
+                #     float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                #     self.piox = -6
+                #     self.OrgMain = 'n'
+                #     self.turnover += 1
+
+                #  high peak (same direction)
+                if count_m>10 and slope_m<-100 and slope<-200:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
-                    float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                        float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.piox = -6
                     self.OrgMain = 'n'
                     self.turnover += 1
 
-            if self.sig==1 or self.sig==-2:
-
-                # clear at turbulance
-                if count_m>20 and slope_m>0:
+                # high peak (opposite direction)
+                if self.OrgMain == "s" and count_m>10 and slope_m>0:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                     float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                    self.piox = -1
+                    self.piox = -9
                     self.OrgMain = 'n'
                     self.turnover += 1
 
-                if prf_able == -1:
-
-                    # Condition 1
-                    if self.OrgMain == "s" and ee_s > ee_s_ave_long and ee_s>1.5  and ee_s_ave > 1.3:
-                        if slope_s>0 and slope_m > 100:
-                            # outype = "bad_out"
-                            self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
-                            self.piox = -1
-                            self.OrgMain='n'
-                            self.turnover += 1
-
-                    #### Condition 3 (Additional Order) ####
-                    if self.OrgMain == "s" and ee_s > ee_s_ave and slope_s<0 and ee_s > 1.8:
-                        if self.ord_count==1 and price>self.inp+self.tick*(20*self.ord_count):
-                            self.piox = -10
-                            self.ord_count += 1
-                            self.inp = (self.inp + float(lblBhoga1v))/self.ord_count
-                            print self.ord_count
-                            return -2
-
-                if prf_able == 1:
-
-                    # Condition 4
-                    if self.OrgMain == "s" and ee_s < ee_s_ave and slope_m>0:  #ee_s_slope>0 (candidate)
-                        #outype = "ee_s_out"
+                # bad_out
+                if self.OrgMain == "s" and ee_s > ee_s_ave_long and ee_s>1.5  and ee_s_ave > 1.3:
+                    if slope_s>0 and slope_m > 100:
                         self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
-                        self.piox = -4
+                        self.piox = -1
                         self.OrgMain='n'
                         self.turnover += 1
+
+                # good_out
+                if self.OrgMain == "s" and ee_s < ee_s_ave:
+                    if slope>0:  #ee_s_slope>0 (candidate)
+                        self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
+                        self.piox = -2
+                        self.OrgMain='n'
+                        self.turnover += 1
+
+                #### Additional Order ####
+                if self.OrgMain == "s" and ee_s > ee_s_ave and slope_s<0 and ee_s > 1.8:
+                    if self.ord_count==1 and price>self.inp+self.tick*(20*self.ord_count):
+                        self.piox = -10
+                        self.ord_count += 1
+                        self.inp = (self.inp + float(lblBhoga1v))/self.ord_count
+                        print self.ord_count
+                        return -2
 
         self.df.at[self.nf, "piox"] = self.piox
         self.df.at[self.nf, "profit"] = self.profit
@@ -1095,7 +1098,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope_m', 'slope_s', 'ee_s','ee_s_slope', 'sig', 'OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope_m', 'ee_s', 'nPX_m',  'nPY_m', 'sig', 'OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
