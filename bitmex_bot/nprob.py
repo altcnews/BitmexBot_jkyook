@@ -871,8 +871,8 @@ class Nprob:
         prf_able = 0
         profit_band = 20 * ee_s
         loss_band = 30 * ee_s
-        if profit_band>50:
-            profit_band=50
+        if profit_band>40:
+            profit_band=40
         if profit_band<30:
             profit_band=30
         if loss_band>60:
@@ -1052,7 +1052,7 @@ class Nprob:
                 if prf_able == 1:
 
                     # Condition 4
-                    if self.OrgMain == "s" and ee_s < ee_s_ave and slope_m>0:
+                    if self.OrgMain == "s" and ee_s < ee_s_ave and slope_m>0:  #ee_s_slope>0 (candidate)
                         #outype = "ee_s_out"
                         self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
                         self.piox = -4
