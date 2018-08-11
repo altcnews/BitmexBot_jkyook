@@ -21,6 +21,7 @@ class Nprob:
         self.profit=0
         self.startime=time.time()
         self.sig = 0
+        self.piox = 0
         self.inp_preset=0
         self.OrgMain='n'
         self.ord_count = 1
@@ -774,6 +775,17 @@ class Nprob:
         self.df.at[self.nf, "cri_ee_s"] = cri_ee_s
 
         ###############################
+        #  // PIOX //
+        ###############################
+
+        if self.piox > 0 :
+            if nPY_m > 400000 or nPY > nPY_m:
+                self.piox = 0
+        if self.piox < 0:
+            if nPX_m > 400000 or nPX > nPX_m:
+                self.piox = 0
+
+        ###############################
         #  // In Decision //
         ###############################
 
@@ -795,7 +807,7 @@ class Nprob:
             #             self.inp = float(lblBhoga1v)
 
             # count_in_middle
-            if count_m > 5:
+            if self.piox==0 and count_m > 5:
                 if nPY_m!=0 and nPY_m<400000 and nPY<nPY_m:  #cvol_m>100000 and
                     if self.OrgMain == 'n':
                         self.sig = 2
@@ -977,7 +989,7 @@ class Nprob:
                 #     self.turnover += 1
 
                 #  high peak (same direction)
-                if count_m>10 and slope_m>100 and slope>200:
+                if count_m>10 and slope_m>100 and slope_m<250 and slope>200 and slope<500:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.piox = 6
@@ -1002,12 +1014,13 @@ class Nprob:
 
                 # good_out (weakening)
                 if self.OrgMain == "b":
-                    if ee_s<ee_s_ave or nPX_m>400000:
-                        self.profit += ((float(lblBhoga1v) - self.inp) - (
-                                    float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                        self.piox = 2
-                        self.OrgMain='n'
-                        self.turnover += 1
+                    if count_m<5:
+                        if ee_s<ee_s_ave or nPY_m>400000 or nPY>nPY_m:
+                            self.profit += ((float(lblBhoga1v) - self.inp) - (
+                                        float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                            self.piox = 4
+                            self.OrgMain='n'
+                            self.turnover += 1
 
                 # #### Additional Order ####
                 # if self.OrgMain == "b" and ee_s > ee_s_ave and slope_s>0 and ee_s > 1.8:
@@ -1031,7 +1044,7 @@ class Nprob:
                 #     self.turnover += 1
 
                 #  high peak (same direction)
-                if count_m>10 and slope_m<-100 and slope<-200:
+                if count_m>10 and slope_m<-100 and slope_m>-250 and slope<-200 and slope>-500:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.piox = -6
@@ -1056,9 +1069,9 @@ class Nprob:
 
                 # good_out (weakening)
                 if self.OrgMain == "s":
-                    if ee_s<ee_s_ave or nPY_m>400000:
+                    if ee_s<ee_s_ave or nPX_m>400000 or nPX>nPX_m:
                         self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
-                        self.piox = -2
+                        self.piox = -4
                         self.OrgMain='n'
                         self.turnover += 1
 
