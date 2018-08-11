@@ -766,14 +766,14 @@ class Nprob:
             # count_in
             if count_m>20:
                 if slope_m>0:
-                    self.sig = 3
                     if self.OrgMain == 'n':
+                        self.sig = 3
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
                 if slope_m < 0:
-                    self.sig = -3
                     if self.OrgMain == 'n':
+                        self.sig = -3
                         self.OrgMain = "s"
                         self.nfset = self.nf
                         self.inp = float(lblBhoga1v)
