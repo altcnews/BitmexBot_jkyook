@@ -340,8 +340,8 @@ class Nprob:
             nPX_m = 0
             nPY_m = 0
         if self.nf >= self.min_3+1:
-            nPX_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "nPX"].mean()
-            nPY_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "nPY"].mean()
+            nPX_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "x1"].mean()
+            nPY_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "y1"].mean()
         self.df.at[self.nf, "nPX_m"] = nPX_m
         self.df.at[self.nf, "nPY_m"] = nPY_m
 
@@ -796,13 +796,13 @@ class Nprob:
 
             # count_in_middle
             if count_m > 5:
-                if nPY_m!=0 and nPY_m<400000:  #cvol_m>100000 and
+                if nPY_m!=0 and nPY_m<400000 and nPY<nPY_m:  #cvol_m>100000 and
                     if self.OrgMain == 'n':
                         self.sig = 2
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
-                if nPX_m!=0 and nPX_m<400000:  #cvol_m<-100000 and
+                if nPX_m!=0 and nPX_m<400000 and nPX<nPX_m:  #cvol_m<-100000 and
                     if self.OrgMain == 'n':
                         self.sig = -2
                         self.OrgMain = "s"
@@ -992,7 +992,7 @@ class Nprob:
                     self.OrgMain = 'n'
                     self.turnover += 1
 
-                # bad_out
+                # bad_out (opposite direction)
                 if self.OrgMain == "b" and ee_s > ee_s_ave_long and ee_s>1.5  and ee_s_ave > 1.3:
                     if slope_s<0 and slope_m < -100:
                         self.profit+=((float(lblBhoga1v)-self.inp) - (float(lblBhoga1v)+self.inp)*0.00075)* self.ord_count
@@ -1000,23 +1000,23 @@ class Nprob:
                         self.OrgMain='n'
                         self.turnover += 1
 
-                # good_out
-                if self.OrgMain == "b" and ee_s<ee_s_ave:
-                    if slope<0:
+                # good_out (weakening)
+                if self.OrgMain == "b":
+                    if ee_s<ee_s_ave or nPX_m>400000:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                                     float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                         self.piox = 2
                         self.OrgMain='n'
                         self.turnover += 1
 
-                #### Additional Order ####
-                if self.OrgMain == "b" and ee_s > ee_s_ave and slope_s>0 and ee_s > 1.8:
-                    if self.ord_count==1 and price<self.inp-self.tick*(20*self.ord_count):
-                        self.piox = 10
-                        self.ord_count += 1
-                        self.inp = (self.inp + float(lblShoga1v))/self.ord_count
-                        print self.ord_count
-                        return 2
+                # #### Additional Order ####
+                # if self.OrgMain == "b" and ee_s > ee_s_ave and slope_s>0 and ee_s > 1.8:
+                #     if self.ord_count==1 and price<self.inp-self.tick*(20*self.ord_count):
+                #         self.piox = 10
+                #         self.ord_count += 1
+                #         self.inp = (self.inp + float(lblShoga1v))/self.ord_count
+                #         print self.ord_count
+                #         return 2
 
         elif self.OrgMain == "s": #  and lstm_mean>0.75:
 
@@ -1046,7 +1046,7 @@ class Nprob:
                     self.OrgMain = 'n'
                     self.turnover += 1
 
-                # bad_out
+                # bad_out (opposite direction)
                 if self.OrgMain == "s" and ee_s > ee_s_ave_long and ee_s>1.5  and ee_s_ave > 1.3:
                     if slope_s>0 and slope_m > 100:
                         self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
@@ -1054,22 +1054,22 @@ class Nprob:
                         self.OrgMain='n'
                         self.turnover += 1
 
-                # good_out
-                if self.OrgMain == "s" and ee_s < ee_s_ave:
-                    if slope>0:  #ee_s_slope>0 (candidate)
+                # good_out (weakening)
+                if self.OrgMain == "s":
+                    if ee_s<ee_s_ave or nPY_m>400000:
                         self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
                         self.piox = -2
                         self.OrgMain='n'
                         self.turnover += 1
 
-                #### Additional Order ####
-                if self.OrgMain == "s" and ee_s > ee_s_ave and slope_s<0 and ee_s > 1.8:
-                    if self.ord_count==1 and price>self.inp+self.tick*(20*self.ord_count):
-                        self.piox = -10
-                        self.ord_count += 1
-                        self.inp = (self.inp + float(lblBhoga1v))/self.ord_count
-                        print self.ord_count
-                        return -2
+                # #### Additional Order ####
+                # if self.OrgMain == "s" and ee_s > ee_s_ave and slope_s<0 and ee_s > 1.8:
+                #     if self.ord_count==1 and price>self.inp+self.tick*(20*self.ord_count):
+                #         self.piox = -10
+                #         self.ord_count += 1
+                #         self.inp = (self.inp + float(lblBhoga1v))/self.ord_count
+                #         print self.ord_count
+                #         return -2
 
         self.df.at[self.nf, "piox"] = self.piox
         self.df.at[self.nf, "profit"] = self.profit
