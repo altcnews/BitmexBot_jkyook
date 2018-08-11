@@ -80,6 +80,13 @@ class Nprob:
         self.df.at[self.nf, "x2"] = int(lblBqty2v)
         # self.df.at[self.nf, "px2"] = float(lblBhoga2v)
 
+        # cvol_m
+        if self.nf < self.sec_15+1:
+            cvol_m = 0
+        if self.nf >= self.sec_15+1:
+            cvol_m = self.df.ix[self.nf - self.sec_15:self.nf - 1, "cvolume"].mean()
+        self.df.at[self.nf, "cvol_m"] = cvol_m
+
         # # trd_off
         # if self.nf < 3:
         #     trdoff = 0
@@ -317,12 +324,12 @@ class Nprob:
         # self.df.at[self.nf, "PXYm"] = PXYm
 
         # nPX, nPY
-        if self.nf < self.sec_15+1:
+        if self.nf < self.sec_30+1:
             nPX = 0
             nPY = 0
         if self.nf >= self.sec_15+1:
-            nPX = float(3*self.df.ix[self.nf - self.sec_15:self.nf - 1, "x1"].mean() + self.df.ix[self.nf - self.sec_15:self.nf - 1, "x2"].mean()) / 4
-            nPY = float(3*self.df.ix[self.nf - self.sec_15:self.nf - 1, "y1"].mean() + self.df.ix[self.nf - self.sec_15:self.nf - 1, "y2"].mean()) / 4
+            nPX = float(3*self.df.ix[self.nf - self.sec_30:self.nf - 1, "x1"].mean() + self.df.ix[self.nf - self.sec_30:self.nf - 1, "x2"].mean()) / 4
+            nPY = float(3*self.df.ix[self.nf - self.sec_30:self.nf - 1, "y1"].mean() + self.df.ix[self.nf - self.sec_30:self.nf - 1, "y2"].mean()) / 4
 
         nPXY = float(nPX + nPY) / 2
         self.df.at[self.nf, "nPX"] = nPX
@@ -763,8 +770,8 @@ class Nprob:
 
         if self.nf >  self.min_1+1 :
 
-            # count_in
-            if count_m>20:
+            # count_in_peak
+            if count_m>20 and slope>300:
                 if slope_m>0:
                     if self.OrgMain == 'n':
                         self.sig = 3
@@ -774,6 +781,21 @@ class Nprob:
                 if slope_m < 0:
                     if self.OrgMain == 'n':
                         self.sig = -3
+                        self.OrgMain = "s"
+                        self.nfset = self.nf
+                        self.inp = float(lblBhoga1v)
+
+            # count_in_middle
+            if count_m > 5:
+                if cvol_m>150000:
+                    if self.OrgMain == 'n':
+                        self.sig = 2
+                        self.OrgMain = "b"
+                        self.nfset = self.nf
+                        self.inp = float(lblShoga1v)
+                if cvol_m<-150000:
+                    if self.OrgMain == 'n':
+                        self.sig = -2
                         self.OrgMain = "s"
                         self.nfset = self.nf
                         self.inp = float(lblBhoga1v)
@@ -934,7 +956,7 @@ class Nprob:
         self.piox=0
         if self.OrgMain == "b":
 
-            if self.sig==3:
+            if self.sig==3 or self.sig==2:
                 # Condition 6
                 if self.hit_peak == 6 and count_m<20 and slope_m<0:
                     # outype = "high_peak"
@@ -944,7 +966,7 @@ class Nprob:
                     self.OrgMain = 'n'
                     self.turnover += 1
 
-            if self.sig==-1:
+            if self.sig==-1 or self.sig==2:
 
                 # clear at turbulance
                 if count_m>20 and slope_m<0:
@@ -987,7 +1009,7 @@ class Nprob:
 
         elif self.OrgMain == "s": #  and lstm_mean>0.75:
 
-            if self.sig==-3:
+            if self.sig==-3 or self.sig==-2:
                 # Condition 6
                 if self.hit_peak == -6 and count_m<20 and slope_m>0:
                     # outype = "high_peak"
@@ -997,7 +1019,7 @@ class Nprob:
                     self.OrgMain = 'n'
                     self.turnover += 1
 
-            if self.sig==1:
+            if self.sig==1 or self.sig==-2:
 
                 # clear at turbulance
                 if count_m>20 and slope_m>0:
