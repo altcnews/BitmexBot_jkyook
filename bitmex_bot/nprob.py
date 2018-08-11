@@ -786,14 +786,14 @@ class Nprob:
                         self.inp = float(lblBhoga1v)
 
             # count_in_middle
-            if count_m > 5:
-                if cvol_m>150000:
+            if count_m > 7:
+                if cvol_m>150000 and nPY<200000:
                     if self.OrgMain == 'n':
                         self.sig = 2
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
-                if cvol_m<-150000:
+                if cvol_m<-150000 and nPX<200000:
                     if self.OrgMain == 'n':
                         self.sig = -2
                         self.OrgMain = "s"
