@@ -327,14 +327,23 @@ class Nprob:
         if self.nf < self.sec_30+1:
             nPX = 0
             nPY = 0
-        if self.nf >= self.sec_15+1:
+        if self.nf >= self.sec_30+1:
             nPX = float(3*self.df.ix[self.nf - self.sec_30:self.nf - 1, "x1"].mean() + self.df.ix[self.nf - self.sec_30:self.nf - 1, "x2"].mean()) / 4
             nPY = float(3*self.df.ix[self.nf - self.sec_30:self.nf - 1, "y1"].mean() + self.df.ix[self.nf - self.sec_30:self.nf - 1, "y2"].mean()) / 4
-
         nPXY = float(nPX + nPY) / 2
         self.df.at[self.nf, "nPX"] = nPX
         self.df.at[self.nf, "nPY"] = nPY
         self.df.at[self.nf, "nPXY"] = nPXY
+
+        # nPX_m, nPY_m
+        if self.nf < self.min_3+1:
+            nPX_m = 0
+            nPY_m = 0
+        if self.nf >= self.min_3+1:
+            nPX_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "nPX"].mean()
+            nPY_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "nPY"].mean()
+        self.df.at[self.nf, "nPX_m"] = nPX_m
+        self.df.at[self.nf, "nPY_m"] = nPY_m
 
         # stXY
         if self.nf < self.sec_30+1:
@@ -786,14 +795,14 @@ class Nprob:
                         self.inp = float(lblBhoga1v)
 
             # count_in_middle
-            if count_m > 7:
-                if cvol_m>150000 and nPY<200000:
+            if count_m > 5:
+                if nPY_m<400000:  #cvol_m>100000 and
                     if self.OrgMain == 'n':
                         self.sig = 2
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
-                if cvol_m<-150000 and nPX<200000:
+                if nPX_m<400000:  #cvol_m<-100000 and
                     if self.OrgMain == 'n':
                         self.sig = -2
                         self.OrgMain = "s"
@@ -956,9 +965,9 @@ class Nprob:
         self.piox=0
         if self.OrgMain == "b":
 
-            if self.sig==3 or self.sig==2:
+            if self.sig==3 or self.sig==2 or self.hit_peak == 6:
                 # Condition 6
-                if self.hit_peak == 6 and count_m<20 and slope_m<0:
+                if count_m<20 and slope_m<0:
                     # outype = "high_peak"
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
@@ -1009,9 +1018,9 @@ class Nprob:
 
         elif self.OrgMain == "s": #  and lstm_mean>0.75:
 
-            if self.sig==-3 or self.sig==-2:
+            if self.sig==-3 or self.sig==-2 or self.hit_peak == -6:
                 # Condition 6
-                if self.hit_peak == -6 and count_m<20 and slope_m>0:
+                if count_m<20 and slope_m>0:
                     # outype = "high_peak"
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                     float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
