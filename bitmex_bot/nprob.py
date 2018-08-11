@@ -944,7 +944,7 @@ class Nprob:
                     self.OrgMain = 'n'
                     self.turnover += 1
 
-            if self.sig==1:
+            if self.sig==-1:
 
                 # clear at turbulance
                 if count_m>20 and slope_m<0:
@@ -997,7 +997,7 @@ class Nprob:
                     self.OrgMain = 'n'
                     self.turnover += 1
 
-            if self.sig==-1:
+            if self.sig==1:
 
                 # clear at turbulance
                 if count_m>20 and slope_m>0:
