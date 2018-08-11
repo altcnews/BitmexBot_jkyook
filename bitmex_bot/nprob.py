@@ -21,6 +21,7 @@ class Nprob:
         self.profit=0
         self.startime=time.time()
         self.sig = 0
+        self.inp_preset=0
         self.OrgMain='n'
         self.ord_count = 1
         self.turnover=0
@@ -203,6 +204,11 @@ class Nprob:
         #         dt = 0.5
         # self.df.at[self.nf, "dt"] = dt
         self.df.at[self.nf, "dt"] = count
+
+        if self.nf < self.sec_15+1:
+            count_m = 0
+        if self.nf >= self.sec_15+1:
+            count_m = self.df.ix[self.nf - 3:self.nf - 1, "dt"].mean()
 
         # mt
         if self.nf==0:
@@ -756,7 +762,7 @@ class Nprob:
         if self.nf >  self.min_1+1 :
 
             # count_in
-            if count>20:
+            if count_m>20:
                 if slope>0:
                     self.sig = 3
                     if self.OrgMain == 'n':
@@ -771,11 +777,11 @@ class Nprob:
                         self.inp = float(lblBhoga1v)
 
             # orginal in decision
-            if count<20:
+            if count_m<20:
                 if ee_s > 1.5 and ee_s >= ee_s_ave and ee_s_slope>0:  #and ee_s_ave > 1.5
                     if dt_sum_1>0 and slope_m>25 and dt_main_2==1: #  slope > 100 and and dt_sum_2 > 0  slope_s>0
                         # if self.cri_r > 1 and self.cri > -3 and self.df.ix[self.nf - 1, "cri"] >= self.df.ix[self.nf - 2, "cri"]:
-                        # if ee_s >= 2 or count>=20:
+                        # if ee_s >= 2 or count_m>=20:
                         #     if nPY < 500000:
                         #         if self.OrgMain == 'n':
                         #             self.sig = 2
@@ -783,14 +789,16 @@ class Nprob:
                         #             self.nfset = self.nf
                         #             self.inp = float(lblShoga1v)
                         # else:
-                        if self.OrgMain == 'n':
-                            self.sig = 1
-                            self.OrgMain = "s"
-                            self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)
+                        self.inp_preset = float(lblBhoga1v)
+                        if self.inp_preset!=0 and float(lblBhoga1v)<self.inp_preset:
+                            if self.OrgMain == 'n':
+                                self.sig = 1
+                                self.OrgMain = "s"
+                                self.nfset = self.nf
+                                self.inp = float(lblBhoga1v)
                     if dt_sum_1<0 and slope_m<-25 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
                         # if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
-                        # if ee_s >= 2 or count >= 20:
+                        # if ee_s >= 2 or count_m >= 20:
                         #     if nPX < 500000:
                         #         if self.OrgMain == 'n':
                         #             self.sig = -2
@@ -798,11 +806,13 @@ class Nprob:
                         #             self.nfset = self.nf
                         #             self.inp = float(lblBhoga1v)
                         # else:
-                        if self.OrgMain == 'n':
-                            self.sig = -1
-                            self.OrgMain = "b"
-                            self.nfset = self.nf
-                            self.inp = float(lblShoga1v)
+                        self.inp_preset = float(lblShoga1v)
+                        if self.inp_preset!=0 and float(lblShoga1v)>self.inp_preset:
+                            if self.OrgMain == 'n':
+                                self.sig = -1
+                                self.OrgMain = "b"
+                                self.nfset = self.nf
+                                self.inp = float(lblShoga1v)
         self.df.at[self.nf, "inp"] = self.inp
         self.df.at[self.nf, "sig"] = self.sig
         self.df.at[self.nf, "nfset"] = self.nfset
@@ -919,7 +929,7 @@ class Nprob:
 
             if self.sig==3:
                 # Condition 6
-                if self.hit_peak == 6 and count<20:
+                if self.hit_peak == 6 and count_m<20:
                     # outype = "high_peak"
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
@@ -930,7 +940,7 @@ class Nprob:
             if self.sig==1:
 
                 # clear at turbulance
-                if count>20 and slope_m<0:
+                if count_m>20 and slope_m<0:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                     float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.piox = 1
@@ -1000,7 +1010,7 @@ class Nprob:
 
             if self.sig==-3:
                 # Condition 6
-                if self.hit_peak == -6 and count<20:
+                if self.hit_peak == -6 and count_m<20:
                     # outype = "high_peak"
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                     float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
@@ -1011,7 +1021,7 @@ class Nprob:
             if self.sig==-1:
 
                 # clear at turbulance
-                if count>20 and slope_m>0:
+                if count_m>20 and slope_m>0:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                     float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.piox = -1
