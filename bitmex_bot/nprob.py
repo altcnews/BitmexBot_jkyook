@@ -808,13 +808,13 @@ class Nprob:
 
             # count_in_middle
             if self.piox==0 and count_m > 5:
-                if nPY_m!=0 and nPY_m<400000 and nPY<nPY_m:  #cvol_m>100000 and
+                if nPY_m!=0 and nPY_m<400000 and nPY<nPY_m and slope>0:  #cvol_m>100000 and
                     if self.OrgMain == 'n':
                         self.sig = 2
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
-                if nPX_m!=0 and nPX_m<400000 and nPX<nPX_m:  #cvol_m<-100000 and
+                if nPX_m!=0 and nPX_m<400000 and nPX<nPX_m and slope<0:  #cvol_m<-100000 and
                     if self.OrgMain == 'n':
                         self.sig = -2
                         self.OrgMain = "s"
