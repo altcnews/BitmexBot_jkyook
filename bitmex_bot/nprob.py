@@ -205,10 +205,12 @@ class Nprob:
         # self.df.at[self.nf, "dt"] = dt
         self.df.at[self.nf, "dt"] = count
 
+        # count_m
         if self.nf < self.sec_15+1:
             count_m = 0
         if self.nf >= self.sec_15+1:
             count_m = self.df.ix[self.nf - 3:self.nf - 1, "dt"].mean()
+        self.df.at[self.nf, "count_m"] = count_m
 
         # mt
         if self.nf==0:
@@ -790,12 +792,13 @@ class Nprob:
                         #             self.inp = float(lblShoga1v)
                         # else:
                         self.inp_preset = float(lblBhoga1v)
-                        if self.inp_preset!=0 and float(lblBhoga1v)<self.inp_preset:
-                            if self.OrgMain == 'n':
-                                self.sig = 1
-                                self.OrgMain = "s"
-                                self.nfset = self.nf
-                                self.inp = float(lblBhoga1v)
+                    if self.inp_preset!=0 and slope_m>0 and float(lblBhoga1v)<self.inp_preset:
+                        if self.OrgMain == 'n':
+                            self.sig = 1
+                            self.OrgMain = "s"
+                            self.nfset = self.nf
+                            self.inp = float(lblBhoga1v)
+                            self.inp_preset = 0
                     if dt_sum_1<0 and slope_m<-25 and dt_main_2==-1 : #slope < -100 and and dt_sum_2 < 0
                         # if self.cri_r < 1 and self.cri < 3 and self.df.ix[self.nf - 1, "cri"] <= self.df.ix[self.nf - 2, "cri"]:
                         # if ee_s >= 2 or count_m >= 20:
@@ -807,13 +810,17 @@ class Nprob:
                         #             self.inp = float(lblBhoga1v)
                         # else:
                         self.inp_preset = float(lblShoga1v)
-                        if self.inp_preset!=0 and float(lblShoga1v)>self.inp_preset:
-                            if self.OrgMain == 'n':
-                                self.sig = -1
-                                self.OrgMain = "b"
-                                self.nfset = self.nf
-                                self.inp = float(lblShoga1v)
+                    if self.inp_preset!=0  and slope_m<0 and float(lblShoga1v)>self.inp_preset:
+                        if self.OrgMain == 'n':
+                            self.sig = -1
+                            self.OrgMain = "b"
+                            self.nfset = self.nf
+                            self.inp = float(lblShoga1v)
+                            self.inp_preset = 0
+                else:
+                    self.inp_preset = 0
         self.df.at[self.nf, "inp"] = self.inp
+        self.df.at[self.nf, "inp_preset"] = self.inp_preset
         self.df.at[self.nf, "sig"] = self.sig
         self.df.at[self.nf, "nfset"] = self.nfset
 
