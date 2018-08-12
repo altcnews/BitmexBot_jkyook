@@ -328,23 +328,29 @@ class Nprob:
         if self.nf < self.sec_30+1:
             nPX = 0
             nPY = 0
+            nPXY_d = 0
         if self.nf >= self.sec_30+1:
             nPX = float(3*self.df.ix[self.nf - self.sec_30:self.nf - 1, "x1"].mean() + self.df.ix[self.nf - self.sec_30:self.nf - 1, "x2"].mean()) / 4
             nPY = float(3*self.df.ix[self.nf - self.sec_30:self.nf - 1, "y1"].mean() + self.df.ix[self.nf - self.sec_30:self.nf - 1, "y2"].mean()) / 4
         nPXY = float(nPX + nPY) / 2
+        nPXY_d = nPX- nPY
         self.df.at[self.nf, "nPX"] = nPX
         self.df.at[self.nf, "nPY"] = nPY
         self.df.at[self.nf, "nPXY"] = nPXY
+        self.df.at[self.nf, "nPXY_d"] = nPXY_d
 
         # nPX_m, nPY_m
         if self.nf < self.min_3+1:
             nPX_m = 0
             nPY_m = 0
+            nPXY_d_m = 0
         if self.nf >= self.min_3+1:
             nPX_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "x1"].mean()
             nPY_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "y1"].mean()
+            nPXY_d_m = self.df.ix[self.nf - self.min_1:self.nf - 1, "nPXY_d"].mean()
         self.df.at[self.nf, "nPX_m"] = nPX_m
         self.df.at[self.nf, "nPY_m"] = nPY_m
+        self.df.at[self.nf, "nPXY_d_m"] = nPXY_d_m
 
         # stXY
         if self.nf < self.sec_30+1:
@@ -809,7 +815,7 @@ class Nprob:
             # count_in_middle
             if self.piox==0 and count_m > 5 and count_m<15:
                 if slope<200:
-                    if nPY_m!=0 and nPY_m<400000 and nPY<nPY_m and slope>0:  #cvol_m>100000 and
+                    if nPY_m!=0 and nPY<350000 and nPY<nPY_m and slope_s>8:  #cvol_m>100000 and
                         # if self.inp_preset == 0:
                         #     self.inp_preset = float(lblShoga1v)
                         # if self.inp_preset!=0 and float(lblShoga1v)>self.inp_preset:
@@ -819,7 +825,7 @@ class Nprob:
                             self.nfset = self.nf
                             self.inp = float(lblShoga1v)
                 if slope>-200:
-                    if nPX_m!=0 and nPX_m<400000 and nPX<nPX_m and slope<0:  #cvol_m<-100000 and
+                    if nPX_m!=0 and nPX<350000 and nPX<nPX_m and slope_s<-8:  #cvol_m<-100000 and
                         # if self.inp_preset == 0:
                         #     self.inp_preset = float(lblBhoga1v)
                         # if self.inp_preset!=0 and float(lblBhoga1v)<self.inp_preset:
@@ -1007,6 +1013,15 @@ class Nprob:
                     self.turnover += 1
                     self.inp_preset = 0
 
+                #  high peak (slope_s conversion)
+                if slope_s<0:
+                    self.profit += ((float(lblBhoga1v) - self.inp) - (
+                        float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                    self.piox = 7
+                    self.OrgMain = 'n'
+                    self.turnover += 1
+                    self.inp_preset = 0
+
                 # high peak (opposite direction)
                 if self.OrgMain == "b" and count_m>10 and slope_m<0:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
@@ -1062,6 +1077,15 @@ class Nprob:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.piox = -6
+                    self.OrgMain = 'n'
+                    self.turnover += 1
+                    self.inp_preset = 0
+
+                #  high peak (slope_s conversion)
+                if slope_s>0:
+                    self.profit += ((self.inp - float(lblBhoga1v)) - (
+                        float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                    self.piox = -7
                     self.OrgMain = 'n'
                     self.turnover += 1
                     self.inp_preset = 0
