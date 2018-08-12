@@ -808,25 +808,29 @@ class Nprob:
 
             # count_in_middle
             if self.piox==0 and count_m > 5 and count_m<15:
-                if nPY_m!=0 and nPY_m<400000 and nPY<nPY_m and slope>0:  #cvol_m>100000 and
-                    if self.inp_preset == 0:
-                        self.inp_preset = float(lblShoga1v)
-                    if self.inp_preset!=0 and float(lblShoga1v)>self.inp_preset:
-                        if self.OrgMain == 'n':
-                            self.sig = 2
-                            self.OrgMain = "b"
-                            self.nfset = self.nf
-                            self.inp = float(lblShoga1v)
+                if slope<200:
+                    if nPY_m!=0 and nPY_m<400000 and nPY<nPY_m and slope>0:  #cvol_m>100000 and
+                        if self.inp_preset == 0:
                             self.inp_preset = float(lblShoga1v)
-                if nPX_m!=0 and nPX_m<400000 and nPX<nPX_m and slope<0:  #cvol_m<-100000 and
-                    if self.inp_preset == 0:
-                        self.inp_preset = float(lblBhoga1v)
-                    if self.inp_preset!=0 and float(lblBhoga1v)<self.inp_preset:
-                        if self.OrgMain == 'n':
-                            self.sig = -2
-                            self.OrgMain = "s"
-                            self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)
+                        if self.inp_preset!=0 and float(lblShoga1v)>self.inp_preset:
+                            if self.OrgMain == 'n':
+                                self.sig = 2
+                                self.OrgMain = "b"
+                                self.nfset = self.nf
+                                self.inp = float(lblShoga1v)
+                                self.inp_preset = float(lblShoga1v)
+                if slope>-200:
+                    if nPX_m!=0 and nPX_m<400000 and nPX<nPX_m and slope<0:  #cvol_m<-100000 and
+                        if self.inp_preset == 0:
+                            self.inp_preset = float(lblBhoga1v)
+                        if self.inp_preset!=0 and float(lblBhoga1v)<self.inp_preset:
+                            if self.OrgMain == 'n':
+                                self.sig = -2
+                                self.OrgMain = "s"
+                                self.nfset = self.nf
+                                self.inp = float(lblBhoga1v)
+            if self.piox == 0 and count_m < 5:
+                self.inp_preset == 0
 
             # # orginal in decision
             # if count_m<20:
