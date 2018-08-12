@@ -785,11 +785,13 @@ class Nprob:
         ###############################
 
         if self.piox > 0 :
-            if nPY_m > 400000 or nPY > nPY_m:
-                self.piox = 0
+            if slope_s<5 and slope_m<100:
+                if nPY_m > 400000 or nPY > nPY_m:
+                    self.piox = 0
         if self.piox < 0:
-            if nPX_m > 400000 or nPX > nPX_m:
-                self.piox = 0
+            if slope_s>-5 and slope_m>-100:
+                if nPX_m > 400000 or nPX > nPX_m:
+                    self.piox = 0
 
         ###############################
         #  // In Decision //
