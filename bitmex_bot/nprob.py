@@ -341,8 +341,8 @@ class Nprob:
             nPX_m = 0
             nPY_m = 0
         if self.nf >= self.min_3+1:
-            nPX_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "x1"].mean()/1000
-            nPY_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "y1"].mean()/1000
+            nPX_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "x1"].mean()
+            nPY_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "y1"].mean()
         self.df.at[self.nf, "nPX_m"] = nPX_m
         self.df.at[self.nf, "nPY_m"] = nPY_m
 
@@ -779,10 +779,10 @@ class Nprob:
         ###############################
 
         if self.piox > 0 :
-            if nPY_m > 400 or nPY > nPY_m:
+            if nPY_m > 400000 or nPY > nPY_m:
                 self.piox = 0
         if self.piox < 0:
-            if nPX_m > 400 or nPX > nPX_m:
+            if nPX_m > 400000 or nPX > nPX_m:
                 self.piox = 0
 
         ###############################
@@ -809,7 +809,7 @@ class Nprob:
             # count_in_middle
             if self.piox==0 and count_m > 5 and count_m<15:
                 if slope<200:
-                    if nPY_m!=0 and nPY_m<400 and nPY<nPY_m and slope>0:  #cvol_m>100000 and
+                    if nPY_m!=0 and nPY_m<400000 and nPY<nPY_m and slope>0:  #cvol_m>100000 and
                         # if self.inp_preset == 0:
                         #     self.inp_preset = float(lblShoga1v)
                         # if self.inp_preset!=0 and float(lblShoga1v)>self.inp_preset:
@@ -819,7 +819,7 @@ class Nprob:
                             self.nfset = self.nf
                             self.inp = float(lblShoga1v)
                 if slope>-200:
-                    if nPX_m!=0 and nPX_m<400 and nPX<nPX_m and slope<0:  #cvol_m<-100000 and
+                    if nPX_m!=0 and nPX_m<400000 and nPX<nPX_m and slope<0:  #cvol_m<-100000 and
                         # if self.inp_preset == 0:
                         #     self.inp_preset = float(lblBhoga1v)
                         # if self.inp_preset!=0 and float(lblBhoga1v)<self.inp_preset:
@@ -1028,7 +1028,7 @@ class Nprob:
                 # good_out (weakening)
                 if self.OrgMain == "b":
                     if count_m<5:
-                        if ee_s<ee_s_ave or nPY_m>400 or nPY>nPY_m:
+                        if ee_s<ee_s_ave or nPY_m>400000 or nPY>nPY_m:
                             self.profit += ((float(lblBhoga1v) - self.inp) - (
                                         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                             self.piox = 4
@@ -1087,7 +1087,7 @@ class Nprob:
                 # good_out (weakening)
                 if self.OrgMain == "s":
                     if count_m<5:
-                        if ee_s<ee_s_ave or nPX_m>400 or nPX>nPX_m:
+                        if ee_s<ee_s_ave or nPX_m>400000 or nPX>nPX_m:
                             self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
                             self.piox = -4
                             self.OrgMain='n'
