@@ -807,9 +807,10 @@ class Nprob:
             #             self.inp = float(lblBhoga1v)
 
             # count_in_middle
-            if self.piox==0 and count_m > 5:
+            if self.piox==0 and count_m > 5 and count_m<15:
                 if nPY_m!=0 and nPY_m<400000 and nPY<nPY_m and slope>0:  #cvol_m>100000 and
-                    self.inp_preset = float(lblShoga1v)
+                    if self.inp_preset == 0:
+                        self.inp_preset = float(lblShoga1v)
                     if self.inp_preset!=0 and float(lblShoga1v)>self.inp_preset:
                         if self.OrgMain == 'n':
                             self.sig = 2
@@ -818,7 +819,8 @@ class Nprob:
                             self.inp = float(lblShoga1v)
                             self.inp_preset = float(lblShoga1v)
                 if nPX_m!=0 and nPX_m<400000 and nPX<nPX_m and slope<0:  #cvol_m<-100000 and
-                    self.inp_preset = float(lblBhoga1v)
+                    if self.inp_preset == 0:
+                        self.inp_preset = float(lblBhoga1v)
                     if self.inp_preset!=0 and float(lblBhoga1v)<self.inp_preset:
                         if self.OrgMain == 'n':
                             self.sig = -2
@@ -1000,6 +1002,7 @@ class Nprob:
                     self.piox = 6
                     self.OrgMain = 'n'
                     self.turnover += 1
+                    self.inp_preset = 0
 
                 # high peak (opposite direction)
                 if self.OrgMain == "b" and count_m>10 and slope_m<0:
@@ -1008,6 +1011,7 @@ class Nprob:
                     self.piox = 9
                     self.OrgMain = 'n'
                     self.turnover += 1
+                    self.inp_preset = 0
 
                 # bad_out (opposite direction)
                 if self.OrgMain == "b" and ee_s > ee_s_ave_long and ee_s>1.5  and ee_s_ave > 1.3:
@@ -1016,6 +1020,7 @@ class Nprob:
                         self.piox = 1
                         self.OrgMain='n'
                         self.turnover += 1
+                        self.inp_preset = 0
 
                 # good_out (weakening)
                 if self.OrgMain == "b":
@@ -1026,6 +1031,7 @@ class Nprob:
                             self.piox = 4
                             self.OrgMain='n'
                             self.turnover += 1
+                            self.inp_preset = 0
 
                 # #### Additional Order ####
                 # if self.OrgMain == "b" and ee_s > ee_s_ave and slope_s>0 and ee_s > 1.8:
@@ -1055,6 +1061,7 @@ class Nprob:
                     self.piox = -6
                     self.OrgMain = 'n'
                     self.turnover += 1
+                    self.inp_preset = 0
 
                 # high peak (opposite direction)
                 if self.OrgMain == "s" and count_m>10 and slope_m>0:
@@ -1063,6 +1070,7 @@ class Nprob:
                     self.piox = -9
                     self.OrgMain = 'n'
                     self.turnover += 1
+                    self.inp_preset = 0
 
                 # bad_out (opposite direction)
                 if self.OrgMain == "s" and ee_s > ee_s_ave_long and ee_s>1.5  and ee_s_ave > 1.3:
@@ -1071,14 +1079,17 @@ class Nprob:
                         self.piox = -1
                         self.OrgMain='n'
                         self.turnover += 1
+                        self.inp_preset = 0
 
                 # good_out (weakening)
                 if self.OrgMain == "s":
-                    if ee_s<ee_s_ave or nPX_m>400000 or nPX>nPX_m:
-                        self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
-                        self.piox = -4
-                        self.OrgMain='n'
-                        self.turnover += 1
+                    if count_m<5:
+                        if ee_s<ee_s_ave or nPX_m>400000 or nPX>nPX_m:
+                            self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075) * self.ord_count
+                            self.piox = -4
+                            self.OrgMain='n'
+                            self.turnover += 1
+                            self.inp_preset = 0
 
                 # #### Additional Order ####
                 # if self.OrgMain == "s" and ee_s > ee_s_ave and slope_s<0 and ee_s > 1.8:
@@ -1116,7 +1127,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope_m', 'ee_s', 'nPX_m',  'nPY_m', 'sig', 'OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope_m', 'ee_s', 'nPX_m',  'nPY_m', 'sig', 'OrgMain', 'inp_preset', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
