@@ -178,63 +178,6 @@ class Nprob:
             nsf = self.nf - ns
         self.df.at[self.nf, "nsf"] = nsf
 
-
-        # # Wilcoxon Test
-        #
-        # if self.nf > self.sec_15+1:
-        #     y1_sX = self.df.ix[ns:self.nf - 1, "sX"]
-        #     y2_sX = self.df.ix[self.nf - 10:self.nf - 1, "sX"]
-        #     try:
-        #         if y1_sX.equals(y2_sX) == 1:
-        #             wc_sX = 50
-        #         else:
-        #             u, wc_sX = stat.mannwhitneyu(y1_sX, y2_sX)
-        #             if y2_sX.mean() >= y1_sX.mean():
-        #                 wc_sX = 50 + (0.5 - wc_sX) * 100
-        #             else:
-        #                 wc_sX = 50 - (0.5 - wc_sX) * 100
-        #     except:
-        #         wc_sX = 50
-        #
-        #     y1_sY = self.df.ix[ns:self.nf - 1, "sY"]
-        #     y2_sY = self.df.ix[self.nf - 10:self.nf - 1, "sY"]
-        #     try:
-        #         if y1_sY.equals(y2_sY) == 1:
-        #             wc_sY = 50
-        #         else:  # if y1_sY.equals(y2_sY)!=1:
-        #             u, wc_sY = stat.mannwhitneyu(y1_sY, y2_sY)
-        #             if y2_sY.mean() >= y1_sY.mean():
-        #                 wc_sY = 50 + (0.5 - wc_sY) * 100
-        #             else:
-        #                 wc_sY = 50 - (0.5 - wc_sY) * 100
-        #     except:
-        #         wc_sY = 50
-        #
-        #     y1_sXY = self.df.ix[ns:self.nf - 1, "sXY"]
-        #     y2_sXY = self.df.ix[self.nf - 10:self.nf - 1, "sXY"]
-        #     try:
-        #         if y1_sXY.equals(y2_sXY) == 1:
-        #             wc_sXY = 50
-        #         else:  # if y1_sXY.equals(y2_sXY)!=1:
-        #             u, wc_sXY = stat.mannwhitneyu(y1_sXY, y2_sXY)
-        #             if y2_sXY.mean() >= y1_sXY.mean():
-        #                 wc_sXY = 50 + (0.5 - wc_sXY) * 100
-        #             else:
-        #                 wc_sXY = 50 - (0.5 - wc_sXY) * 100
-        #     except:
-        #         wc_sXY = 50
-        #
-        # else:
-        #     wc_sX = 50
-        #     wc_sY = 50
-        #     wc_sXY = 50
-        #     # wc_sXY_l = 50
-        #
-        # self.df.at[self.nf, "PX"] = wc_sX
-        # self.df.at[self.nf, "PY"] = wc_sY
-        # self.df.at[self.nf, "PXY"] = wc_sXY
-        # # self.df.at[self.nf, "PXY_l"] = wc_sXY_l
-
         # nPX, nPY
         if self.nf < self.sec_30+1:
             nPX = 0
@@ -277,39 +220,6 @@ class Nprob:
             stPXY = 0
         self.df.at[self.nf, "stPXY"] = stPXY
 
-        # # PINDEX
-        # pindex = 0
-        # if self.nf >= self.sec_30+1:
-        #     try:
-        #         pi1 = float(wc_sXY - 50) / 50
-        #         if stPXY != 0:
-        #             pi2 =  float(stat.norm.ppf((100 - stPXY) / 100)) / 2.5
-        #         else:
-        #             pi2 = 1
-        #         try:
-        #             normxy = stat.norm.ppf( float(wc_sXY) / 100)
-        #         except:
-        #             normxy = 0
-        #         try:
-        #             normx = stat.norm.ppf(float(wc_sX) / 100)
-        #         except:
-        #             normx = 0
-        #         try:
-        #             normy = stat.norm.ppf(float(wc_sY) / 100)
-        #         except:
-        #             normy = 0
-        #         pindex = 50 + 50 * normxy / float(2.5) * abs(normx - normy) / float(5) + 12.5 * pi1 * pi2
-        #     except:
-        #         pindex = 50
-        #
-        # self.df.at[self.nf, "pindex"] = pindex
-        #
-        # # PINDEX2
-        # pindex2 = 0
-        # if self.nf >= self.min_1+1:
-        #     pindex2 = self.df.ix[self.nf - self.min_1:self.nf - 1, "pindex"].mean()
-        # self.df.at[self.nf, "pindex2"] = pindex2
-
         # slope = slope
         if self.nf >= self.sec_30+1:
             # c = range(0, 300, 5)
@@ -341,47 +251,6 @@ class Nprob:
             std_err_s = 0
         self.df.at[self.nf, "slope_s"] = slope_s
 
-
-        ###############################
-        # Bump, S-seires
-        ###############################
-
-        # BUMP
-
-        # # aa
-        # if self.nf >= self.sec_15+1:
-        #     aa = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stXY"].mean()/1000000  #/ float(150) ) ** 0.5
-        # else:
-        #     aa = 1
-        # self.df.at[self.nf, "aa_trd"] = aa
-        #
-        # # bb
-        # bb = 1
-        # self.df.at[self.nf, "bb_prc"] = bb
-        #
-        # # cc
-        # cc=1
-        # if self.nf >= self.sec_15+1 and self.df.ix[self.nf - 1, "pindex"]!=0:
-        #     c1 = self.df.ix[self.nf - self.sec_15:self.nf - 1, "pindex"].mean()
-        #     if c1 >= 50:
-        #         cc = (1 + 2 * (c1 - 50) / float(50)) ** 0.5
-        #     if c1 < 50:
-        #         cc = (1 - 2 * (c1 - 50) / float(50)) ** 0.5
-        # else:
-        #     cc = 1
-        # self.df.at[self.nf, "cc_pid"] = cc
-        #
-        # # dd
-        # if self.nf >= self.sec_15+1 and stPXY != 0:
-        #     d1 = stPXY
-        #     if d1 <= 50:
-        #         dd = 1 + stat.norm.ppf((100 - d1) / float(100)) ** 0.6
-        #     if d1 > 50:
-        #         dd = 1 + stat.norm.ppf((100 - 49.999) / float(100)) ** 0.6
-        # else:
-        #     dd = 1
-        # self.df.at[self.nf, "dd_sWC"] = dd
-
         # ee
         if self.nf >= self.sec_15+1:
             if mt < 0.98:
@@ -408,260 +277,6 @@ class Nprob:
             ee_s_ave = 1
         self.df.at[self.nf, "ee_s_ave"] = ee_s_ave
 
-        # # ee_s_ave_long
-        # if self.nf >= self.min_3+1:
-        #     ee_s_ave_long = self.df.ix[self.nf - self.min_3:self.nf, "ee_s"].mean()
-        # else:
-        #     ee_s_ave_long = 1
-        # self.df.at[self.nf, "ee_s_ave_long"] = ee_s_ave_long
-
-        # # ee_s slope(mtv-slope * -1 conversion)
-        # if self.nf >= self.min_1+1:
-        #     ee_s_y = self.df.ix[self.nf - self.sec_30:self.nf - 1, "ee_s"]
-        #     ee_s_x = self.df.ix[self.nf - self.sec_30:self.nf - 1, "stime"]
-        #     # print ee_s_y.values.reshape(-1, 1)
-        #     ee_s_slope = regr.fit(ee_s_y.values.reshape(-1, 1), ee_s_x.values.reshape(-1, 1)).coef_[0][0]/100000
-        # else:
-        #     ee_s_slope=0
-        # self.df.at[self.nf, "ee_s_slope"] = ee_s_slope
-        #
-        # # ee_s_ox
-        # if self.nf >= self.min_1+1:
-        #     ee_s_ox = 0
-        #     if ee_s_slope>0:
-        #             if ee_s > ee_s_ave and ee_s>2:
-        #                 ee_s_ox = 1
-        # else:
-        #     ee_s_ox = 0
-        # self.df.at[self.nf, "ee_s_ox"] = ee_s_ox
-
-        # # bump
-        # if self.nf >= self.sec_15+1:
-        #     bump = 1 * (abs(aa * bb * cc * dd * ee_mt)) ** 0.5
-        # else:
-        #     bump = 0
-        # self.df.at[self.nf, "bump"] = bump
-        #
-        # # bumpm
-        # if self.nf >= self.sec_15+1:
-        #     bumpm = self.df.ix[self.nf - self.sec_15:self.nf, "bump"].mean()
-        # else:
-        #     bumpm = 0
-        # self.df.at[self.nf, "bumpm"] = bumpm
-        #
-        # # abump
-        # if self.nf >= self.sec_15+1:
-        #     abump = 20 * (bump / float(20) + 0.2 * stPXY / float(100)) / 1.2
-        # else:
-        #     abump = 0
-        # self.df.at[self.nf, "abump"] = abump
-        #
-        # # abumpm
-        # if self.nf >= self.sec_15+1:
-        #     abumpm = self.df.ix[self.nf - self.sec_15:self.nf, "abump"].mean()
-        # else:
-        #     abumpm = 0
-        # self.df.at[self.nf, "abumpm"] = abumpm
-
-
-        # # s1
-        # if self.nf >= self.sec_15:
-        #     if self.nfset < self.nf and self.nfset != 0:
-        #         s1 = sXY - self.df.ix[self.nfset, "sXY"]
-        #     else:
-        #         s1 = 0
-        # else:
-        #     s1 = 0
-        # self.df.at[self.nf, "s1"] = s1
-        #
-        # # s2_s
-        # if self.nf >= self.sec_15+1:
-        #     if ns < self.nf-2:
-        #         s2_s = 3.873 * self.df.ix[ns:self.nf, "sXY"].std() / float(nPXY)
-        #     else:
-        #         s2_s = self.df.ix[self.nf-1, "s2_s"]
-        # else:
-        #     s2_s = 0
-        # self.df.at[self.nf, "s2_s"] = s2_s
-        #
-        # # s2_s_mean
-        # if self.nf >= self.sec_30+1: # and ns < self.nf-2:
-        #     s2_s_m = self.df.ix[self.nf - self.sec_30:self.nf, "s2_s"].mean()
-        # else:
-        #     s2_s_m = 0
-        # self.df.at[self.nf, "s2_s"] = s2_s
-        #
-        # # s3_x, s3_y
-        # span = self.sec_15
-        # if self.nf >= self.sec_15+1:
-        #     s3_x = self.df.ix[self.nf - span:self.nf-1, "dx1"].mean() - self.df.ix[self.nf - span:self.nf-1, "dyy"].mean() + self.df.ix[self.nf - span:self.nf-1, "dy1"].mean()
-        #     s3_y = self.df.ix[self.nf - span:self.nf-1, "dy1"].mean() - self.df.ix[self.nf - span:self.nf-1, "dxx"].mean() + self.df.ix[self.nf - span:self.nf-1, "dx1"].mean()
-        # else:
-        #     s3_x = 0
-        #     s3_y = 0
-        # self.df.at[self.nf, "s3_x"] = s3_x
-        # self.df.at[self.nf, "s3_y"] = s3_y
-        #
-        # # degree of consentration of s3_x, s3_y
-        # if self.nf >= self.sec_30+1:
-        #     span_c = self.sec_30
-        #     df_c = self.df.s3[self.nf - span_c:self.nf - 1]
-        #     df_x_c = self.df.s3_x[self.nf - span_c:self.nf - 1]
-        #     s3_c = float(len(df_c[df_c > 0])) / span_c
-        #     s3_x_c = float(len(df_x_c[df_x_c > 0]))/ span_c
-        #     s3_y_c = 1-s3_x_c
-        # else:
-        #     s3_c = 0
-        #     s3_x_c = 0
-        #     s3_y_c = 0
-        # self.df.ix[self.nf, "s3_x_c"] = s3_x_c
-        # self.df.ix[self.nf, "s3_y_c"] = s3_y_c
-        # self.df.ix[self.nf, "s3_c"] = s3_c
-        #
-        # # s3
-        # if self.nf >= self.sec_15:
-        #     s3 = s3_x - s3_y
-        # else:
-        #     s3 = 0
-        # self.df.at[self.nf, "s3"] = s3
-        #
-        # #s3_m_m
-        # if self.nf >= self.sec_15+1:
-        #     s3_m_m = (self.df.ix[self.nf - self.sec_15:self.nf - 1, "s3"].max() + self.df.ix[self.nf - 100:self.nf - 1, "s3"].min()) / 2
-        # else:
-        #     s3_m_m=0
-        # self.df.at[self.nf, "s3_m_m"] = s3_m_m
-        #
-        # #s3_mean_short
-        # if self.nf >= self.sec_30+1:
-        #     s3_m_short = self.df.ix[self.nf - self.sec_30:self.nf - 1, "s3"].mean()
-        # else:
-        #     s3_m_short=0
-        # self.df.at[self.nf, "s3_m_short"] = s3_m_short
-        #
-        # #s3_mean
-        # if self.nf >= self.min_1+1:
-        #     s3_m= self.df.ix[self.nf - self.min_1:self.nf-1, "s3"].mean()
-        # else:
-        #     s3_m=0
-        # self.df.at[self.nf, "s3_m"] = s3_m
-        #
-        # # s7
-        # adj_s2 = (wc_sXY-50) / 50
-        # s7 = 0
-        # if s1 != 0 and self.nf >= self.sec_15+1 and nPXY != 0:
-        #     if self.OrgMain == "b":
-        #         s7 = 4 + self.df.ix[self.nf - 1, "s1"] / float(nPY) + adj_s2 * stXY / float(nPY)
-        #     elif self.OrgMain == "s":
-        #         s7 = 4 - self.df.ix[self.nf - 1, "s1"] / float(nPX) - adj_s2 * stXY / float(nPY)
-        #     elif self.OrgMain == "n":
-        #         s7 = 4 + stXY / float(nPXY)
-        # self.df.at[self.nf, "s7"] = s7
-
-        ###############################
-        # Signal : dt_main, org_in, cri, cir_r
-        ###############################
-
-        # # dt_main_1, dt_main_2
-        # if self.nf > self.min_1+1 :
-        #     dt_main_1=0
-        #     if s3>50000 and slope>-1:
-        #         dt_main_1= 1
-        #     if s3<-50000 and slope<-0.5:
-        #         dt_main_1= -1
-        # else:
-        #     dt_main_1 = 0
-        # self.df.at[self.nf, "dt_main_1"] = dt_main_1
-        #
-        # if self.nf > self.min_1+1 :
-        #     dt_main_2 = 0
-        #     if slope > 0 and s3 > 0 and mt < 0.15:
-        #         dt_main_2 = 1
-        #     if slope < 0 and s3 < 0 and mt < 0.15:
-        #         dt_main_2 = -1
-        # else:
-        #     dt_main_2 = 0
-        # self.df.at[self.nf, "dt_main_2"] = dt_main_2
-        #
-        # # dt_sum
-        # if self.nf > self.min_1+1:
-        #     dt_sum_1 = self.df.ix[self.nf - self.min_1:self.nf-1, "dt_main_1"].mean()
-        # else:
-        #     dt_sum_1=0
-        # self.df.at[self.nf, "dt_sum_1"] = dt_sum_1
-        #
-        # if self.nf >  self.min_1+1:
-        #     dt_sum_2 = self.df.ix[self.nf -  self.min_1:self.nf-1, "dt_main_2"].mean()
-        # else:
-        #     dt_sum_2=0
-        # self.df.at[self.nf, "dt_sum_2"] = dt_sum_2
-        #
-        # # org_in_2
-        # if self.nf > self.min_1+1:
-        #     if s2_s > 0.5 and mt < 1: #wc_sXY_<40
-        #         if wc_sXY>99 and s3_x > 30000 and s3_y < 0:
-        #             self.org_in_2 = 1
-        #         if wc_sXY<1 and s3_y > 30000 and s3_x < 0:
-        #             self.org_in_2 = -1
-        #     if self.cri > 0 and self.cri_r > 1 and s3_m > 0 and s3_m_short > 0:
-        #         if self.org_in_2 == 1:
-        #             self.org_in_2 = 3
-        #         elif self.org_in_2 != 1:
-        #             self.org_in_2 = 2
-        #     if self.cri < 0 and self.cri_r < 1 and s3_m < 0 and s3_m_short < 0:
-        #         if self.org_in_2 == -1:
-        #             self.org_in_2 = -3
-        #         elif self.org_in_2 != -1:
-        #             self.org_in_2 = -2
-        # else:
-        #     self.org_in_2 = 0
-        # self.df.at[self.nf, "org_in_2"] = self.org_in_2
-        #
-        # #cri
-        # if self.org_in_2 == 1 or self.org_in_2 == 3:
-        #     self.cri += 1
-        # if self.org_in_2 == -1 or self.org_in_2 == -3:
-        #     self.cri -= 1
-        # if self.cri>5:
-        #     self.cri=5
-        # if self.cri<-5:
-        #     self.cri=-5
-        # self.df.at[self.nf, "cri"] = self.cri
-        #
-        # #cri_r
-        # if self.nf >  self.min_1+1:
-        #     if self.nf>500:
-        #         if ee_s>=1.7 and ee_s<2.2:
-        #             len_cri_r = int(500 + (ee_s-1.8) * 1250)
-        #         if ee_s>=2.2:
-        #             len_cri_r = 1000
-        #         if ee_s<1.7:
-        #             len_cri_r = 500
-        #     else:
-        #         len_cri_r = self.nf - 1
-        #
-        #     df_r = self.df.ix[self.nf - min(self.nf,len_cri_r):self.nf - 1, "org_in_2"]
-        #     df_r_y = df_r[df_r < 0].count()
-        #     df_r_x = df_r[df_r > 0].count()
-        #     if df_r_y!=0:
-        #         self.cri_r = float(df_r_x)/df_r_y
-        #         if self.cri_r>2:
-        #             self.cri_r=2
-        #     else:
-        #         if df_r_x!=0:
-        #             self.cri_r=2
-        #         else:
-        #             self.cri_r=1
-        # else:
-        #     self.cri_r=1
-        # self.df.at[self.nf, "cri_r"] = self.cri_r
-        #
-        # # ee_s * cri
-        # if self.nf>= self.min_1+1:
-        #     cri_ee_s = self.cri * ee_s
-        # else:
-        #     cri_ee_s = 0
-        # self.df.at[self.nf, "cri_ee_s"] = cri_ee_s
 
         ###############################
         #  // PIOX //
@@ -734,23 +349,6 @@ class Nprob:
                 prf_able = -1
         self.df.at[self.nf, "prf_able"] = prf_able
 
-        # hit_peak
-        # adj_market=ee_s_ave/1.8
-        if self.OrgMain == "b":
-            if self.hit_peak==0:
-                if slope>=200 or slope_s>=10 or slope_m>=150:
-                    hit_type = "the_peak_slope"
-                    self.hit_peak = 6
-
-
-        elif self.OrgMain == "s":
-            if self.hit_peak==0:
-                if slope<=-200 or slope_s<=-10 or slope_m<=-150:
-                    hit_type = "the_peak_slope"
-                    self.hit_peak = -6
-
-        self.df.at[self.nf, "hit_peak"] = self.hit_peak
-
         ###############################
         #  // Out Decision //
         ###############################
@@ -808,15 +406,6 @@ class Nprob:
                             self.turnover += 1
                             self.inp_preset = 0
 
-                # #### Additional Order ####
-                # if self.OrgMain == "b" and ee_s > ee_s_ave and slope_s>0 and ee_s > 1.8:
-                #     if self.ord_count==1 and price<self.inp-self.tick*(20*self.ord_count):
-                #         self.piox = 10
-                #         self.ord_count += 1
-                #         self.inp = (self.inp + float(lblShoga1v))/self.ord_count
-                #         print self.ord_count
-                #         return 2
-
         elif self.OrgMain == "s": #  and lstm_mean>0.75:
 
             if prf_able != 0:
@@ -867,15 +456,6 @@ class Nprob:
                             self.turnover += 1
                             self.inp_preset = 0
 
-                # #### Additional Order ####
-                # if self.OrgMain == "s" and ee_s > ee_s_ave and slope_s<0 and ee_s > 1.8:
-                #     if self.ord_count==1 and price>self.inp+self.tick*(20*self.ord_count):
-                #         self.piox = -10
-                #         self.ord_count += 1
-                #         self.inp = (self.inp + float(lblBhoga1v))/self.ord_count
-                #         print self.ord_count
-                #         return -2
-
         self.df.at[self.nf, "piox"] = self.piox
         self.df.at[self.nf, "profit"] = self.profit
         self.df.at[self.nf, "ord_count"] = self.ord_count
@@ -915,10 +495,6 @@ class Nprob:
     def threadme(self):
         thread_plot = threading.Thread(target=self.btnPlot_Clicked, args=())
         thread_plot.start()
-
-    def test(self):
-        print 'a'
-
 
     def btnPlot_Clicked(self):
         global plt
