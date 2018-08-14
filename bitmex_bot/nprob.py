@@ -301,11 +301,15 @@ class Nprob:
         #  // PIOX //
         ###############################
 
-        if self.piox > 0 :
+        if abs(self.piox) == 8:
+            self.piox = 0
+
+        if self.piox < 5 and self.piox > 0 :
             if slope_s<5 and slope_m<100:
                 if nPY_m > 400000 or nPY > nPY_m:
                     self.piox = 0
-        if self.piox < 0:
+
+        if self.piox > -5 and self.piox < 0 :
             if slope_s>-5 and slope_m>-100:
                 if nPX_m > 400000 or nPX > nPX_m:
                     self.piox = 0
@@ -399,32 +403,32 @@ class Nprob:
         self.piox=0
         if self.OrgMain == "b":
 
-            #  high peak (same direction)
-            if count > 15 and slope > 200:
+            # #  high peak (same direction)
+            # if count > 15 and slope > 200:
+            #     self.profit += ((float(lblBhoga1v) - self.inp) - (
+            #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+            #     self.piox = 9
+            #     self.OrgMain = 'n'
+            #     self.turnover += 1
+            #     self.inp_preset = 0
+
+            #  high peak (slope_s conversion)
+            if cvol_s < 0:
                 self.profit += ((float(lblBhoga1v) - self.inp) - (
-                    float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                self.piox = 6
+                        float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                self.piox = 8
                 self.OrgMain = 'n'
                 self.turnover += 1
                 self.inp_preset = 0
 
-            # high peak (slope_s conversion)
-            if slope_s < 0:
-                self.profit += ((float(lblBhoga1v) - self.inp) - (
-                    float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                self.piox = 7
-                self.OrgMain = 'n'
-                self.turnover += 1
-                self.inp_preset = 0
-
-            # high peak (opposite direction)
-            if self.OrgMain == "b" and count_m > 10 and slope_m < 0:
-                self.profit += ((float(lblBhoga1v) - self.inp) - (
-                    float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                self.piox = 9
-                self.OrgMain = 'n'
-                self.turnover += 1
-                self.inp_preset = 0
+            # # high peak (opposite direction)
+            # if self.OrgMain == "b" and count_m > 10 and slope_m < 0:
+            #     self.profit += ((float(lblBhoga1v) - self.inp) - (
+            #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+            #     self.piox = 6
+            #     self.OrgMain = 'n'
+            #     self.turnover += 1
+            #     self.inp_preset = 0
 
             if prf_able != 0:
 
@@ -450,32 +454,32 @@ class Nprob:
 
         elif self.OrgMain == "s": #  and lstm_mean>0.75:
 
-            #  high peak (same direction)
-            if count > 20 and slope < -200:
+            # #  high peak (same direction)
+            # if count > 20 and slope < -200:
+            #     self.profit += ((self.inp - float(lblBhoga1v)) - (
+            #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+            #     self.piox = -9
+            #     self.OrgMain = 'n'
+            #     self.turnover += 1
+            #     self.inp_preset = 0
+
+            #  high peak (slope_s conversion)
+            if cvol_s > 0:
                 self.profit += ((self.inp - float(lblBhoga1v)) - (
-                    float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                self.piox = -6
+                        float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                self.piox = -8
                 self.OrgMain = 'n'
                 self.turnover += 1
                 self.inp_preset = 0
 
-            # high peak (slope_s conversion)
-            if slope_s > 0:
-                self.profit += ((self.inp - float(lblBhoga1v)) - (
-                    float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                self.piox = -7
-                self.OrgMain = 'n'
-                self.turnover += 1
-                self.inp_preset = 0
-
-            # high peak (opposite direction)
-            if self.OrgMain == "s" and count_m > 10 and slope_m > 0:
-                self.profit += ((self.inp - float(lblBhoga1v)) - (
-                    float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                self.piox = -9
-                self.OrgMain = 'n'
-                self.turnover += 1
-                self.inp_preset = 0
+            # # high peak (opposite direction)
+            # if self.OrgMain == "s" and count_m > 10 and slope_m > 0:
+            #     self.profit += ((self.inp - float(lblBhoga1v)) - (
+            #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+            #     self.piox = -6
+            #     self.OrgMain = 'n'
+            #     self.turnover += 1
+            #     self.inp_preset = 0
 
             if prf_able != 0:
 
