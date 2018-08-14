@@ -310,7 +310,7 @@ class Nprob:
             if self.piox==0 and count_m > 5 and count_m<15:
 
                 # b
-                if nPY_m != 0 and nPY < 500000 and nPY < nPY_m:
+                if nPY_m != 0 and nPY < 500000 and nPY < nPY_m and slope<200:
                     # ascending
                     if count_m > 8 and count_s>0 and slope_s > 0:
                             if self.OrgMain == 'n':
@@ -327,7 +327,7 @@ class Nprob:
                             self.inp = float(lblShoga1v)
 
                 # s
-                if nPX_m != 0 and nPX < 500000 and nPX < nPX_m:
+                if nPX_m != 0 and nPX < 500000 and nPX < nPX_m and slope>-200:
                     # ascending
                     if count_m > 8 and count_s>0 and slope_s<0:
                         if self.OrgMain == 'n':
