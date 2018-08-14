@@ -82,6 +82,16 @@ class Nprob:
             cvol_m = self.df.ix[self.nf - self.sec_15:self.nf - 1, "cvolume"].mean()
         self.df.at[self.nf, "cvol_m"] = cvol_m
 
+        # cvol_s
+        if self.nf < self.min_1+1:
+            cvol_s = 0
+        if self.nf >= self.min_1+1:
+            c_y = self.df.ix[self.nf - 7:self.nf - 1, "cvol_m"]
+            c_x = self.df.ix[self.nf - 7:self.nf - 1, "stime"]
+            cvol_s = regr.fit(c_x.values.reshape(-1, 1), c_y.values.reshape(-1, 1)).coef_[0][0]
+        self.df.at[self.nf, "cvol_s"] = cvol_s
+
+
         # xnet, ynet
         if self.nf < 2:
             dx1 = 0
@@ -307,41 +317,41 @@ class Nprob:
         if self.nf >  self.min_1+1 :
 
             # count_in_middle
-            if self.piox==0 and count_m > 5 and count_m<15:
+            if self.piox==0 and count_m > 5 and count_m<15 and abs(slope)<200:
 
                 # b
-                if nPY_m != 0 and nPY < 500000 and nPY < nPY_m and slope<200:
+                if nPY_m != 0 and nPY < 500000 and nPY < nPY_m:
                     # ascending
-                    if count_m > 8 and count_s>0 and slope_s > 0:
+                    if count_s>0 and cvol_s > 0 :
                             if self.OrgMain == 'n':
                                 self.sig = 2
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
                     # descending
-                    if count_s<0 and slope_s > 8:
-                        if self.OrgMain == 'n':
-                            self.sig = 1
-                            self.OrgMain = "b"
-                            self.nfset = self.nf
-                            self.inp = float(lblShoga1v)
+                    # if count_s<0 and cvol_s > 0:
+                    #     if self.OrgMain == 'n':
+                    #         self.sig = 1
+                    #         self.OrgMain = "b"
+                    #         self.nfset = self.nf
+                    #         self.inp = float(lblShoga1v)
 
                 # s
-                if nPX_m != 0 and nPX < 500000 and nPX < nPX_m and slope>-200:
+                if nPX_m != 0 and nPX < 500000 and nPX < nPX_m:
                     # ascending
-                    if count_m > 8 and count_s>0 and slope_s<0:
+                    if count_s>0 and cvol_s<0:
                         if self.OrgMain == 'n':
                             self.sig = -2
                             self.OrgMain = "s"
                             self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)
+                            self.inp = float(lblBhoga1v)\
                     # descending
-                    if count_s<0 and slope_s<-8:
-                        if self.OrgMain == 'n':
-                            self.sig = -1
-                            self.OrgMain = "s"
-                            self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)
+                    # if count_s<0 and cvol_s<0:
+                        # if self.OrgMain == 'n':
+                        #     self.sig = -1
+                        #     self.OrgMain = "s"
+                        #     self.nfset = self.nf
+                        #     self.inp = float(lblBhoga1v)
         self.df.at[self.nf, "inp"] = self.inp
         self.df.at[self.nf, "inp_preset"] = self.inp_preset
         self.df.at[self.nf, "sig"] = self.sig
@@ -375,6 +385,12 @@ class Nprob:
                 prf_able = -1
         self.df.at[self.nf, "prf_able"] = prf_able
 
+            # cvol_peak
+        if cvol_s>50:
+            self.hit_peak = 6
+        if cvol_s<-50:
+            self.hit_peak = -6
+
         ###############################
         #  // Out Decision //
         ###############################
@@ -386,7 +402,7 @@ class Nprob:
             if prf_able != 0:
 
                 #  high peak (same direction)
-                if count_m>10 and slope_m>100 and slope_m<250 and slope>200 and slope<500:
+                if count>15 and slope>200:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.piox = 6
@@ -437,7 +453,7 @@ class Nprob:
             if prf_able != 0:
 
                 #  high peak (same direction)
-                if count_m>10 and slope_m<-100 and slope_m>-250 and slope<-200 and slope>-500:
+                if count>20 and slope<-200:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.piox = -6
@@ -509,7 +525,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope_m', 'slope_s', 'nPX_m',  'nPY_m', 'sig', 'OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope_m', 'count_s', 'nPX_m',  'nPY_m', 'cvol_s', 'OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
@@ -601,7 +617,7 @@ def ynet(p, t, W, sw, a, b, c, d):
 
     elif p > t:
         if sw == "Buy":
-            result = (a - b - d) + W #= W - b + a - d
+            result = (a - b - d) + W   #= W - b + a - d
         else:
             result = (a - b - d)
 
