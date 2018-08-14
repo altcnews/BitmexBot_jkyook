@@ -168,9 +168,12 @@ class Nprob:
         self.df.at[self.nf, "mtm"] = mtm
 
         # count_s
-        r_dt = self.df.ix[self.nf - 10:self.nf - 1, "dt"]
-        r_stime = self.df.ix[self.nf - 10:self.nf - 1, "stime"]
-        count_s = regr.fit(r_stime.values.reshape(-1, 1), r_dt.values.reshape(-1, 1)).coef_[0][0]
+        if self.nf < self.min_1+1:
+            count_s = 0
+        if self.nf >= self.min_1+1:
+            r_dt = self.df.ix[self.nf - 5:self.nf - 1, "count_m"]
+            r_stime = self.df.ix[self.nf - 5:self.nf - 1, "stime"]
+            count_s = regr.fit(r_stime.values.reshape(-1, 1), r_dt.values.reshape(-1, 1)).coef_[0][0]*1000
         self.df.at[self.nf, "count_s"] = count_s
 
         # ns
@@ -304,19 +307,19 @@ class Nprob:
         if self.nf >  self.min_1+1 :
 
             # count_in_middle
-            if self.piox==0 and count_m > 5 and count_m<20:
+            if self.piox==0 and count_m > 5 and count_m<15:
 
                 # b
                 if nPY_m != 0 and nPY < 500000 and nPY < nPY_m:
                     # ascending
-                    if count_s > 0 or slope_s > 0:
+                    if count_m > 8 and count>count_m and slope_s > 0:
                             if self.OrgMain == 'n':
                                 self.sig = 2
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
                     # descending
-                    if count_s < 0 or slope_s > 8:
+                    if count<count_m and slope_s > 8:
                         if self.OrgMain == 'n':
                             self.sig = 1
                             self.OrgMain = "b"
@@ -326,14 +329,14 @@ class Nprob:
                 # s
                 if nPX_m != 0 and nPX < 500000 and nPX < nPX_m:
                     # ascending
-                    if count_s>0 and slope_s<0:
+                    if count_m > 8 and count>count_m and slope_s<0:
                         if self.OrgMain == 'n':
                             self.sig = -2
                             self.OrgMain = "s"
                             self.nfset = self.nf
                             self.inp = float(lblBhoga1v)
                     # descending
-                    if count_s<0 and slope_s<-8:
+                    if count<count_m and slope_s<-8:
                         if self.OrgMain == 'n':
                             self.sig = -1
                             self.OrgMain = "s"
