@@ -213,14 +213,14 @@ class Nprob:
         self.df.at[self.nf, "nPXY_d"] = nPXY_d
 
         # nPX_m, nPY_m
-        if self.nf < self.min_3+1:
+        if self.nf < self.min_1+1:
             nPX_m = 0
             nPY_m = 0
             nPXY_d_m = 0
-        if self.nf >= self.min_3+1:
-            nPX_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "x1"].mean()
-            nPY_m = self.df.ix[self.nf - self.min_3:self.nf - 1, "y1"].mean()
-            nPXY_d_m = self.df.ix[self.nf - self.min_1:self.nf - 1, "nPXY_d"].mean()
+        if self.nf >= self.min_1+1:
+            nPX_m = self.df.ix[self.nf - int(self.min_1*0.75):self.nf - 1, "x1"].mean()
+            nPY_m = self.df.ix[self.nf - int(self.min_1*0.75):self.nf - 1, "y1"].mean()
+            nPXY_d_m = self.df.ix[self.nf - int(self.min_1*0.75):self.nf - 1, "nPXY_d"].mean()
         self.df.at[self.nf, "nPX_m"] = nPX_m
         self.df.at[self.nf, "nPY_m"] = nPY_m
         self.df.at[self.nf, "nPXY_d_m"] = nPXY_d_m
@@ -306,12 +306,12 @@ class Nprob:
 
         if self.piox < 5 and self.piox > 0 :
             if slope_s<5 and slope_m<100:
-                if nPY_m > 400000 or nPY > nPY_m:
+                if nPY_m > 500000 or nPY > nPY_m:
                     self.piox = 0
 
         if self.piox > -5 and self.piox < 0 :
             if slope_s>-5 and slope_m>-100:
-                if nPX_m > 400000 or nPX > nPX_m:
+                if nPX_m > 500000 or nPX > nPX_m:
                     self.piox = 0
 
         ###############################
@@ -320,42 +320,40 @@ class Nprob:
 
         if self.nf >  self.min_1+1 :
 
-            # count_in_middle
-            if self.piox==0 and count_m > 5 and count_m<15 and abs(slope)<200:
+            # ascending
+            if self.piox==0 and count_m > 10 and count_m<15 and abs(slope)<200:
 
-                # b
-                if nPY_m != 0 and nPY < 500000 and nPY < nPY_m:
-                    # ascending
-                    if count_s>0 and cvol_s > 0 :
+                if nPY_m != 0 and nPY < 500000 and nPX > nPX_m:
+                    if  count_s>0.5 and cvol_s>0:
                             if self.OrgMain == 'n':
                                 self.sig = 2
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
-                    # descending
-                    # if count_s<0 and cvol_s > 0:
-                    #     if self.OrgMain == 'n':
-                    #         self.sig = 1
-                    #         self.OrgMain = "b"
-                    #         self.nfset = self.nf
-                    #         self.inp = float(lblShoga1v)
 
-                # s
-                if nPX_m != 0 and nPX < 500000 and nPX < nPX_m:
-                    # ascending
-                    if count_s>0 and cvol_s<0:
+                if nPX_m != 0 and nPX < 500000 and nPY > nPY_m:
+                    if count_s > 0.5 and cvol_s < 0:
                         if self.OrgMain == 'n':
                             self.sig = -2
                             self.OrgMain = "s"
                             self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)\
-                    # descending
-                    # if count_s<0 and cvol_s<0:
-                        # if self.OrgMain == 'n':
-                        #     self.sig = -1
-                        #     self.OrgMain = "s"
-                        #     self.nfset = self.nf
-                        #     self.inp = float(lblBhoga1v)
+                            self.inp = float(lblBhoga1v)
+
+            # # afterpeaking
+            # if self.piox==0 and nPX>nPX_m and cvol_s > 5 and slope<-30:
+            #     if self.OrgMain == 'n':
+            #         self.sig = 1
+            #         self.OrgMain = "b"
+            #         self.nfset = self.nf
+            #         self.inp = float(lblShoga1v)
+            #
+            # if self.piox==0 and nPY > nPY_m and cvol_s < -5 and slope > 30:
+            #     if self.OrgMain == 'n':
+            #         self.sig = -1
+            #         self.OrgMain = "s"
+            #         self.nfset = self.nf
+            #         self.inp = float(lblBhoga1v)
+
         self.df.at[self.nf, "inp"] = self.inp
         self.df.at[self.nf, "inp_preset"] = self.inp_preset
         self.df.at[self.nf, "sig"] = self.sig
@@ -413,7 +411,7 @@ class Nprob:
             #     self.inp_preset = 0
 
             #  high peak (slope_s conversion)
-            if cvol_s < 0:
+            if nPY>nPY_m and cvol_s < -5 and slope>30:
                 self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                 self.piox = 8
@@ -464,7 +462,7 @@ class Nprob:
             #     self.inp_preset = 0
 
             #  high peak (slope_s conversion)
-            if cvol_s > 0:
+            if nPX>nPX_m and cvol_s > 5 and slope<-30:
                 self.profit += ((self.inp - float(lblBhoga1v)) - (
                         float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                 self.piox = -8
