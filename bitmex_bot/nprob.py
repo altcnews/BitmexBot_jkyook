@@ -238,6 +238,19 @@ class Nprob:
         self.df.at[self.nf, "nPY_s"] = nPY_s
         self.df.at[self.nf, "nPX_s"] = nPX_s
 
+        # nPX_ss, nPY_ss
+        if self.nf >= self.min_1+1:
+            r_ny_s = self.df.ix[self.nf - 5:self.nf - 1, "nPY_s"] #.iloc[c]
+            r_nx_s = self.df.ix[self.nf - 5:self.nf - 1, "nPX_s"] #.iloc[c]
+            r_t = self.df.ix[self.nf - 5:self.nf - 1, "stime"] #.iloc[c]
+            nPY_ss = regr.fit(r_t.values.reshape(-1, 1), r_ny_s.values.reshape(-1, 1)).coef_[0][0]
+            nPX_ss = regr.fit(r_t.values.reshape(-1, 1), r_nx_s.values.reshape(-1, 1)).coef_[0][0]
+        else:
+            nPY_ss = 0
+            nPX_ss = 0
+        self.df.at[self.nf, "nPY_ss"] = nPY_ss
+        self.df.at[self.nf, "nPX_ss"] = nPX_ss
+
         # stXY
         if self.nf < self.sec_30+1:
             stXY = 0
@@ -336,7 +349,7 @@ class Nprob:
             # ascending
             if self.piox==0 and count_m > 5 and count_m<15 and abs(slope)<200:
 
-                if nPY_m != 0 and nPY < 500000 and nPY < nPY_m and nPY_s<0:
+                if nPY_m != 0 and nPY < 500000 and nPY < nPY_m and nPY_s<0 and nPY_ss<0:
                     if  count_s>0.5 and cvol_s>0:
                             if self.OrgMain == 'n':
                                 self.sig = 2
@@ -344,7 +357,7 @@ class Nprob:
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
 
-                if nPX_m != 0 and nPX < 500000 and nPX < nPX_m and nPX_s<0:
+                if nPX_m != 0 and nPX < 500000 and nPX < nPX_m and nPX_s<0 and nPX_ss<0:
                     if count_s > 0.5 and cvol_s < 0:
                         if self.OrgMain == 'n':
                             self.sig = -2
@@ -540,7 +553,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope_m', 'count_s', 'nPX_s',  'nPY_s', 'cvol_s', 'OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope_m', 'count_s', 'nPX_ss',  'nPY_ss', 'cvol_s', 'OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
