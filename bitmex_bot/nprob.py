@@ -332,7 +332,7 @@ class Nprob:
 
         if self.piox < 5 and self.piox > 0 :
             if slope_s<5 and slope_m<100:
-                if y1_m > 500000 or y1 > t1_m:
+                if y1_m > 500000 or y1 > y1_m:
                     self.piox = 0
 
         if self.piox > -5 and self.piox < 0 :
