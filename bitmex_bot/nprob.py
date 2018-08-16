@@ -347,23 +347,24 @@ class Nprob:
         if self.nf >  self.min_1+1 :
 
             # ascending
-            if self.piox==0 and count_m > 5 and count_m<15 and abs(slope)<200:
+            if self.piox==0 and count_m > 5 and count > self.df.at[self.nf-1, "dt"] :
+                if count_m<15 and abs(slope)<200:
 
-                if y1_m != 0 and y1 < 500000 and y1_s<0 and y1_ss<0:
-                    if  count_s>0.5 and cvol_s>0:
+                    if y1_m != 0 and y1 < 500000 and y1_s<0 and y1_ss<0:
+                        if  count_s>0.5 and cvol_s>0:
+                                if self.OrgMain == 'n':
+                                    self.sig = 2
+                                    self.OrgMain = "b"
+                                    self.nfset = self.nf
+                                    self.inp = float(lblShoga1v)
+
+                    if x1_m != 0 and x1 < 500000 and x1_s<0 and x1_ss<0:
+                        if count_s > 0.5 and cvol_s < 0:
                             if self.OrgMain == 'n':
-                                self.sig = 2
-                                self.OrgMain = "b"
+                                self.sig = -2
+                                self.OrgMain = "s"
                                 self.nfset = self.nf
-                                self.inp = float(lblShoga1v)
-
-                if x1_m != 0 and x1 < 500000 and x1_s<0 and x1_ss<0:
-                    if count_s > 0.5 and cvol_s < 0:
-                        if self.OrgMain == 'n':
-                            self.sig = -2
-                            self.OrgMain = "s"
-                            self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)
+                                self.inp = float(lblBhoga1v)
 
             # # afterpeaking
             # if self.piox==0 and nPX>nPX_m and cvol_s > 5 and slope<-30:
