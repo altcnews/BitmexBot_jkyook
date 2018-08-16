@@ -353,17 +353,17 @@ class Nprob:
         if self.nf >  self.min_1+1 :
 
             # ascending
-            if self.piox==0 and count_m > 5 and count > self.df.at[self.nf-1, "dt"] : #and mt<1.5
+            if self.piox==0: # and count_m > 5 and count > self.df.at[self.nf-1, "dt"] : #and mt<1.5
                 if count_m<20 and abs(slope)<200:
 
-                    if cvol_t>15 and cvol_s>0: #and y1 < 200000
+                    if cvol_t>15 and cvol_s>10: #and y1 < 200000
                         if self.OrgMain == 'n':
                             self.sig = 2
                             self.OrgMain = "b"
                             self.nfset = self.nf
                             self.inp = float(lblShoga1v)
 
-                    if cvol_t<-15 and cvol_s<0:  #and x1 < 200000
+                    if cvol_t<-15 and cvol_s<-10:  #and x1 < 200000
                             if self.OrgMain == 'n':
                                 self.sig = -2
                                 self.OrgMain = "s"
