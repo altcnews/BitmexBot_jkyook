@@ -173,8 +173,8 @@ class Nprob:
         # mtm
         if self.nf < self.sec_30+1:
             mtm = 0
-        if self.nf >= self.sec_30+1:
-            mtm = self.df.ix[self.nf - self.sec_30:self.nf - 1, "mt"].mean()
+        if self.nf >= self.sec_15+1:
+            mtm = self.df.ix[self.nf - self.sec_15:self.nf - 1, "mt"].mean()
         self.df.at[self.nf, "mtm"] = mtm
 
         # count_s
@@ -347,7 +347,7 @@ class Nprob:
         if self.nf >  self.min_1+1 :
 
             # ascending
-            if self.piox==0 and count_m > 5 and count > self.df.at[self.nf-1, "dt"] :
+            if self.piox==0 and mt<2 and count_m > 5 and count > self.df.at[self.nf-1, "dt"] :
                 if count_m<15 and abs(slope)<200:
 
                     if y1_m != 0 and y1 < 500000 and y1_s<0 and y1_ss<0:
