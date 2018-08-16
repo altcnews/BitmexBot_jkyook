@@ -86,8 +86,8 @@ class Nprob:
         if self.nf < self.min_1+1:
             cvol_s = 0
         if self.nf >= self.min_1+1:
-            c_y = self.df.ix[self.nf - 7:self.nf - 1, "cvol_m"]
-            c_x = self.df.ix[self.nf - 7:self.nf - 1, "stime"]
+            c_y = self.df.ix[self.nf - 9:self.nf - 1, "cvol_m"]
+            c_x = self.df.ix[self.nf - 9:self.nf - 1, "stime"]
             cvol_s = regr.fit(c_x.values.reshape(-1, 1), c_y.values.reshape(-1, 1)).coef_[0][0]
         self.df.at[self.nf, "cvol_s"] = cvol_s
 
@@ -240,10 +240,10 @@ class Nprob:
         self.df.at[self.nf, "stPXY"] = stPXY
 
         # slope = slope
-        if self.nf >= self.sec_30+1:
+        if self.nf >= self.sec_15+1:
             # c = range(0, 300, 5)
-            ry = self.df.ix[self.nf - self.sec_30:self.nf - 1, "sXY"] #.iloc[c]
-            rx = self.df.ix[self.nf - self.sec_30:self.nf - 1, "stime"] #.iloc[c]
+            ry = self.df.ix[self.nf - self.sec_15:self.nf - 1, "sXY"] #.iloc[c]
+            rx = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stime"] #.iloc[c]
             slope = regr.fit(rx.values.reshape(-1, 1), ry.values.reshape(-1, 1)).coef_[0][0]
         else:
             slope = 0
@@ -252,17 +252,17 @@ class Nprob:
         self.df.at[self.nf, "slope"] = slope
 
         # slope_m
-        if self.nf < self.min_1+1:
+        if self.nf < self.sec_15+1:
             slope_m = 0
-        if self.nf >= self.min_1+1:
-            slope_m = self.df.ix[self.nf - self.min_1:self.nf - 1, "slope"].mean()
+        if self.nf >= self.sec_15+1:
+            slope_m = self.df.ix[self.nf - self.sec_15:self.nf - 1, "slope"].mean()
         self.df.at[self.nf, "slope_m"] = slope_m
 
 
         # slope_s
-        if self.nf >= self.min_1+1:
-            ry = self.df.ix[self.nf - self.sec_30:self.nf - 1, "slope"] #.iloc[c]
-            rx = self.df.ix[self.nf - self.sec_30:self.nf - 1, "stime"] #.iloc[c]
+        if self.nf >= self.sec_30+1:
+            ry = self.df.ix[self.nf - self.sec_15:self.nf - 1, "slope"] #.iloc[c]
+            rx = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stime"] #.iloc[c]
             slope_s = regr.fit(rx.values.reshape(-1, 1), ry.values.reshape(-1, 1)).coef_[0][0] * 1000
         else:
             slope_s = 0
@@ -321,9 +321,9 @@ class Nprob:
         if self.nf >  self.min_1+1 :
 
             # ascending
-            if self.piox==0 and count_m > 10 and count_m<15 and abs(slope)<200:
+            if self.piox==0 and count_m > 5 and count_m<15 and abs(slope)<200:
 
-                if nPY_m != 0 and nPY < 500000 and nPX > nPX_m:
+                if nPY_m != 0 and nPY < 500000 and nPY < nPY_m:
                     if  count_s>0.5 and cvol_s>0:
                             if self.OrgMain == 'n':
                                 self.sig = 2
@@ -331,7 +331,7 @@ class Nprob:
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
 
-                if nPX_m != 0 and nPX < 500000 and nPY > nPY_m:
+                if nPX_m != 0 and nPX < 500000 and nPX < nPX_m:
                     if count_s > 0.5 and cvol_s < 0:
                         if self.OrgMain == 'n':
                             self.sig = -2
