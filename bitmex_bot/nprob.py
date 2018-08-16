@@ -181,8 +181,8 @@ class Nprob:
         if self.nf < self.min_1+1:
             count_s = 0
         if self.nf >= self.min_1+1:
-            r_dt = self.df.ix[self.nf - 10:self.nf - 1, "count_m"]
-            r_stime = self.df.ix[self.nf - 10:self.nf - 1, "stime"]
+            r_dt = self.df.ix[self.nf - 5:self.nf - 1, "count_m"]
+            r_stime = self.df.ix[self.nf - 5:self.nf - 1, "stime"]
             count_s = regr.fit(r_stime.values.reshape(-1, 1), r_dt.values.reshape(-1, 1)).coef_[0][0]*1000
         self.df.at[self.nf, "count_s"] = count_s
 
@@ -224,6 +224,19 @@ class Nprob:
         self.df.at[self.nf, "nPX_m"] = nPX_m
         self.df.at[self.nf, "nPY_m"] = nPY_m
         self.df.at[self.nf, "nPXY_d_m"] = nPXY_d_m
+
+        # nPX_s, nPY_s
+        if self.nf >= self.min_1+1:
+            r_ny = self.df.ix[self.nf - self.sec_15:self.nf - 1, "nPY_m"] #.iloc[c]
+            r_nx = self.df.ix[self.nf - self.sec_15:self.nf - 1, "nPX_m"] #.iloc[c]
+            r_t = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stime"] #.iloc[c]
+            nPY_s = regr.fit(r_t.values.reshape(-1, 1), r_ny.values.reshape(-1, 1)).coef_[0][0]
+            nPX_s = regr.fit(r_t.values.reshape(-1, 1), r_nx.values.reshape(-1, 1)).coef_[0][0]
+        else:
+            nPY_s = 0
+            nPX_s = 0
+        self.df.at[self.nf, "nPY_s"] = nPY_s
+        self.df.at[self.nf, "nPX_s"] = nPX_s
 
         # stXY
         if self.nf < self.sec_30+1:
@@ -323,7 +336,7 @@ class Nprob:
             # ascending
             if self.piox==0 and count_m > 5 and count_m<15 and abs(slope)<200:
 
-                if nPY_m != 0 and nPY < 500000 and nPY < nPY_m:
+                if nPY_m != 0 and nPY < 500000 and nPY < nPY_m and nPY_s<0:
                     if  count_s>0.5 and cvol_s>0:
                             if self.OrgMain == 'n':
                                 self.sig = 2
@@ -331,7 +344,7 @@ class Nprob:
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
 
-                if nPX_m != 0 and nPX < 500000 and nPX < nPX_m:
+                if nPX_m != 0 and nPX < 500000 and nPX < nPX_m and nPX_s<0:
                     if count_s > 0.5 and cvol_s < 0:
                         if self.OrgMain == 'n':
                             self.sig = -2
@@ -527,7 +540,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope_m', 'count_s', 'nPX_m',  'nPY_m', 'cvol_s', 'OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'slope_m', 'count_s', 'nPX_s',  'nPY_s', 'cvol_s', 'OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
