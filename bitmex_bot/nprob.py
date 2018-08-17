@@ -369,6 +369,7 @@ class Nprob:
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
+
                 # after-peak
 
                 if cvol_t > 15:
@@ -387,7 +388,10 @@ class Nprob:
                     self.nfset = self.nf
                     self.inp = float(lblShoga1v)
 
-                    #
+                if abs(self.sig) == 0.5:
+                    if abs(cvol_t) < 15:
+                        self.sig = 0
+
                     # if y1_m != 0 and y1 < 100000 and y1_s<0: # and y1_ss<0:
                     #     if  count_s>0.5 and cvol_s>0:
                     #             if self.OrgMain == 'n':
@@ -492,6 +496,7 @@ class Nprob:
                 self.piox = 7
                 self.OrgMain = 'n'
                 self.turnover += 1
+                self.sig = 0
 
 
             # # high peak (opposite direction)
@@ -549,7 +554,8 @@ class Nprob:
                 self.piox = -7
                 self.OrgMain = 'n'
                 self.turnover += 1
-                
+                self.sig = 0
+
             # # high peak (opposite direction)
             # if self.OrgMain == "s" and count_m > 10 and slope_m > 0:
             #     self.profit += ((self.inp - float(lblBhoga1v)) - (
@@ -596,7 +602,8 @@ class Nprob:
             self.hit_peak = 0
             self.inp = 0
             self.nfset = 0
-            self.sig = 0
+            if abs(self.sig) != 0.5:
+                self.sig = 0
 
         self.df.at[self.nf, "d_OMain"] = self.d_OMain
         self.df.at[self.nf, "OrgMain"] = self.OrgMain
