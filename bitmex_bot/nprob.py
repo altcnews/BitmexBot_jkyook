@@ -494,7 +494,7 @@ class Nprob:
 
             #  after - peak
 
-            if self.in_str == 1 and cvol_s < 0:
+            if self.in_str == -1 and cvol_s < 0:
                 self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
                 self.piox = 7
@@ -556,7 +556,7 @@ class Nprob:
                     self.turnover += 1
                     self.in_str = 0
 
-            if self.in_str == -1 and cvol_s > 0:
+            if self.in_str == 1 and cvol_s > 0:
                 self.profit += ((self.inp - float(lblBhoga1v)) - (
                         float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                 self.piox = -7
