@@ -366,7 +366,7 @@ class Nprob:
             # after-peak
             if cvol_t > 15:
                 self.sig_1 = 0.5
-            if self.sig_1 == 0.5 and cvol_t < 15:
+            if self.sig_1 == 0.5 and cvol_t < 0:
                 self.sig_1 = 0
             if self.sig_1 == 0.5 and cvol_s < 0 and cvol_t < -5:
                 self.sig_1 = 1
@@ -378,7 +378,7 @@ class Nprob:
 
             if cvol_t < -15:
                 self.sig_1 = -0.5
-            if self.sig_1 == -0.5 and cvol_t > -15:
+            if self.sig_1 == -0.5 and cvol_t > 0:
                 self.sig_1 = 0
             if self.sig_1 == -0.5 and cvol_s > 0 and cvol_t > 5:
                 self.sig_1 = -1
