@@ -247,9 +247,9 @@ class Nprob:
 
         # x1_ss, y1_ss
         if self.nf >= self.min_1+1:
-            r_ny_s = self.df.ix[self.nf - 5:self.nf - 1, "y1_s"] #.iloc[c]
-            r_nx_s = self.df.ix[self.nf - 5:self.nf - 1, "x1_s"] #.iloc[c]
-            r_t = self.df.ix[self.nf - 5:self.nf - 1, "stime"] #.iloc[c]
+            r_ny_s = self.df.ix[self.nf - 7:self.nf - 1, "y1_s"] #.iloc[c]
+            r_nx_s = self.df.ix[self.nf - 7:self.nf - 1, "x1_s"] #.iloc[c]
+            r_t = self.df.ix[self.nf - 7:self.nf - 1, "stime"] #.iloc[c]
             y1_ss = regr.fit(r_t.values.reshape(-1, 1), r_ny_s.values.reshape(-1, 1)).coef_[0][0]*1000
             x1_ss = regr.fit(r_t.values.reshape(-1, 1), r_nx_s.values.reshape(-1, 1)).coef_[0][0]*1000
         else:
@@ -483,7 +483,7 @@ class Nprob:
             #     self.inp_preset = 0
 
             #  high peak (slope_s conversion)
-            if y1>100000 and slope>30:
+            if cvol_t<15 and y1>100000 and slope>30:
                 if cvol_s < -5 or y1_ss >0:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
@@ -546,7 +546,7 @@ class Nprob:
             #     self.inp_preset = 0
 
             #  high peak (slope_s conversion)
-            if x1>100000 and cvol_s > 5 and slope<-30:
+            if cvol_t<15 and x1>100000 and cvol_s > 5 and slope<-30:
                 if cvol_s > 5 or x1_ss > 0:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
