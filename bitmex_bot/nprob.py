@@ -375,18 +375,20 @@ class Nprob:
                 if cvol_t > 15:
                     self.sig = 0.5
                 if self.sig == 0.5 and cvol_s < 10 and cvol_s > 0 :
-                    self.sig = 1
-                    self.OrgMain = "s"
-                    self.nfset = self.nf
-                    self.inp = float(lblBhoga1v)
+                    if self.OrgMain == 'n':
+                        self.sig = 1
+                        self.OrgMain = "s"
+                        self.nfset = self.nf
+                        self.inp = float(lblBhoga1v)
 
                 if cvol_t < -15:
                     self.sig = -0.5
                 if self.sig == -0.5 and cvol_s > -10  and cvol_s < 0 :
-                    self.sig = -1
-                    self.OrgMain = "b"
-                    self.nfset = self.nf
-                    self.inp = float(lblShoga1v)
+                    if self.OrgMain == 'n':
+                        self.sig = -1
+                        self.OrgMain = "b"
+                        self.nfset = self.nf
+                        self.inp = float(lblShoga1v)
 
                 if abs(self.sig) == 0.5:
                     if abs(cvol_t) < 15:
@@ -612,7 +614,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'cvol_t', 'count_s', 'cvol_s', 'OrgMain', 'inp','profit']] #, 'x1_ss',  'y1_ss'
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'count_s', 'cvol_t', 'cvol_s', 'sig', 'OrgMain', 'inp','profit']] #, 'x1_ss',  'y1_ss'
             print '-----------'
 
         elap = time.time() - t_start
