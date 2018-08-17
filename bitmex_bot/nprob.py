@@ -389,6 +389,7 @@ class Nprob:
                     self.inp = float(lblShoga1v)
 
             # keep-going
+            self.sig_2 = 0
             if count_m<20 and abs(slope)<200:
 
                 if cvol_t>15 and cvol_s>10:
@@ -398,8 +399,6 @@ class Nprob:
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
-                    else:
-                        self.sig_2 = 0
 
                 if cvol_t<-15 and cvol_s<-10:
                     self.sig_2 = -2
@@ -408,8 +407,6 @@ class Nprob:
                         self.OrgMain = "s"
                         self.nfset = self.nf
                         self.inp = float(lblBhoga1v)
-                    else:
-                        self.sig_2 = 0
 
         self.df.at[self.nf, "inp"] = self.inp
         self.df.at[self.nf, "inp_preset"] = self.inp_preset
