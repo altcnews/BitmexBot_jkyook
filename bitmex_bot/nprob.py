@@ -391,52 +391,25 @@ class Nprob:
             # keep-going
             if count_m<20 and abs(slope)<200:
 
-                if cvol_t>15 and cvol_s>10: #and y1 < 200000
+                if cvol_t>15 and cvol_s>10:
                     self.sig_2 = 2
                     if self.OrgMain == 'n' and self.piox==0:
                         self.in_str = 2
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
+                    else:
+                        self.sig_2 = 0
 
-                if cvol_t<-15 and cvol_s<-10:  #and x1 < 200000
-                        self.sig_2 = -2
-                        if self.OrgMain == 'n' and self.piox==0:
-                            self.in_str= -2
-                            self.OrgMain = "s"
-                            self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)
-
-                    # if y1_m != 0 and y1 < 100000 and y1_s<0: # and y1_ss<0:
-                    #     if  count_s>0.5 and cvol_s>0:
-                    #             if self.OrgMain == 'n':
-                    #                 self.sig = 2
-                    #                 self.OrgMain = "b"
-                    #                 self.nfset = self.nf
-                    #                 self.inp = float(lblShoga1v)
-                    #
-                    # if x1_m != 0 and x1 < 100000 and x1_s<0: # and x1_ss<0:
-                    #     if count_s > 0.5 and cvol_s < 0:
-                    #         if self.OrgMain == 'n':
-                    #             self.sig = -2
-                    #             self.OrgMain = "s"
-                    #             self.nfset = self.nf
-                    #             self.inp = float(lblBhoga1v)
-
-            # # afterpeaking
-            # if self.piox==0 and nPX>nPX_m and cvol_s > 5 and slope<-30:
-            #     if self.OrgMain == 'n':
-            #         self.sig = 1
-            #         self.OrgMain = "b"
-            #         self.nfset = self.nf
-            #         self.inp = float(lblShoga1v)
-            #
-            # if self.piox==0 and nPY > nPY_m and cvol_s < -5 and slope > 30:
-            #     if self.OrgMain == 'n':
-            #         self.sig = -1
-            #         self.OrgMain = "s"
-            #         self.nfset = self.nf
-            #         self.inp = float(lblBhoga1v)
+                if cvol_t<-15 and cvol_s<-10:
+                    self.sig_2 = -2
+                    if self.OrgMain == 'n' and self.piox==0:
+                        self.in_str= -2
+                        self.OrgMain = "s"
+                        self.nfset = self.nf
+                        self.inp = float(lblBhoga1v)
+                    else:
+                        self.sig_2 = 0
 
         self.df.at[self.nf, "inp"] = self.inp
         self.df.at[self.nf, "inp_preset"] = self.inp_preset
