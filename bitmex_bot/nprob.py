@@ -364,11 +364,14 @@ class Nprob:
         if self.nf >  self.min_1+1 :
 
             # after-peak
+            self.sig_1 = 0
             if cvol_t > 15:
                 self.sig_1 = 0.5
-            if self.sig_1 == 0.5:
+                self.in_str = 0.5
+            if self.in_str == 0.5:
                 if count_m<5:
                     self.sig_1 = 0
+                    self.in_str = 0
                 if count_m>10:
                     if cvol_s < 0 and cvol_t < -5:
                         self.sig_1 = 1
@@ -380,9 +383,11 @@ class Nprob:
 
             if cvol_t < -15:
                 self.sig_1 = -0.5
+                self.in_str = -0.5
             if self.sig_1 == -0.5:
                 if count_m<5:
                     self.sig_1 = 0
+                    self.in_str = 0
                 if count_m>10:
                     if cvol_s > 0 and cvol_t > 5:
                         self.sig_1 = -1
