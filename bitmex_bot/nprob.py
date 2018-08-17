@@ -51,7 +51,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print 'nf: %d   /prc: %0.1f  /hit_peak: %d   /turn_over: %d' % (self.nf, price, self.hit_peak, self.turnover)
+        print 'nf: %d   /prc: %0.1f  /sig_1: %d   /sig_2: %d   /turn_over: %d' % (self.nf, price, self.sig_1, self.sig_2, self.turnover)
         # nowtime=time.time()
 
         if self.nf!=0 and self.nf%2000==0: # and self.nf>self.min_5
@@ -340,8 +340,12 @@ class Nprob:
         #  // PIOX //
         ###############################
 
-        if abs(self.piox) == 8:
-            self.piox = 0
+        if self.piox == 8:
+            if cvol_t < 15:
+                self.piox = 0
+        if self.piox == -8:
+            if cvol_t > -15:
+                self.piox = 0
 
         if self.piox < 5 and self.piox > 0 :
             if slope_s<5 and slope_m<100:
@@ -359,12 +363,11 @@ class Nprob:
 
         if self.nf >  self.min_1+1 :
 
-            self.sig_1 = 0
-            self.sig_2 = 0
-
             # after-peak
             if cvol_t > 15:
                 self.sig_1 = 0.5
+            if self.sig_1 == 0.5 and cvol_t < 15:
+                self.sig_1 = 0
             if self.sig_1 == 0.5 and cvol_s < 0 and cvol_t < -5:
                 self.sig_1 = 1
                 if self.OrgMain == 'n' and self.piox==0:
@@ -375,6 +378,8 @@ class Nprob:
 
             if cvol_t < -15:
                 self.sig_1 = -0.5
+            if self.sig_1 == -0.5 and cvol_t > -15:
+                self.sig_1 = 0
             if self.sig_1 == -0.5 and cvol_s > 0 and cvol_t > 5:
                 self.sig_1 = -1
                 if self.OrgMain == 'n' and self.piox==0:
