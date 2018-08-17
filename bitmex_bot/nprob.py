@@ -54,7 +54,7 @@ class Nprob:
         print 'nf: %d   /prc: %0.1f  /sig_1: %d   /sig_2: %d   /turn_over: %d' % (self.nf, price, self.sig_1, self.sig_2, self.turnover)
         # nowtime=time.time()
 
-        if self.nf!=0 and self.nf%2000==0: # and self.nf>self.min_5
+        if self.nf!=0 and self.nf%500==0: # and self.nf>self.min_5
             # self.df=self.df[self.nf-self.min_/3-1:self.nf]
             self.btnSave_Clicked()
 
@@ -181,6 +181,8 @@ class Nprob:
         # mt
         if self.nf==0:
             mt = 0.5
+        # else:
+        #     mt = t_start - self.df.ix[self.nf - 1:self.nf - 1, "mt"]
         self.df.at[self.nf, "mt"] = mt
 
         # mtm
@@ -372,7 +374,7 @@ class Nprob:
                 if count_m<5:
                     self.sig_1 = 0
                     self.in_str = 0
-                if count_m>10:
+                if count_m>5:
                     if cvol_s < 0 and cvol_t < -5:
                         self.sig_1 = 1
                         if self.OrgMain == 'n' and self.piox==0:
@@ -384,11 +386,11 @@ class Nprob:
             if cvol_t < -15:
                 self.sig_1 = -0.5
                 self.in_str = -0.5
-            if self.sig_1 == -0.5:
+            if self.in_str == -0.5:
                 if count_m<5:
                     self.sig_1 = 0
                     self.in_str = 0
-                if count_m>10:
+                if count_m>5:
                     if cvol_s > 0 and cvol_t > 5:
                         self.sig_1 = -1
                         if self.OrgMain == 'n' and self.piox==0:
@@ -401,7 +403,7 @@ class Nprob:
             self.sig_2 = 0
             if count_m<20 and abs(slope)<200:
 
-                if cvol_t>20 and cvol_s>15:
+                if cvol_t>15 and cvol_s>10:
                     self.sig_2 = 2
                     if self.OrgMain == 'n' and self.piox==0:
                         self.in_str = 2
@@ -409,7 +411,7 @@ class Nprob:
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
 
-                if cvol_t<-20 and cvol_s<-15:
+                if cvol_t<-15 and cvol_s<-10:
                     self.sig_2 = -2
                     if self.OrgMain == 'n' and self.piox==0:
                         self.in_str= -2
@@ -419,6 +421,7 @@ class Nprob:
 
         self.df.at[self.nf, "inp"] = self.inp
         self.df.at[self.nf, "inp_preset"] = self.inp_preset
+        self.df.at[self.nf, "in_str"] = self.in_str
         self.df.at[self.nf, "sig_1"] = self.sig_1
         self.df.at[self.nf, "sig_2"] = self.sig_2
         self.df.at[self.nf, "nfset"] = self.nfset
