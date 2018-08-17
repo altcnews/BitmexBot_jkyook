@@ -366,27 +366,31 @@ class Nprob:
             # after-peak
             if cvol_t > 15:
                 self.sig_1 = 0.5
-            if self.sig_1 == 0.5 and cvol_t < 0:
-                self.sig_1 = 0
-            if self.sig_1 == 0.5 and cvol_s < 0 and cvol_t < -5:
-                self.sig_1 = 1
-                if self.OrgMain == 'n' and self.piox==0:
-                    self.in_str = 1
-                    self.OrgMain = "s"
-                    self.nfset = self.nf
-                    self.inp = float(lblBhoga1v)
+            if self.sig_1 == 0.5:
+                if count_m<5:
+                    self.sig_1 = 0
+                if count_m>10:
+                    if cvol_s < 0 and cvol_t < -5:
+                        self.sig_1 = 1
+                        if self.OrgMain == 'n' and self.piox==0:
+                            self.in_str = 1
+                            self.OrgMain = "s"
+                            self.nfset = self.nf
+                            self.inp = float(lblBhoga1v)
 
             if cvol_t < -15:
                 self.sig_1 = -0.5
-            if self.sig_1 == -0.5 and cvol_t > 0:
-                self.sig_1 = 0
-            if self.sig_1 == -0.5 and cvol_s > 0 and cvol_t > 5:
-                self.sig_1 = -1
-                if self.OrgMain == 'n' and self.piox==0:
-                    self.in_str = -1
-                    self.OrgMain = "b"
-                    self.nfset = self.nf
-                    self.inp = float(lblShoga1v)
+            if self.sig_1 == -0.5:
+                if count_m<5:
+                    self.sig_1 = 0
+                if count_m>10:
+                    if cvol_s > 0 and cvol_t > 5:
+                        self.sig_1 = -1
+                        if self.OrgMain == 'n' and self.piox==0:
+                            self.in_str = -1
+                            self.OrgMain = "b"
+                            self.nfset = self.nf
+                            self.inp = float(lblShoga1v)
 
             # keep-going
             self.sig_2 = 0
