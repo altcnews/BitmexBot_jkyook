@@ -504,6 +504,8 @@ class Nprob:
                     self.in_str = 0
                     self.OrgMain = 'n'
                     self.turnover += 1
+                    self.sig_1 = 0
+                    self.sig_2 = 0
 
             #  after - peak
 
@@ -514,7 +516,8 @@ class Nprob:
                 self.in_str = 0
                 self.OrgMain = 'n'
                 self.turnover += 1
-
+                self.sig_1 = 0
+                self.sig_2 = 0
 
             # # high peak (opposite direction)
             # if self.OrgMain == "b" and count_m > 10 and slope_m < 0:
@@ -535,6 +538,8 @@ class Nprob:
                         self.in_str = 0
                         self.OrgMain='n'
                         self.turnover += 1
+                        self.sig_1 = 0
+                        self.sig_2 = 0
 
                 # good_out (weakening)
                 if self.OrgMain == "b":
@@ -546,6 +551,8 @@ class Nprob:
                             self.in_str = 0
                             self.OrgMain='n'
                             self.turnover += 1
+                            self.sig_1 = 0
+                            self.sig_2 = 0
 
         elif self.OrgMain == "s": #  and lstm_mean>0.75:
 
@@ -568,6 +575,8 @@ class Nprob:
                     self.OrgMain = 'n'
                     self.turnover += 1
                     self.in_str = 0
+                    self.sig_1 = 0
+                    self.sig_2 = 0
 
             if self.in_str == 1 and cvol_s > 0:
                 self.profit += ((self.inp - float(lblBhoga1v)) - (
@@ -576,6 +585,8 @@ class Nprob:
                 self.in_str = 0
                 self.OrgMain = 'n'
                 self.turnover += 1
+                self.sig_1 = 0
+                self.sig_2 = 0
 
             # # high peak (opposite direction)
             # if self.OrgMain == "s" and count_m > 10 and slope_m > 0:
@@ -596,6 +607,8 @@ class Nprob:
                         self.in_str = 0
                         self.OrgMain='n'
                         self.turnover += 1
+                        self.sig_1 = 0
+                        self.sig_2 = 0
 
                 # good_out (weakening)
                 if self.OrgMain == "s":
@@ -606,6 +619,8 @@ class Nprob:
                             self.in_str = 0
                             self.OrgMain='n'
                             self.turnover += 1
+                            self.sig_1 = 0
+                            self.sig_2 = 0
 
         self.df.at[self.nf, "piox"] = self.piox
         self.df.at[self.nf, "profit"] = self.profit
