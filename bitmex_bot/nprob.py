@@ -377,7 +377,7 @@ class Nprob:
 
                 if cvol_t > 15:
                     self.sig = 0.5
-                if self.sig == 0.5 and cvol_s < 10 and cvol_s > 0 :
+                if self.sig == 0.5 and cvol_s < 0  :
                     if self.OrgMain == 'n':
                         self.sig = 1
                         self.in_str = 1
@@ -387,7 +387,7 @@ class Nprob:
 
                 if cvol_t < -15:
                     self.sig = -0.5
-                if self.sig == -0.5 and cvol_s > -10  and cvol_s < 0 :
+                if self.sig == -0.5 and cvol_s > 0 :
                     if self.OrgMain == 'n':
                         self.sig = -1
                         self.in_str = -1
@@ -597,7 +597,7 @@ class Nprob:
         self.df.at[self.nf, "piox"] = self.piox
         self.df.at[self.nf, "profit"] = self.profit
         self.df.at[self.nf, "ord_count"] = self.ord_count
-        self.df.at[self.nf, "oin_str"] = self.in_str
+        self.df.at[self.nf, "in_str"] = self.in_str
 
         ###############################
         #  // RESET & ETC //
