@@ -401,7 +401,7 @@ class Nprob:
             self.sig_2 = 0
             if count_m<20 and abs(slope)<200:
 
-                if cvol_t>15 and cvol_s>10:
+                if cvol_t>20 and cvol_s>15:
                     self.sig_2 = 2
                     if self.OrgMain == 'n' and self.piox==0:
                         self.in_str = 2
@@ -409,7 +409,7 @@ class Nprob:
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
 
-                if cvol_t<-15 and cvol_s<-10:
+                if cvol_t<-20 and cvol_s<-15:
                     self.sig_2 = -2
                     if self.OrgMain == 'n' and self.piox==0:
                         self.in_str= -2
@@ -553,7 +553,6 @@ class Nprob:
                     self.in_str = 0
                     self.OrgMain = 'n'
                     self.turnover += 1
-                    self.in_str = 0
                     self.sig_1 = 0
                     self.sig_2 = 0
 
