@@ -369,7 +369,8 @@ class Nprob:
             self.sig_1 = 0
             if cvol_t > 15:
                 self.sig_1 = 0.5
-                self.in_str = 0.5
+                if self.sig_1 == 0:
+                    self.in_str = 0.5
             if self.in_str == 0.5:
                 if count_m<5:
                     self.sig_1 = 0
@@ -385,11 +386,12 @@ class Nprob:
 
             if cvol_t < -15:
                 self.sig_1 = -0.5
-                self.in_str = -0.5
+                if self.sig_1 == 0:
+                    self.in_str = -0.5
             if self.in_str == -0.5:
                 if count_m<5:
                     self.sig_1 = 0
-                    self.in_str = 0
+                    self.in_str = 0.5
                 if count_m>5:
                     if cvol_s > 0 and cvol_t > 5:
                         self.sig_1 = -1
