@@ -401,7 +401,7 @@ class Nprob:
 
             # keep-going
             self.sig_2 = 0
-            if count_m<20 and abs(slope)<200:
+            if count_m<30: # and abs(slope)<200:
 
                 if cvol_t>15 and cvol_s>10:
                     self.sig_2 = 2
@@ -548,7 +548,7 @@ class Nprob:
             #     self.inp_preset = 0
 
             #  high peak (slope_s conversion)
-            if cvol_t<15 and x1>100000 and cvol_s > 5 and slope<-30:
+            if self.in_str == -2 and cvol_t<15 and x1>100000 and cvol_s > 5 and slope<-30:
                 if cvol_s > 5 or x1_ss > 0:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
