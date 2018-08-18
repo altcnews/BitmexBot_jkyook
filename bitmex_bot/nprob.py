@@ -369,7 +369,7 @@ class Nprob:
             self.sig_1 = 0
             if cvol_t > 15:
                 self.sig_1 = 0.5
-                if self.sig_1 == 0:
+                if self.in_str == 0:
                     self.in_str = 0.5
             if self.in_str == 0.5:
                 if count_m<5:
@@ -386,7 +386,7 @@ class Nprob:
 
             if cvol_t < -15:
                 self.sig_1 = -0.5
-                if self.sig_1 == 0:
+                if self.in_str == 0:
                     self.in_str = -0.5
             if self.in_str == -0.5:
                 if count_m<5:
@@ -481,7 +481,7 @@ class Nprob:
 
             #  high peak (slope_s conversion)
             if self.in_str == 2 and cvol_t<15 and y1>100000 and slope>30:
-                if cvol_s < -5 or y1_ss >0:
+                if cvol_s < -5: # or y1_ss >0:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
                     self.piox = 8
@@ -551,7 +551,7 @@ class Nprob:
 
             #  high peak (slope_s conversion)
             if self.in_str == -2 and cvol_t<15 and x1>100000 and cvol_s > 5 and slope<-30:
-                if cvol_s > 5 or x1_ss > 0:
+                if cvol_s > 5: # or x1_ss > 0:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                     self.piox = -8
