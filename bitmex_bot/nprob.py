@@ -88,6 +88,14 @@ class Nprob:
             cvol_m = self.df.ix[self.nf - self.sec_15:self.nf - 1, "cvolume"].mean()
         self.df.at[self.nf, "cvol_m"] = cvol_m
 
+        # cvol_count
+        if self.nf < self.sec_15+1:
+            cvol_c = 0
+        if self.nf >= self.sec_15+1:
+            cvol_c = self.df[self.nf - 20:self.nf - 1][self.df.cvolume[self.nf - 20:self.nf - 1]>0].count()[0]
+        self.df.at[self.nf, "cvol_c"] = cvol_c
+        print 'cvol_c: ', cvol_c
+
         # cvol_s
         if self.nf < self.min_1+1:
             cvol_s = 0
@@ -406,7 +414,7 @@ class Nprob:
             if count_m<30: # and abs(slope)<200:
 
                 if cvol_t>15 and cvol_s>10:
-                    if self.df.at[self.nf-2:self.nf-1, "cvol_t"].mean()>15:
+                    if self.df[self.nf-2:self.nf-1, "cvol_t"].mean()>10:
                         self.sig_2 = 2
                         if self.OrgMain == 'n' and self.piox==0:
                             self.in_str = 2
@@ -415,12 +423,12 @@ class Nprob:
                             self.inp = float(lblShoga1v)
 
                 if cvol_t<-15 and cvol_s<-10:
-                    if self.df.at[self.nf-2:self.nf-1, "cvol_t"].mean()<15:
+                    if self.df[self.nf-2:self.nf-1, "cvol_t"].mean()<-10:
                         self.sig_2 = -2
                         if self.OrgMain == 'n' and self.piox==0:
                             self.in_str= -2
                             self.OrgMain = "s"
-                            self.nfset = self.nf 
+                            self.nfset = self.nf
                             self.inp = float(lblBhoga1v)
 
         self.df.at[self.nf, "inp"] = self.inp
