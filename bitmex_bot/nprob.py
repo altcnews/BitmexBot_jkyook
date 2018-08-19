@@ -391,7 +391,7 @@ class Nprob:
             if self.in_str == -0.5:
                 if count_m<5:
                     self.sig_1 = 0
-                    self.in_str = 0.5
+                    self.in_str = 0
                 if count_m>5:
                     if cvol_s > 0 and cvol_t > 5:
                         self.sig_1 = -1
@@ -406,20 +406,22 @@ class Nprob:
             if count_m<30: # and abs(slope)<200:
 
                 if cvol_t>15 and cvol_s>10:
-                    self.sig_2 = 2
-                    if self.OrgMain == 'n' and self.piox==0:
-                        self.in_str = 2
-                        self.OrgMain = "b"
-                        self.nfset = self.nf
-                        self.inp = float(lblShoga1v)
+                    if self.df.at[self.nf-2:self.nf-1, "cvol_t"].mean()>15:
+                        self.sig_2 = 2
+                        if self.OrgMain == 'n' and self.piox==0:
+                            self.in_str = 2
+                            self.OrgMain = "b"
+                            self.nfset = self.nf
+                            self.inp = float(lblShoga1v)
 
                 if cvol_t<-15 and cvol_s<-10:
-                    self.sig_2 = -2
-                    if self.OrgMain == 'n' and self.piox==0:
-                        self.in_str= -2
-                        self.OrgMain = "s"
-                        self.nfset = self.nf
-                        self.inp = float(lblBhoga1v)
+                    if self.df.at[self.nf-2:self.nf-1, "cvol_t"].mean()<15:
+                        self.sig_2 = -2
+                        if self.OrgMain == 'n' and self.piox==0:
+                            self.in_str= -2
+                            self.OrgMain = "s"
+                            self.nfset = self.nf 
+                            self.inp = float(lblBhoga1v)
 
         self.df.at[self.nf, "inp"] = self.inp
         self.df.at[self.nf, "inp_preset"] = self.inp_preset
