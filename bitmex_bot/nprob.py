@@ -157,6 +157,16 @@ class Nprob:
         self.df.at[self.nf, "dyy"] = dyy
         self.df.at[self.nf, "dxy"] = dxy
 
+        # dxx,dyy ave_20
+        if self.nf < self.sec_30+1:
+            dxx_20 = 0
+            dyy_20 = 0
+        if self.nf >= self.sec_30+1:
+            dxx_20 = self.df.ix[self.nf - 20:self.nf - 1, "dxx"].sum()
+            dyy_20 = self.df.ix[self.nf - 20:self.nf - 1, "dyy"].sum()
+        self.df.at[self.nf, "dxx_20"] = dxx_20
+        self.df.at[self.nf, "dyy_20"] = dyy_20
+
         # sX, sY, sXY
         if self.nf == 0:
             sX = 0
@@ -372,68 +382,82 @@ class Nprob:
         #  // In Decision //
         ###############################
 
+        # Trend_Inn
         if self.nf >  self.min_1+1 :
+            if dxx_20>5*1000000:
+                if self.OrgMain == 'n':
+                    self.OrgMain = "b"
+                    self.nfset = self.nf
+                    self.inp = float(lblShoga1v)
+            if dyy_20>5*1000000:
+                if self.OrgMain == 'n':
+                    self.OrgMain = "s"
+                    self.nfset = self.nf
+                    self.inp = float(lblBhoga1v)
 
-            # after-peak
-            self.sig_1 = 0
-            if cvol_t > 15:
-                self.sig_1 = 0.5
-                if self.in_str_1 == 0:
-                    self.in_str_1 = 0.5
-            if self.in_str_1 == 0.5:
-                if count_m<5:
-                    self.sig_1 = 0
-                    self.in_str_1 = 0
-                if count_m>5:
-                    if cvol_s < 0 and cvol_t < -5:
-                        self.sig_1 = 1
-                        if self.OrgMain == 'n' and self.piox==0:
-                            self.in_str_1 = 1
-                            self.OrgMain = "s"
-                            self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)
-
-            if cvol_t < -15:
-                self.sig_1 = -0.5
-                if self.in_str_1 == 0:
-                    self.in_str_1= -0.5
-            if self.in_str_1 == -0.5:
-                if count_m<5:
-                    self.sig_1 = 0
-                    self.in_str_1 = 0
-                if count_m>5:
-                    if cvol_s > 0 and cvol_t > 5:
-                        self.sig_1 = -1
-                        if self.OrgMain == 'n' and self.piox==0:
-                            self.in_str_1 = -1
-                            self.OrgMain = "b"
-                            self.nfset = self.nf
-                            self.inp = float(lblShoga1v)
-
-            # keep-going
-            self.sig_2 = 0
-            if count_m<30: # and abs(slope)<200:
-
-                if cvol_t>15 and cvol_s>10:
-                    if self.df[self.nf-1, "cvol_t"]>10:
-                        self.sig_2 = 2
-                        if self.OrgMain == 'n' and self.piox==0:
-                            self.in_str = 2
-                            self.OrgMain = "b"
-                            self.nfset = self.nf
-                            self.inp = float(lblShoga1v)
-
-                if cvol_t<-15 and cvol_s<-10:
-                    if self.df[self.nf-1, "cvol_t"]>10:
-                        self.sig_2 = -2
-                        if self.OrgMain == 'n' and self.piox==0:
-                            self.in_str= -2
-                            self.OrgMain = "s"
-                            self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)
+        # # Peak_Inn
+        # if self.nf >  self.min_1+1 :
+        #
+        #     # after-peak
+        #     self.sig_1 = 0
+        #     if cvol_t > 15:
+        #         self.sig_1 = 0.5
+        #         if self.in_str_1 == 0:
+        #             self.in_str_1 = 0.5
+        #     if self.in_str_1 == 0.5:
+        #         if count_m<5:
+        #             self.sig_1 = 0
+        #             self.in_str_1 = 0
+        #         if count_m>5:
+        #             if cvol_s < 0 and cvol_t < -5:
+        #                 self.sig_1 = 1
+        #                 if self.OrgMain == 'n' and self.piox==0:
+        #                     self.in_str_1 = 1
+        #                     self.OrgMain = "s"
+        #                     self.nfset = self.nf
+        #                     self.inp = float(lblBhoga1v)
+        #
+        #     if cvol_t < -15:
+        #         self.sig_1 = -0.5
+        #         if self.in_str_1 == 0:
+        #             self.in_str_1= -0.5
+        #     if self.in_str_1 == -0.5:
+        #         if count_m<5:
+        #             self.sig_1 = 0
+        #             self.in_str_1 = 0
+        #         if count_m>5:
+        #             if cvol_s > 0 and cvol_t > 5:
+        #                 self.sig_1 = -1
+        #                 if self.OrgMain == 'n' and self.piox==0:
+        #                     self.in_str_1 = -1
+        #                     self.OrgMain = "b"
+        #                     self.nfset = self.nf
+        #                     self.inp = float(lblShoga1v)
+        #
+        #     # keep-going
+        #     self.sig_2 = 0
+        #     if count_m<30: # and abs(slope)<200:
+        #
+        #         if cvol_t>15 and cvol_s>10:
+        #             if self.df.at[self.nf-1, "cvol_t"]>10:
+        #                 self.sig_2 = 2
+        #                 if self.OrgMain == 'n' and self.piox==0:
+        #                     self.in_str = 2
+        #                     self.OrgMain = "b"
+        #                     self.nfset = self.nf
+        #                     self.inp = float(lblShoga1v)
+        #
+        #         if cvol_t<-15 and cvol_s<-10:
+        #             if self.df.at[self.nf-1, "cvol_t"]>10:
+        #                 self.sig_2 = -2
+        #                 if self.OrgMain == 'n' and self.piox==0:
+        #                     self.in_str= -2
+        #                     self.OrgMain = "s"
+        #                     self.nfset = self.nf
+        #                     self.inp = float(lblBhoga1v)
 
         self.df.at[self.nf, "inp"] = self.inp
-        self.df.at[self.nf, "inp_preset"] = self.inp_preset
+        # self.df.at[self.nf, "inp_preset"] = self.inp_preset
         self.df.at[self.nf, "in_str_1"] = self.in_str_1
         self.df.at[self.nf, "in_str"] = self.in_str
         self.df.at[self.nf, "sig_1"] = self.sig_1
@@ -478,148 +502,163 @@ class Nprob:
         #  // Out Decision //
         ###############################
 
-        # piox
-        self.piox=0
+        #  Trend_Out
         if self.OrgMain == "b":
-
-            # #  high peak (same direction)
-            # if count > 15 and slope > 200:
-            #     self.profit += ((float(lblBhoga1v) - self.inp) - (
-            #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-            #     self.piox = 9
-            #     self.OrgMain = 'n'
-            #     self.turnover += 1
-            #     self.inp_preset = 0
-
-            #  high peak (slope_s conversion)
-            if self.in_str == 2 and cvol_t<15 and y1>100000 and slope>30:
-                if cvol_s < -5 and cvol_t<0: # or y1_ss >0:
-                    self.profit += ((float(lblBhoga1v) - self.inp) - (
-                            float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
-                    self.piox = 8
-                    self.in_str = 0
-                    self.OrgMain = 'n'
-                    self.turnover += 1
-                    self.sig_1 = 0
-                    self.sig_2 = 0
-
-            #  after - peak
-
-            if  self.OrgMain == "b" and self.in_str_1 == -1 and cvol_s < 0 and cvol_t < -0.5:
+            if dyy_20>5*1000000:
                 self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
-                self.piox = 7
-                self.in_str_1 = 0
                 self.OrgMain = 'n'
                 self.turnover += 1
-                self.sig_1 = 0
-                self.sig_2 = 0
 
-            # # high peak (opposite direction)
-            # if self.OrgMain == "b" and count_m > 10 and slope_m < 0:
-            #     self.profit += ((float(lblBhoga1v) - self.inp) - (
-            #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-            #     self.piox = 6
-            #     self.OrgMain = 'n'
-            #     self.turnover += 1
-            #     self.inp_preset = 0
-
-            if prf_able != 0:
-
-                # bad_out (opposite direction)
-                if self.OrgMain == "b" and ee_s > ee_s_ave and ee_s>1.5  and ee_s_ave > 1.3:
-                    if slope_s<0 and slope_m < -100:
-                        self.profit+=((float(lblBhoga1v)-self.inp) - (float(lblBhoga1v)+self.inp)*0.00075/2)* self.ord_count
-                        self.piox = 1
-                        self.in_str_1 = 0
-                        self.in_str = 0
-                        self.OrgMain='n'
-                        self.turnover += 1
-                        self.sig_1 = 0
-                        self.sig_2 = 0
-
-                # good_out (weakening)
-                if self.OrgMain == "b":
-                    if count_m<5:
-                        if ee_s<ee_s_ave or y1_m>400000 or y1>y1_m:
-                            self.profit += ((float(lblBhoga1v) - self.inp) - (
-                                        float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
-                            self.piox = 4
-                            self.in_str_1 = 0
-                            self.in_str = 0
-                            self.OrgMain='n'
-                            self.turnover += 1
-                            self.sig_1 = 0
-                            self.sig_2 = 0
-
-        elif self.OrgMain == "s": #  and lstm_mean>0.75:
-
-            # #  high peak (same direction)
-            # if count > 20 and slope < -200:
-            #     self.profit += ((self.inp - float(lblBhoga1v)) - (
-            #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-            #     self.piox = -9
-            #     self.OrgMain = 'n'
-            #     self.turnover += 1
-            #     self.inp_preset = 0
-
-            #  high peak (slope_s conversion)
-            if self.in_str == -2 and cvol_t<15 and x1>100000 and cvol_s > 5 and slope<-30:
-                if cvol_s > 5 and cvol_t>0: # or x1_ss > 0:
-                    self.profit += ((self.inp - float(lblBhoga1v)) - (
-                            float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
-                    self.piox = -8
-                    self.in_str = 0
-                    self.OrgMain = 'n'
-                    self.turnover += 1
-                    self.sig_1 = 0
-                    self.sig_2 = 0
-
-            if  self.OrgMain == "s" and self.in_str_1 == 1 and cvol_s > 0 and cvol_t > 0.5:
+        if self.OrgMain == "s":
+            if dxx_20 > 5 * 1000000:
                 self.profit += ((self.inp - float(lblBhoga1v)) - (
-                        float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
-                self.piox = -7
-                self.in_str_1 = 0
+                        float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                 self.OrgMain = 'n'
                 self.turnover += 1
-                self.sig_1 = 0
-                self.sig_2 = 0
 
-            # # high peak (opposite direction)
-            # if self.OrgMain == "s" and count_m > 10 and slope_m > 0:
-            #     self.profit += ((self.inp - float(lblBhoga1v)) - (
-            #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-            #     self.piox = -6
-            #     self.OrgMain = 'n'
-            #     self.turnover += 1
-            #     self.inp_preset = 0
-
-            if prf_able != 0:
-
-                # bad_out (opposite direction)
-                if self.OrgMain == "s" and ee_s > ee_s_ave and ee_s>1.5  and ee_s_ave > 1.3:
-                    if slope_s>0 and slope_m > 100:
-                        self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075/2) * self.ord_count
-                        self.piox = -1
-                        self.in_str_1 = 0
-                        self.in_str = 0
-                        self.OrgMain='n'
-                        self.turnover += 1
-                        self.sig_1 = 0
-                        self.sig_2 = 0
-
-                # good_out (weakening)
-                if self.OrgMain == "s":
-                    if count_m<5:
-                        if ee_s<ee_s_ave or x1_m>400000 or x1>x1_m:
-                            self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075/2) * self.ord_count
-                            self.piox = -4
-                            self.in_str_1 = 0
-                            self.in_str = 0
-                            self.OrgMain='n'
-                            self.turnover += 1
-                            self.sig_1 = 0
-                            self.sig_2 = 0
+        # # Peak_Out
+        # self.piox=0
+        # if self.OrgMain == "b":
+        #
+        #     # #  high peak (same direction)
+        #     # if count > 15 and slope > 200:
+        #     #     self.profit += ((float(lblBhoga1v) - self.inp) - (
+        #     #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+        #     #     self.piox = 9
+        #     #     self.OrgMain = 'n'
+        #     #     self.turnover += 1
+        #     #     self.inp_preset = 0
+        #
+        #     #  high peak (slope_s conversion)
+        #     if self.in_str == 2 and cvol_t<15 and y1>100000 and slope>30:
+        #         if cvol_s < -5 and cvol_t<0: # or y1_ss >0:
+        #             self.profit += ((float(lblBhoga1v) - self.inp) - (
+        #                     float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
+        #             self.piox = 8
+        #             self.in_str = 0
+        #             self.OrgMain = 'n'
+        #             self.turnover += 1
+        #             self.sig_1 = 0
+        #             self.sig_2 = 0
+        #
+        #     #  after - peak
+        #
+        #     if  self.OrgMain == "b" and self.in_str_1 == -1 and cvol_s < 0 and cvol_t < -0.5:
+        #         self.profit += ((float(lblBhoga1v) - self.inp) - (
+        #                 float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
+        #         self.piox = 7
+        #         self.in_str_1 = 0
+        #         self.OrgMain = 'n'
+        #         self.turnover += 1
+        #         self.sig_1 = 0
+        #         self.sig_2 = 0
+        #
+        #     # # high peak (opposite direction)
+        #     # if self.OrgMain == "b" and count_m > 10 and slope_m < 0:
+        #     #     self.profit += ((float(lblBhoga1v) - self.inp) - (
+        #     #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+        #     #     self.piox = 6
+        #     #     self.OrgMain = 'n'
+        #     #     self.turnover += 1
+        #     #     self.inp_preset = 0
+        #
+        #     if prf_able != 0:
+        #
+        #         # bad_out (opposite direction)
+        #         if self.OrgMain == "b" and ee_s > ee_s_ave and ee_s>1.5  and ee_s_ave > 1.3:
+        #             if slope_s<0 and slope_m < -100:
+        #                 self.profit+=((float(lblBhoga1v)-self.inp) - (float(lblBhoga1v)+self.inp)*0.00075/2)* self.ord_count
+        #                 self.piox = 1
+        #                 self.in_str_1 = 0
+        #                 self.in_str = 0
+        #                 self.OrgMain='n'
+        #                 self.turnover += 1
+        #                 self.sig_1 = 0
+        #                 self.sig_2 = 0
+        #
+        #         # good_out (weakening)
+        #         if self.OrgMain == "b":
+        #             if count_m<5:
+        #                 if ee_s<ee_s_ave or y1_m>400000 or y1>y1_m:
+        #                     self.profit += ((float(lblBhoga1v) - self.inp) - (
+        #                                 float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
+        #                     self.piox = 4
+        #                     self.in_str_1 = 0
+        #                     self.in_str = 0
+        #                     self.OrgMain='n'
+        #                     self.turnover += 1
+        #                     self.sig_1 = 0
+        #                     self.sig_2 = 0
+        #
+        # elif self.OrgMain == "s": #  and lstm_mean>0.75:
+        #
+        #     # #  high peak (same direction)
+        #     # if count > 20 and slope < -200:
+        #     #     self.profit += ((self.inp - float(lblBhoga1v)) - (
+        #     #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+        #     #     self.piox = -9
+        #     #     self.OrgMain = 'n'
+        #     #     self.turnover += 1
+        #     #     self.inp_preset = 0
+        #
+        #     #  high peak (slope_s conversion)
+        #     if self.in_str == -2 and cvol_t<15 and x1>100000 and cvol_s > 5 and slope<-30:
+        #         if cvol_s > 5 and cvol_t>0: # or x1_ss > 0:
+        #             self.profit += ((self.inp - float(lblBhoga1v)) - (
+        #                     float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
+        #             self.piox = -8
+        #             self.in_str = 0
+        #             self.OrgMain = 'n'
+        #             self.turnover += 1
+        #             self.sig_1 = 0
+        #             self.sig_2 = 0
+        #
+        #     if  self.OrgMain == "s" and self.in_str_1 == 1 and cvol_s > 0 and cvol_t > 0.5:
+        #         self.profit += ((self.inp - float(lblBhoga1v)) - (
+        #                 float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
+        #         self.piox = -7
+        #         self.in_str_1 = 0
+        #         self.OrgMain = 'n'
+        #         self.turnover += 1
+        #         self.sig_1 = 0
+        #         self.sig_2 = 0
+        #
+        #     # # high peak (opposite direction)
+        #     # if self.OrgMain == "s" and count_m > 10 and slope_m > 0:
+        #     #     self.profit += ((self.inp - float(lblBhoga1v)) - (
+        #     #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+        #     #     self.piox = -6
+        #     #     self.OrgMain = 'n'
+        #     #     self.turnover += 1
+        #     #     self.inp_preset = 0
+        #
+        #     if prf_able != 0:
+        #
+        #         # bad_out (opposite direction)
+        #         if self.OrgMain == "s" and ee_s > ee_s_ave and ee_s>1.5  and ee_s_ave > 1.3:
+        #             if slope_s>0 and slope_m > 100:
+        #                 self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075/2) * self.ord_count
+        #                 self.piox = -1
+        #                 self.in_str_1 = 0
+        #                 self.in_str = 0
+        #                 self.OrgMain='n'
+        #                 self.turnover += 1
+        #                 self.sig_1 = 0
+        #                 self.sig_2 = 0
+        #
+        #         # good_out (weakening)
+        #         if self.OrgMain == "s":
+        #             if count_m<5:
+        #                 if ee_s<ee_s_ave or x1_m>400000 or x1>x1_m:
+        #                     self.profit += ((self.inp-float(lblBhoga1v)) - (float(lblBhoga1v)+self.inp)*0.00075/2) * self.ord_count
+        #                     self.piox = -4
+        #                     self.in_str_1 = 0
+        #                     self.in_str = 0
+        #                     self.OrgMain='n'
+        #                     self.turnover += 1
+        #                     self.sig_1 = 0
+        #                     self.sig_2 = 0
 
         self.df.at[self.nf, "piox"] = self.piox
         self.df.at[self.nf, "profit"] = self.profit
@@ -647,7 +686,8 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'count_s', 'cvol_t', 'cvol_s', 'in_str', 'OrgMain', 'inp','profit']] #, 'x1_ss',  'y1_ss'
+            # print self.df.ix[self.nf-9:self.nf-1,['dt', 'count_s', 'cvol_t', 'cvol_s', 'in_str', 'OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'dxx_20', 'dyy_20', 'cvol_t', 'OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
