@@ -414,22 +414,22 @@ class Nprob:
             if count_m<30: # and abs(slope)<200:
 
                 if cvol_t>15 and cvol_s>10:
-                    if self.df[self.nf-2:self.nf-1, "cvol_t"].mean()>10:
-                        self.sig_2 = 2
-                        if self.OrgMain == 'n' and self.piox==0:
-                            self.in_str = 2
-                            self.OrgMain = "b"
-                            self.nfset = self.nf
-                            self.inp = float(lblShoga1v)
+                    # if self.df[self.nf-2:self.nf-1, "cvol_t"].mean()>10:
+                    self.sig_2 = 2
+                    if self.OrgMain == 'n' and self.piox==0:
+                        self.in_str = 2
+                        self.OrgMain = "b"
+                        self.nfset = self.nf
+                        self.inp = float(lblShoga1v)
 
                 if cvol_t<-15 and cvol_s<-10:
-                    if self.df[self.nf-2:self.nf-1, "cvol_t"].mean()<-10:
-                        self.sig_2 = -2
-                        if self.OrgMain == 'n' and self.piox==0:
-                            self.in_str= -2
-                            self.OrgMain = "s"
-                            self.nfset = self.nf
-                            self.inp = float(lblBhoga1v)
+                    # if self.df[self.nf-2:self.nf-1, "cvol/_t"].mean()<-10:
+                    self.sig_2 = -2
+                    if self.OrgMain == 'n' and self.piox==0:
+                        self.in_str= -2
+                        self.OrgMain = "s"
+                        self.nfset = self.nf
+                        self.inp = float(lblBhoga1v)
 
         self.df.at[self.nf, "inp"] = self.inp
         self.df.at[self.nf, "inp_preset"] = self.inp_preset
@@ -491,7 +491,7 @@ class Nprob:
 
             #  high peak (slope_s conversion)
             if self.in_str == 2 and cvol_t<15 and y1>100000 and slope>30:
-                if cvol_s < -5: # or y1_ss >0:
+                if cvol_s < -5 and cvol_t<0: # or y1_ss >0:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
                     self.piox = 8
@@ -561,7 +561,7 @@ class Nprob:
 
             #  high peak (slope_s conversion)
             if self.in_str == -2 and cvol_t<15 and x1>100000 and cvol_s > 5 and slope<-30:
-                if cvol_s > 5: # or x1_ss > 0:
+                if cvol_s > 5 and cvol_t>0: # or x1_ss > 0:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                     self.piox = -8
