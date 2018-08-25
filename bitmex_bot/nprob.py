@@ -388,11 +388,13 @@ class Nprob:
                 if dxx_20>5*1000000:
                     if self.OrgMain == 'n':
                         self.OrgMain = "b"
+                        self.in_str == 2
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
                 if dyy_20>5*1000000:
                     if self.OrgMain == 'n':
                         self.OrgMain = "s"
+                        self.in_str == -2
                         self.nfset = self.nf
                         self.inp = float(lblBhoga1v)
 
@@ -507,21 +509,21 @@ class Nprob:
         # #  Trend_Out
         if 1 == 1:
             if self.OrgMain == "b":
-                if dyy_20>5*1000000:
+                if dyy_20>5*1000000 and cvol_t>5:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
                     self.OrgMain = 'n'
                     self.turnover += 1
 
             if self.OrgMain == "s":
-                if dxx_20 > 5 * 1000000:
+                if dxx_20 > 5 * 1000000 and cvol_t<-5:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.OrgMain = 'n'
                     self.turnover += 1
 
         # Peak_Out
-        if 1 == 0:
+        if 1 == 1:
             self.piox=0
             if self.OrgMain == "b":
 
