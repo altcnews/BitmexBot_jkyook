@@ -167,11 +167,22 @@ class Nprob:
         self.df.at[self.nf, "dxx_20"] = dxx_20
         self.df.at[self.nf, "dyy_20"] = dyy_20
 
+        # dxx,dyy med_20
+        if self.nf < self.sec_30+1:
+            dxx_20_medi = 0
+            dyy_20_medi = 0
+        if self.nf >= self.sec_30+1:
+            dxx_20_medi = self.df.ix[self.nf - 20:self.nf - 1, "dxx"].median()
+            dyy_20_medi = self.df.ix[self.nf - 20:self.nf - 1, "dyy"].median()
+        self.df.at[self.nf, "dxx_20_medi"] = dxx_20_medi
+        self.df.at[self.nf, "dyy_20_medi"] = dyy_20_medi
+        print 'x_20_medi: %0.5f   /y_20_medi: %0.5f' % (dxx_20_medi, dyy_20_medi)
+
         # dxx_20, dyy_20 slope
         if self.nf < self.sec_30+1:
             s_x_20 = 0
             s_y_20 = 0
-        if self.nf > self.sec_30+1:
+        if self.nf >= self.sec_30+1:
             x_20 = self.df.ix[self.nf - 20:self.nf - 1, "dxx_20"]
             y_20 = self.df.ix[self.nf - 20:self.nf - 1, "dyy_20"]
             t_20 = self.df.ix[self.nf - 20:self.nf - 1, "stime"]
@@ -406,6 +417,7 @@ class Nprob:
         # Trend_Inn
         if 1==1:
             if self.nf >  self.min_1+1 :
+                # if count_m < 30 and count_m > 5 and cvol_t>5:
                 if dxx_20>5*1000000 and dyy_20<1*1000000:
                     if s_x_20>0 and s_y_20<0:
                         if self.OrgMain == 'n' and self.piox==0:
