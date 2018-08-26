@@ -177,7 +177,7 @@ class Nprob:
         self.df.at[self.nf, "dxx_20_medi"] = dxx_20_medi
         self.df.at[self.nf, "dyy_20_medi"] = dyy_20_medi
         dxy_20_medi = dxx_20_medi - dyy_20_medi
-        self.df.at[self.nf, "dyy_20_medi"] = dxy_20_medi
+        self.df.at[self.nf, "dxy_20_medi"] = dxy_20_medi
         # print 'x_20_medi: %d   /y_20_medi: %d' % (dxx_20_medi, dyy_20_medi)
 
         # dxx_20, dyy_20 slope
@@ -395,10 +395,10 @@ class Nprob:
             if cvol_t > -15:
                 self.piox = 0
 
-        if self.piox == 5:
+        if self.piox == 5 or self.piox == 6:
             if cvol_t > 0 :
                 self.piox = 0
-        if self.piox == -5:
+        if self.piox == -5 or self.piox == -6:
             if cvol_t < 0:
                 self.piox = 0
 
@@ -545,6 +545,7 @@ class Nprob:
         #  // Out Decision //
         ###############################
 
+        self.piox=0
         # #  Trend_Out
         if 1 == 1:
             if self.OrgMain == "b":
@@ -555,6 +556,13 @@ class Nprob:
                     self.piox = 5
                     self.turnover += 1
 
+                if dxy_20_medi < 0:
+                    self.profit += ((float(lblBhoga1v) - self.inp) - (
+                        float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
+                    self.OrgMain = 'n'
+                    self.piox = 6
+                    self.turnover += 1
+
             if self.OrgMain == "s":
                 if dxx_20 > 5 * 1000000 and cvol_t>5:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
@@ -563,9 +571,16 @@ class Nprob:
                     self.piox = -5
                     self.turnover += 1
 
+                if dxy_20_medi > 0:
+                    self.profit += ((self.inp - float(lblBhoga1v)) - (
+                            float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                    self.OrgMain = 'n'
+                    self.piox = -6
+                    self.turnover += 1
+
+
         # Peak_Out
         if 1 == 1:
-            self.piox=0
             if self.OrgMain == "b":
 
                 # #  high peak (same direction)
