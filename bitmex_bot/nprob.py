@@ -52,7 +52,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print 'nf: %d   /prc: %0.1f  /sig_1: %d   /sig_2: %d   /turn_over: %d' % (self.nf, price, self.sig_1, self.sig_2, self.turnover)
+        print 'nf: %d   /prc: %0.1f  /in_str: %d   /turn_over: %d' % (self.nf, price, self.in_str, self.turnover)
         # nowtime=time.time()
 
         if self.nf!=0 and self.nf%500==0: # and self.nf>self.min_5
@@ -166,6 +166,20 @@ class Nprob:
             dyy_20 = self.df.ix[self.nf - 20:self.nf - 1, "dyy"].sum()
         self.df.at[self.nf, "dxx_20"] = dxx_20
         self.df.at[self.nf, "dyy_20"] = dyy_20
+
+        # dxx_20, dyy_20 slope
+        if self.nf < self.sec_30+1:
+            s_x_20 = 0
+            s_y_20 = 0
+        if self.nf > self.sec_30+1:
+            x_20 = self.df.ix[self.nf - 20:self.nf - 1, "dxx_20"]
+            y_20 = self.df.ix[self.nf - 20:self.nf - 1, "dyy_20"]
+            t_20 = self.df.ix[self.nf - 20:self.nf - 1, "stime"]
+            s_x_20 = regr.fit(x_20.values.reshape(-1, 1), t_20.values.reshape(-1, 1)).coef_[0][0]
+            s_y_20 = regr.fit(y_20.values.reshape(-1, 1), t_20.values.reshape(-1, 1)).coef_[0][0]
+        self.df.at[self.nf, "s_x_20"] = s_x_20
+        self.df.at[self.nf, "s_y_20"] = s_y_20
+        print 's_x_20: %0.5f   /s_y_20: %0.5f' % (s_x_20, s_y_20)
 
         # sX, sY, sXY
         if self.nf == 0:
@@ -368,6 +382,13 @@ class Nprob:
             if cvol_t > -15:
                 self.piox = 0
 
+        if self.piox == 5:
+            if cvol_t > 0 :
+                self.piox = 0
+        if self.piox == -5:
+            if cvol_t < 0:
+                self.piox = 0
+
         if self.piox < 5 and self.piox > 0 :
             if slope_s<5 and slope_m<100:
                 if y1_m > 500000 or y1 > y1_m:
@@ -385,21 +406,23 @@ class Nprob:
         # Trend_Inn
         if 1==1:
             if self.nf >  self.min_1+1 :
-                if dxx_20>5*1000000:
-                    if self.OrgMain == 'n':
-                        self.OrgMain = "b"
-                        self.in_str == 2
-                        self.nfset = self.nf
-                        self.inp = float(lblShoga1v)
-                if dyy_20>5*1000000:
-                    if self.OrgMain == 'n':
-                        self.OrgMain = "s"
-                        self.in_str == -2
-                        self.nfset = self.nf
-                        self.inp = float(lblBhoga1v)
+                if dxx_20>5*1000000 and dyy_20<1*1000000:
+                    if s_x_20>0 and s_y_20<0:
+                        if self.OrgMain == 'n' and self.piox==0:
+                            self.OrgMain = "b"
+                            self.in_str = 3
+                            self.nfset = self.nf
+                            self.inp = float(lblShoga1v)
+                if dyy_20>5*1000000 and dxx_20<1*1000000:
+                    if s_x_20 < 0 and s_y_20 > 0:
+                        if self.OrgMain == 'n' and self.piox==0:
+                            self.OrgMain = "s"
+                            self.in_str = -3
+                            self.nfset = self.nf
+                            self.inp = float(lblBhoga1v)
 
         # Peak_Inn
-        if 1==0:
+        if 1==1:
             if self.nf >  self.min_1+1 :
 
                 # after-peak
@@ -509,17 +532,19 @@ class Nprob:
         # #  Trend_Out
         if 1 == 1:
             if self.OrgMain == "b":
-                if dyy_20>5*1000000 and cvol_t>5:
+                if dyy_20>5*1000000 and cvol_t<-5:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
                     self.OrgMain = 'n'
+                    self.piox = 5
                     self.turnover += 1
 
             if self.OrgMain == "s":
-                if dxx_20 > 5 * 1000000 and cvol_t<-5:
+                if dxx_20 > 5 * 1000000 and cvol_t>5:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.OrgMain = 'n'
+                    self.piox = -5
                     self.turnover += 1
 
         # Peak_Out
@@ -537,10 +562,22 @@ class Nprob:
                 #     self.inp_preset = 0
 
                 #  high peak (slope_s conversion)
-                if self.in_str == 2 and cvol_t<15 and y1>100000 and slope>30:
+                if self.in_str == 2 and y1>100000 and slope>30:
                     if cvol_s < -5 and cvol_t<0: # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
+                        self.piox = 8
+                        self.in_str = 0
+                        self.OrgMain = 'n'
+                        self.turnover += 1
+                        self.sig_1 = 0
+                        self.sig_2 = 0
+
+                # high peak ()
+                if self.in_str == 3 and cvol_t > 20 and y1 < 50000:
+                    if cvol_s < -5:  # or y1_ss >0:
+                        self.profit += ((float(lblBhoga1v) - self.inp) - (
+                            float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                         self.piox = 8
                         self.in_str = 0
                         self.OrgMain = 'n'
@@ -609,8 +646,20 @@ class Nprob:
                 #     self.inp_preset = 0
 
                 #  high peak (slope_s conversion)
-                if self.in_str == -2 and cvol_t<15 and x1>100000 and cvol_s > 5 and slope<-30:
+                if self.in_str == -2 and x1>100000 and slope<-30:
                     if cvol_s > 5 and cvol_t>0: # or x1_ss > 0:
+                        self.profit += ((self.inp - float(lblBhoga1v)) - (
+                                float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
+                        self.piox = -8
+                        self.in_str = 0
+                        self.OrgMain = 'n'
+                        self.turnover += 1
+                        self.sig_1 = 0
+                        self.sig_2 = 0
+
+                #  high peak ()
+                if self.in_str == -3 and cvol_t<-20 and x1<50000:
+                    if cvol_s > 5 :
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                         self.piox = -8
