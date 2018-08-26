@@ -172,11 +172,13 @@ class Nprob:
             dxx_20_medi = 0
             dyy_20_medi = 0
         if self.nf >= self.sec_30+1:
-            dxx_20_medi = self.df.ix[self.nf - 20:self.nf - 1, "dxx_20"].median()
-            dyy_20_medi = self.df.ix[self.nf - 20:self.nf - 1, "dyy_20"].median()
+            dxx_20_medi = self.df.ix[self.nf - 50:self.nf - 1, "dxx_20"].median()
+            dyy_20_medi = self.df.ix[self.nf - 50:self.nf - 1, "dyy_20"].median()
         self.df.at[self.nf, "dxx_20_medi"] = dxx_20_medi
         self.df.at[self.nf, "dyy_20_medi"] = dyy_20_medi
-        print 'x_20_medi: %0.5f   /y_20_medi: %0.5f' % (dxx_20_medi, dyy_20_medi)
+        dxy_20_medi = dxx_20_medi - dyy_20_medi
+        self.df.at[self.nf, "dyy_20_medi"] = dxy_20_medi
+        # print 'x_20_medi: %d   /y_20_medi: %d' % (dxx_20_medi, dyy_20_medi)
 
         # dxx_20, dyy_20 slope
         if self.nf < self.sec_30+1:
@@ -190,7 +192,7 @@ class Nprob:
             s_y_20 = regr.fit(y_20.values.reshape(-1, 1), t_20.values.reshape(-1, 1)).coef_[0][0]
         self.df.at[self.nf, "s_x_20"] = s_x_20
         self.df.at[self.nf, "s_y_20"] = s_y_20
-        print 's_x_20: %0.5f   /s_y_20: %0.5f' % (s_x_20, s_y_20)
+        # print 's_x_20: %0.5f   /s_y_20: %0.5f' % (s_x_20, s_y_20)
 
         # sX, sY, sXY
         if self.nf == 0:
@@ -417,16 +419,16 @@ class Nprob:
         # Trend_Inn
         if 1==1:
             if self.nf >  self.min_1+1 :
-                # if count_m < 30 and count_m > 5 and cvol_t>5:
-                if dxx_20>5*1000000 and dyy_20<1*1000000:
-                    if s_x_20>0 and s_y_20<0:
+                if count_m < 30 and count_m > 5 and abs(cvol_s)<3: # and cvol_t>5:
+                    if dxy_20_medi>1500000: #dxx_20>5*1000000 and dyy_20<1*1000000:
+                        #if s_x_20>0 and s_y_20<0:
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "b"
                             self.in_str = 3
                             self.nfset = self.nf
                             self.inp = float(lblShoga1v)
-                if dyy_20>5*1000000 and dxx_20<1*1000000:
-                    if s_x_20 < 0 and s_y_20 > 0:
+                    if dxy_20_medi<-1500000: #dyy_20>5*1000000 and dxx_20<1*1000000:
+                        #if s_x_20 < 0 and s_y_20 > 0:
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "s"
                             self.in_str = -3
@@ -434,7 +436,7 @@ class Nprob:
                             self.inp = float(lblBhoga1v)
 
         # Peak_Inn
-        if 1==1:
+        if 1==0:
             if self.nf >  self.min_1+1 :
 
                 # after-peak
