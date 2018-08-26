@@ -436,10 +436,11 @@ class Nprob:
                             self.inp = float(lblBhoga1v)
 
         # Peak_Inn
-        if 1==0:
-            if self.nf >  self.min_1+1 :
+        # if 1==0:
+        if self.nf >  self.min_1+1 :
 
-                # after-peak
+            # after-peak
+            if 1==1:
                 self.sig_1 = 0
                 if cvol_t > 15:
                     self.sig_1 = 0.5
@@ -475,7 +476,8 @@ class Nprob:
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
 
-                # keep-going
+            # keep-going
+            if 1==0:
                 self.sig_2 = 0
                 if count_m<30: # and abs(slope)<200:
 
