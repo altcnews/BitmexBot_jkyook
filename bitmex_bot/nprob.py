@@ -172,8 +172,8 @@ class Nprob:
             dxx_20_medi = 0
             dyy_20_medi = 0
         if self.nf >= self.sec_30+1:
-            dxx_20_medi = self.df.ix[self.nf - 20:self.nf - 1, "dxx"].median()
-            dyy_20_medi = self.df.ix[self.nf - 20:self.nf - 1, "dyy"].median()
+            dxx_20_medi = self.df.ix[self.nf - 20:self.nf - 1, "dxx_20"].median()
+            dyy_20_medi = self.df.ix[self.nf - 20:self.nf - 1, "dyy_20"].median()
         self.df.at[self.nf, "dxx_20_medi"] = dxx_20_medi
         self.df.at[self.nf, "dyy_20_medi"] = dyy_20_medi
         print 'x_20_medi: %0.5f   /y_20_medi: %0.5f' % (dxx_20_medi, dyy_20_medi)
