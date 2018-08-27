@@ -509,6 +509,7 @@ class Nprob:
         self.df.at[self.nf, "in_str"] = self.in_str
         self.df.at[self.nf, "sig_1"] = self.sig_1
         self.df.at[self.nf, "sig_2"] = self.sig_2
+        self.df.at[self.nf, "sig_3"] = self.sig_3
         self.df.at[self.nf, "nfset"] = self.nfset
 
         ###############################
