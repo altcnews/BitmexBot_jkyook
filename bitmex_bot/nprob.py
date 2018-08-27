@@ -195,7 +195,7 @@ class Nprob:
         if self.nf < self.min_1*3/2+1:
             dxy_200_medi = 0
         if self.nf >= self.min_1*3/2+1:
-            dxy_200_medi = self.df.ix[self.nf - 200:self.nf - 1, "dxy_20"].median()
+            dxy_200_medi = self.df.ix[self.nf - 200:self.nf - 1, "dxy_20_medi"].median()
         self.df.at[self.nf, "dxy_200_medi"] = dxy_200_medi
 
         # dxx_20, dyy_20 slope
