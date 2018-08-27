@@ -585,7 +585,7 @@ class Nprob:
 
 
         # Peak_Out
-        if 1 == 0:
+        if 1 == 1:
             if self.OrgMain == "b":
 
                 # #  high peak (same direction)
@@ -642,7 +642,7 @@ class Nprob:
                 #     self.turnover += 1
                 #     self.inp_preset = 0
 
-                if prf_able != 0:
+                if prf_able != 0 and 1==0:
 
                     # bad_out (opposite direction)
                     if self.OrgMain == "b" and ee_s > ee_s_ave and ee_s>1.5  and ee_s_ave > 1.3:
@@ -724,7 +724,7 @@ class Nprob:
                 #     self.turnover += 1
                 #     self.inp_preset = 0
 
-                if prf_able != 0:
+                if prf_able != 0 and 1==0:
 
                     # bad_out (opposite direction)
                     if self.OrgMain == "s" and ee_s > ee_s_ave and ee_s>1.5  and ee_s_ave > 1.3:
