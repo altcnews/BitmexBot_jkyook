@@ -139,6 +139,16 @@ class Nprob:
         self.df.at[self.nf, "dy1"] = dy1
         self.df.at[self.nf, "dx1"] = dx1
 
+        # x1,y1 ave_20
+        if self.nf < self.sec_30+1:
+            x1_20 = 0
+            y1_20 = 0
+        if self.nf >= self.sec_30+1:
+            x1_20 = self.df.ix[self.nf - 20:self.nf - 1, "x1"].mean()
+            y1_20 = self.df.ix[self.nf - 20:self.nf - 1, "y1"].mean()
+        self.df.at[self.nf, "x1_20"] = x1_20
+        self.df.at[self.nf, "y1_20"] = y1_20
+
         # dxx, dyy, dxy
         if cgubun_sum == "Buy":
             wx = 0
@@ -433,16 +443,14 @@ class Nprob:
             if self.nf >  self.min_1+1 :
                 self.sig_3 = 0
                 if count_m < 30 and count_m > 5 and abs(cvol_s)<3: # and cvol_t>5:
-                    if dxy_20_medi>1500000: #dxx_20>5*1000000 and dyy_20<1*1000000:
-                        #if s_x_20>0 and s_y_20<0:
+                    if dxy_20_medi>y1_20:
                         self.sig_3=3
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "b"
                             self.in_str = 3
                             self.nfset = self.nf
                             self.inp = float(lblShoga1v)
-                    if dxy_20_medi<-1500000: #dyy_20>5*1000000 and dxx_20<1*1000000:
-                        #if s_x_20 < 0 and s_y_20 > 0:
+                    if dxy_20_medi<x1_20*-1:
                         self.sig_3=-3
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "s"
