@@ -416,11 +416,11 @@ class Nprob:
 
         # peak_out
         if self.piox > 5:
-            if dxy_200_medi < 0:
+            if dxy_200_medi < 0 and slope < 200 and cvol_t<20:
             # if cvol_t < 15:
                 self.piox = 0
         if self.piox < -5:
-            if dxy_200_medi > 0:
+            if dxy_200_medi > 0 and slope > -200 and cvol_t<20:
             # if cvol_t > -15:
                 self.piox = 0
 
