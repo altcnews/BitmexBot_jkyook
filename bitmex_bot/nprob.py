@@ -389,13 +389,13 @@ class Nprob:
         #  // PIOX //
         ###############################
 
-        # dxy_20_out
+        # treding_out
         if self.piox == 5:
-            if dxy_20_medi < 0:
-                self.piox = 0
+            # if dxy_20_medi < 0:
+            self.piox = 0
         if self.piox == -5:
-            if dxy_20_medi > 0:
-                self.piox = 0
+            # if dxy_20_medi > 0:
+            self.piox = 0
 
         # peak_out
         if self.piox > 5:
@@ -562,6 +562,7 @@ class Nprob:
         ###############################
 
         self.piox=0
+
         # #  Trend_Out
         if 1 == 1:
             if self.OrgMain == "b":
