@@ -90,13 +90,20 @@ class Nprob:
             cvol_m = self.df.ix[self.nf - self.sec_15:self.nf - 1, "cvolume"].mean()
         self.df.at[self.nf, "cvol_m"] = cvol_m
 
-        # cvol_count
+        # cvol_c
         if self.nf < self.sec_15+1:
             cvol_c = 0
         if self.nf >= self.sec_15+1:
             cvol_c = self.df[self.nf - 20:self.nf - 1][self.df.cvolume[self.nf - 20:self.nf - 1]>0].count()[0]
         self.df.at[self.nf, "cvol_c"] = cvol_c
         print 'cvol_c: ', cvol_c
+
+        # cvol_c_med
+        if self.nf < self.min_1+1:
+            cvol_c_med = 0
+        if self.nf >= self.min_1+1:
+            cvol_c_med = self.df.ix[self.nf - 100:self.nf - 1, "cvol_c"].median()
+        self.df.at[self.nf, "cvol_c_med"] = cvol_c_med
 
         # cvol_s
         if self.nf < self.min_1+1:
@@ -450,13 +457,13 @@ class Nprob:
         # Trend_Inn_200
         if 1==1:
             if self.nf >  self.min_1*3/2+1 :
-                if dxy_200_medi>0:
+                if dxy_200_medi>0 and cvol_c_med>10:
                     if self.OrgMain == 'n' and self.piox==0:
                         self.OrgMain = "b"
                         self.in_str = 3
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
-                if dxy_200_medi<0:
+                if dxy_200_medi<0 and cvol_c_med<10:
                     if self.OrgMain == 'n' and self.piox==0:
                         self.OrgMain = "s"
                         self.in_str = -3
@@ -464,7 +471,7 @@ class Nprob:
                         self.inp = float(lblBhoga1v)
 
         # Trend_Inn
-        if 1==1:
+        if 1==0:
             if self.nf >  self.min_1+1 :
                 self.sig_3 = 0
                 if count_m < 30 and count_m > 5 and abs(cvol_s)<3: # and cvol_t>5:
