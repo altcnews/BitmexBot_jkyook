@@ -623,7 +623,7 @@ class Nprob:
 
                 #  after - peak
 
-                if  self.OrgMain == "b" and self.in_str_1 == -1 and cvol_s < 0 and cvol_t < -0.5:
+                if  self.in_str_1 == -1 and self.OrgMain == "b" and cvol_s < 0 and cvol_t < -0.5:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
                     self.piox = 7
@@ -705,7 +705,7 @@ class Nprob:
                         self.sig_1 = 0
                         self.sig_2 = 0
 
-                if  self.OrgMain == "s" and self.in_str_1 == 1 and cvol_s > 0 and cvol_t > 0.5:
+                if  self.in_str_1 == 1 and self.OrgMain == "s" and  cvol_s > 0 and cvol_t > 0.5:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                     self.piox = -7
