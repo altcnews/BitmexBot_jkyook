@@ -195,7 +195,7 @@ class Nprob:
         if self.nf < self.min_1*3/2+1:
             dxy_200_medi = 0
         if self.nf >= self.min_1*3/2+1:
-            dxy_200_medi = self.df.ix[self.nf - 200:self.nf - 1, "dxy_200"].median()
+            dxy_200_medi = self.df.ix[self.nf - 200:self.nf - 1, "dxy_20"].median()
         self.df.at[self.nf, "dxy_200_medi"] = dxy_200_medi
 
         # dxx_20, dyy_20 slope
@@ -444,6 +444,22 @@ class Nprob:
         ###############################
         #  // In Decision //
         ###############################
+
+        # Trend_Inn_200
+        if 1==1:
+            if self.nf >  self.min_1*3/2+1 :
+                if dxy_200_medi>0:
+                    if self.OrgMain == 'n' and self.piox==0:
+                        self.OrgMain = "b"
+                        self.in_str = 3
+                        self.nfset = self.nf
+                        self.inp = float(lblShoga1v)
+                if dxy_200_medi<0:
+                    if self.OrgMain == 'n' and self.piox==0:
+                        self.OrgMain = "s"
+                        self.in_str = -3
+                        self.nfset = self.nf
+                        self.inp = float(lblBhoga1v)
 
         # Trend_Inn
         if 1==1:
