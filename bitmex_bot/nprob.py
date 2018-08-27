@@ -566,6 +566,7 @@ class Nprob:
                         float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                     self.OrgMain = 'n'
                     self.piox = 6
+                    self.in_str = 0
                     self.turnover += 1
 
             if self.OrgMain == "s":
@@ -581,6 +582,7 @@ class Nprob:
                             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.OrgMain = 'n'
                     self.piox = -6
+                    self.in_str = 0
                     self.turnover += 1
 
 
@@ -588,18 +590,18 @@ class Nprob:
         if 1 == 1:
             if self.OrgMain == "b":
 
-                # #  high peak (same direction)
-                # if count > 15 and slope > 200:
-                #     self.profit += ((float(lblBhoga1v) - self.inp) - (
-                #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                #     self.piox = 9
-                #     self.OrgMain = 'n'
-                #     self.turnover += 1
-                #     self.inp_preset = 0
+                #  high peak (same direction)
+                if count > 15 and slope > 200:
+                    self.profit += ((float(lblBhoga1v) - self.inp) - (
+                            float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                    self.piox = 9
+                    self.OrgMain = 'n'
+                    self.turnover += 1
+                    self.inp_preset = 0
 
                 #  high peak (slope_s conversion)
-                if self.in_str == 2 and y1>100000 and slope>30:
-                    if cvol_s < -5 and cvol_t<0: # or y1_ss >0:
+                if self.in_str == 2:
+                    if cvol_s < -5 and cvol_t<0 and y1>100000 and slope>30: # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
                         self.piox = 8
@@ -622,7 +624,6 @@ class Nprob:
                         self.sig_2 = 0
 
                 #  after - peak
-
                 if  self.in_str_1 == -1 and self.OrgMain == "b" and cvol_s < 0 and cvol_t < -0.5:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
@@ -672,18 +673,18 @@ class Nprob:
 
             elif self.OrgMain == "s": #  and lstm_mean>0.75:
 
-                # #  high peak (same direction)
-                # if count > 20 and slope < -200:
-                #     self.profit += ((self.inp - float(lblBhoga1v)) - (
-                #             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
-                #     self.piox = -9
-                #     self.OrgMain = 'n'
-                #     self.turnover += 1
-                #     self.inp_preset = 0
+                #  high peak (same direction)
+                if count > 20 and slope < -200:
+                    self.profit += ((self.inp - float(lblBhoga1v)) - (
+                            float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                    self.piox = -9
+                    self.OrgMain = 'n'
+                    self.turnover += 1
+                    self.inp_preset = 0
 
                 #  high peak (slope_s conversion)
-                if self.in_str == -2 and x1>100000 and slope<-30:
-                    if cvol_s > 5 and cvol_t>0: # or x1_ss > 0:
+                if self.in_str == -2:
+                    if cvol_s > 5 and cvol_t>0 and x1>100000 and slope<-30: # or x1_ss > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                         self.piox = -8
@@ -705,6 +706,7 @@ class Nprob:
                         self.sig_1 = 0
                         self.sig_2 = 0
 
+                #  after - peak
                 if  self.in_str_1 == 1 and self.OrgMain == "s" and  cvol_s > 0 and cvol_t > 0.5:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
