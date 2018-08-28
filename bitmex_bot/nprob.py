@@ -53,7 +53,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print 'nf: %d   /prc: %0.1f  /in_str: %d   /turn_over: %d' % (self.nf, price, self.in_str, self.turnover)
+        print 'nf: %d   /prc: %0.1f  /in: %d   /out: %d     /turn_over: %d' % (self.nf, price, self.in_str, self.piox, self.turnover)
         # nowtime=time.time()
 
         if self.nf!=0 and self.nf%500==0: # and self.nf>self.min_5
@@ -609,7 +609,7 @@ class Nprob:
         # #  Trend_Out
         if 1 == 1:
             if self.OrgMain == "b":
-                if self.in_str == 1 and dxy_200_medi < -500000:
+                if self.in_str == 1 and dxy_200_medi < -100*10000:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                     self.OrgMain = 'n'
@@ -618,7 +618,7 @@ class Nprob:
                     self.turnover += 1
 
             if self.OrgMain == "s":
-                if self.in_str == -1 and dxy_200_medi > 500000:
+                if self.in_str == -1 and dxy_200_medi > 100*10000:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.OrgMain = 'n'
@@ -642,7 +642,7 @@ class Nprob:
 
                 # mid peak (dxy_20 orderbook)
                 if self.in_str == 1:
-                    if cvol_s < -5  and cvol_t < 0:  # or y1_ss >0:
+                    if count_m<10 and cvol_s < -5  and cvol_t < 0:  # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                         self.piox = 1
@@ -719,7 +719,7 @@ class Nprob:
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
-                    if cvol_s > 5  and cvol_t > 0:
+                    if count_m<10 and cvol_s > 5  and cvol_t > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                         self.piox = -1
