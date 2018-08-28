@@ -521,7 +521,7 @@ class Nprob:
 
             # after-peak
             if 1==1:
-                self.sig_1 = 0
+                self.sig_3 = 0
                 if cvol_t > 15:
                     self.sig_3 = 0.5
                     if self.in_str_1 == 0:
