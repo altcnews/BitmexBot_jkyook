@@ -487,7 +487,7 @@ class Nprob:
                         self.in_str = 1
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
-                if elf.piox == 2 dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<5:
+                if self.piox != -2 and dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<5:
                     self.sig_1 = -1
                     if self.OrgMain == 'n' and self.piox==0:
                         self.OrgMain = "s"
