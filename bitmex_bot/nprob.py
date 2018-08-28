@@ -505,6 +505,8 @@ class Nprob:
                     if cvol_t>15 and cvol_s>10:
                         if self.df.at[self.nf-1, "cvol_t"]>10:
                             self.sig_2 = 2
+                            if self.in_str == 1:
+                                self.in_str = 2
                             if self.OrgMain == 'n' and self.piox==0:
                                 self.in_str = 2
                                 self.OrgMain = "b"
@@ -513,6 +515,8 @@ class Nprob:
                     if cvol_t<-15 and cvol_s<-10:
                         if self.df.at[self.nf-1, "cvol_t"]<-10:
                             self.sig_2 = -2
+                            if self.in_str == -1:
+                                self.in_str = -2
                             if self.OrgMain == 'n' and self.piox==0:
                                 self.in_str= -2
                                 self.OrgMain = "s"
@@ -642,7 +646,7 @@ class Nprob:
 
                 # mid peak (dxy_20 orderbook)
                 if self.in_str == 1:
-                    if count_m<10 and cvol_s < -5  and cvol_t < 0:  # or y1_ss >0:
+                    if prf_able == 1 and count_m<10 and cvol_s < -5  and cvol_t < 0:  # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                         self.piox = 1
@@ -719,7 +723,7 @@ class Nprob:
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
-                    if count_m<10 and cvol_s > 5  and cvol_t > 0:
+                    if prf_able == 1 and count_m<10 and cvol_s > 5  and cvol_t > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                         self.piox = -1
