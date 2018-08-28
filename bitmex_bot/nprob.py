@@ -419,8 +419,8 @@ class Nprob:
                     if cvol_t > 0:
                        self.piox = 0
                 if self.piox == 2:
-                    # if cvol_s < -5 and cvol_t < 0 and y1 > 100000 and slope > 30:
-                   self.piox = 0
+                    if cvol_s > 0 and cvol_t > 0:
+                        self.piox = 0
                 if self.piox == 3:
                     if cvol_t > 0:
                        self.piox = 0
@@ -429,8 +429,8 @@ class Nprob:
                     if cvol_t < 0:
                        self.piox = 0
                 if self.piox == -2:
-                    # if cvol_s < -5 and cvol_t < 0 and y1 > 100000 and slope > 30:
-                   self.piox = 0
+                    if cvol_s < 0 and cvol_t < 0:
+                        self.piox = 0
                 if self.piox == -3:
                     if cvol_t < 0:
                        self.piox = 0
@@ -480,14 +480,14 @@ class Nprob:
         if 1==1:
             self.sig_1 = 0
             if self.nf >  self.min_1*3/2+1 :
-                if dxy_200_medi>0 and cvol_c_med>10 and abs(cvol_t)<5:
+                if self.piox != 2 and dxy_200_medi>0 and cvol_c_med>10 and abs(cvol_t)<5:
                     self.sig_1 = 1
                     if self.OrgMain == 'n' and self.piox==0:
                         self.OrgMain = "b"
                         self.in_str = 1
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
-                if dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<5:
+                if elf.piox == 2 dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<5:
                     self.sig_1 = -1
                     if self.OrgMain == 'n' and self.piox==0:
                         self.OrgMain = "s"
@@ -530,7 +530,7 @@ class Nprob:
                     self.sig_3 = 0.5
                     if self.in_str_1 == 0:
                         self.in_str_1 = 0.5
-                if self.in_str_1 == 0.5:
+                if self.in_str_1 == 0.5 or self.piox == 2:
                     if count_m<5:
                         self.sig_3 = 0
                         self.in_str_1 = 0
@@ -547,7 +547,7 @@ class Nprob:
                     self.sig_3 = -0.5
                     if self.in_str_1 == 0:
                         self.in_str_1= -0.5
-                if self.in_str_1 == -0.5:
+                if self.in_str_1 == -0.5 or self.piox == -2:
                     if count_m<5:
                         self.sig_3 = 0
                         self.in_str_1 = 0
