@@ -499,7 +499,7 @@ class Nprob:
         if self.nf >  self.min_1+1 :
 
             # keep-going
-            if 1==0:
+            if 1==1:
                 self.sig_2 = 0
                 if count_m<30 and abs(slope)<200:
                     if cvol_t>15 and cvol_s>10:
@@ -520,7 +520,7 @@ class Nprob:
                                 self.inp = float(lblBhoga1v)
 
             # after-peak
-            if 1==0:
+            if 1==1:
                 self.sig_1 = 0
                 if cvol_t > 15:
                     self.sig_3 = 0.5
