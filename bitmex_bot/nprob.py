@@ -613,7 +613,7 @@ class Nprob:
         # #  Trend_Out
         if 1 == 1:
             if self.OrgMain == "b":
-                if self.in_str == 1 and dxy_200_medi < -100*10000:
+                if self.in_str == 1 and count_m>10 and dxy_200_medi < -100*10000:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                     self.OrgMain = 'n'
@@ -622,7 +622,7 @@ class Nprob:
                     self.turnover += 1
 
             if self.OrgMain == "s":
-                if self.in_str == -1 and dxy_200_medi > 100*10000:
+                if self.in_str == -1 and count_m>10 and dxy_200_medi > 100*10000:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.OrgMain = 'n'
@@ -743,7 +743,7 @@ class Nprob:
 
                 #  after - peak
                 if  self.in_str_1 == 1:
-                    if scvol_s > 0 and cvol_t > 0.5:
+                    if cvol_s > 0 and cvol_t > 0.5:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                         self.piox = -3
@@ -788,6 +788,7 @@ class Nprob:
         self.df.at[self.nf, "piox"] = self.piox
         self.df.at[self.nf, "profit"] = self.profit
         self.df.at[self.nf, "ord_count"] = self.ord_count
+        print 'piox = ', self.piox
 
         ###############################
         #  // RESET & ETC //
