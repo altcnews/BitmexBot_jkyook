@@ -70,8 +70,8 @@ if MODE == "TESTING":
     API_KEY = "3_9ozC36G73tuqLP9pEaUg9b"
     API_SECRET = "ZwXjgm5bGiQlZBiTgEQRDt7BTQQrHeWPSMnla0JkztydScoG"
 if MODE == "LIVE":
-    API_KEY = "jIV-oYUqJAThf5QuiHNguvf-"
-    API_SECRET = "8bUmylJOOXxEgzzwX0RkehpqV7IPn0JcZYiHHfzF5RubG3eQ"
+    API_KEY = "bo2BJHht8Q9V3m5VjwGB28aN"
+    API_SECRET = "HGk6sysF_xUyIu1kQZCejUP1BmpFdZuepyRyi0O4afYR2dXQ"
 
 
 
