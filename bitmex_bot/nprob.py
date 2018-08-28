@@ -53,7 +53,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print 'nf: %d   /prc: %0.1f  /in: %d   /out: %d     /turn_over: %d' % (self.nf, price, self.in_str, self.piox, self.turnover)
+        print 'nf: %d   /prc: %0.1f  /in: %d   /out: %d   /turn_over: %d' % (self.nf, price, self.in_str, self.piox, self.turnover)
         # nowtime=time.time()
 
         if self.nf!=0 and self.nf%500==0: # and self.nf>self.min_5
