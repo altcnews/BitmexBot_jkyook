@@ -585,12 +585,12 @@ class Nprob:
 
         # prf_able
         prf_able = 0
-        profit_band = price * 0.0015 * ee_s
-        loss_band = price * 0.0015 * ee_s
+        profit_band = price * 0.0015 * 1.5 * ee_s
+        loss_band = price * 0.0015 * 1.5 * ee_s
         if profit_band>40:
             profit_band=40
-        if profit_band<10:
-            profit_band=10
+        if profit_band<15:
+            profit_band=15
         if loss_band>60:
             loss_band=60
         if loss_band<40:
