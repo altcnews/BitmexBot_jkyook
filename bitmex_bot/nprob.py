@@ -585,25 +585,25 @@ class Nprob:
 
         # prf_able
         prf_able = 0
-        profit_band = 20 * ee_s
-        loss_band = 30 * ee_s
+        profit_band = price * 0.0015 * ee_s
+        loss_band = price * 0.0015 * ee_s
         if profit_band>40:
             profit_band=40
-        if profit_band<30:
-            profit_band=30
+        if profit_band<10:
+            profit_band=10
         if loss_band>60:
             loss_band=60
         if loss_band<40:
             loss_band=40
         if self.OrgMain == "b":
-            if price >= self.inp + self.tick * profit_band:
+            if price >= self.inp + profit_band:
                 prf_able = 1
-            if price <= self.inp - self.tick * loss_band:
+            if price <= self.inp - loss_band:
                 prf_able = -1
         if self.OrgMain == "s":
-            if price <= self.inp - self.tick * profit_band:
+            if price <= self.inp - profit_band:
                 prf_able = 1
-            if price >= self.inp + self.tick * loss_band:
+            if price >= self.inp + loss_band:
                 prf_able = -1
         self.df.at[self.nf, "prf_able"] = prf_able
 
