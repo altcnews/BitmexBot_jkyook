@@ -424,15 +424,22 @@ class Nprob:
                 if self.piox == 3:
                     if cvol_t > 0:
                        self.piox = 0
+                if self.piox == 5:
+                    if count_m < 5:
+                       self.piox = 0
+
             if self.piox < 0:
                 if self.piox == -1:
-                    if cvol_t < 0:
+                    if cvol_t < 0 and count_m<5:
                        self.piox = 0
                 if self.piox == -2:
                     if cvol_s < 0 and cvol_t < 0:
                         self.piox = 0
                 if self.piox == -3:
                     if cvol_t < 0:
+                       self.piox = 0
+                if self.piox == 3:
+                    if count_m < 5:
                        self.piox = 0
 
         # # treding_out
@@ -511,7 +518,7 @@ class Nprob:
                     self.sig_3 = 0.5
                     if self.in_str_1 == 0:
                         self.in_str_1 = 0.5
-                if self.in_str_1 == 0.5 or self.piox == 2:
+                if self.in_str_1 == 0.5 or self.piox == 5 or self.piox == 2:
                     if count_m<5:
                         self.sig_3 = 0
                         self.in_str_1 = 0
@@ -528,7 +535,7 @@ class Nprob:
                     self.sig_3 = -0.5
                     if self.in_str_1 == 0:
                         self.in_str_1= -0.5
-                if self.in_str_1 == -0.5 or self.piox == -2:
+                if self.in_str_1 == -0.5  or self.piox == -5 or self.piox == -2:
                     if count_m<5:
                         self.sig_3 = 0
                         self.in_str_1 = 0
@@ -553,6 +560,7 @@ class Nprob:
                         self.in_str = 1
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
+
                 if self.piox != -2 and dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<5:
                     self.sig_1 = -1
                     if self.OrgMain == 'n' and self.piox==0:
@@ -618,7 +626,7 @@ class Nprob:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                     self.OrgMain = 'n'
-                    self.piox = 0
+                    self.piox = 5
                     self.in_str = 0
                     self.turnover += 1
 
@@ -627,7 +635,7 @@ class Nprob:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.OrgMain = 'n'
-                    self.piox = 0
+                    self.piox = -5
                     self.in_str = 0
                     self.turnover += 1
 
@@ -797,8 +805,10 @@ class Nprob:
 
         if self.OrgMain=="b":
             self.d_OMain = 1
+            self.piox = 0
         elif self.OrgMain=="s":
             self.d_OMain = -1
+            self.piox = 0
         elif self.OrgMain == "n":
             self.d_OMain = 0
             self.ord_count = 1
