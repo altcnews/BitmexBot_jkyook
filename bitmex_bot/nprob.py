@@ -724,7 +724,7 @@ class Nprob:
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
-                    if prf_able == 1 and count_m<10 and cvol_s > 5  and cvol_t > 0:
+                    if prf_able == -1 and count_m<10 and cvol_s > 5  and cvol_t > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                         self.piox = -1
