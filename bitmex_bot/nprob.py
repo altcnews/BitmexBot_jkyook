@@ -33,6 +33,7 @@ class Nprob:
         self.org_in_2=0
         self.cri=0
         self.cri_r=0
+        self.prf_able = 0
         self.hit_peak=0
         self.loop=0.5           #Loop_interval(0.25)
         self.sec_15 = int(15 / self.loop)  # = 75  ns, nPXY, stPXY, a~e, ee_s, bump, abump, s1, s2_s, s3, s3_m_m
@@ -53,7 +54,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print 'nf: %d   /prc: %0.1f  /in: %d   /out: %d   /turn_over: %d' % (self.nf, price, self.in_str, self.piox, self.turnover)
+        print 'nf: %d  /prc: %0.1f /in: %d /out: %d /prf: %d /turn_over: %d' % (self.nf, price, self.in_str, self.piox, self.prf_able, self.turnover)
         # nowtime=time.time()
 
         if self.nf!=0 and self.nf%500==0: # and self.nf>self.min_5
@@ -583,7 +584,7 @@ class Nprob:
         ###############################
 
         # prf_able
-        prf_able = 0
+        self.prf_able = 0
         profit_band = price * 0.0015 * 1.5 * ee_s
         loss_band = price * 0.0015 * 1.5 * ee_s
         if profit_band>40:
@@ -596,15 +597,15 @@ class Nprob:
             loss_band=40
         if self.OrgMain == "b":
             if price >= self.inp + profit_band:
-                prf_able = 1
+                self.prf_able = 1
             if price <= self.inp - loss_band:
-                prf_able = -1
+                self.prf_able = -1
         if self.OrgMain == "s":
             if price <= self.inp - profit_band:
-                prf_able = 1
+                self.prf_able = 1
             if price >= self.inp + loss_band:
-                prf_able = -1
-        self.df.at[self.nf, "prf_able"] = prf_able
+                self.prf_able = -1
+        self.df.at[self.nf, "prf_able"] = self.prf_able
 
             # cvol_peak
         if cvol_s>50:
@@ -654,7 +655,7 @@ class Nprob:
 
                 # mid peak (dxy_20 orderbook)
                 if self.in_str == 1:
-                    if prf_able == 1 and count_m<10 and cvol_s < -5  and cvol_t < 0:  # or y1_ss >0:
+                    if self.prf_able == 1 and count_m<10 and cvol_s < -5  and cvol_t < 0:  # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                         self.piox = 1
@@ -737,7 +738,7 @@ class Nprob:
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
-                    if prf_able == 1 and count_m<10 and cvol_s > 5  and cvol_t > 0:
+                    if self.prf_able == 1 and count_m<10 and cvol_s > 5  and cvol_t > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                         self.piox = -1
