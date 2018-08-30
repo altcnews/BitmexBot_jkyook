@@ -206,6 +206,15 @@ class Nprob:
             dxy_200_medi = self.df.ix[self.nf - 200:self.nf - 1, "dxy_20_medi"].median()
         self.df.at[self.nf, "dxy_200_medi"] = dxy_200_medi
 
+        # dxy med_200_s
+        if self.nf < self.min_1*3/2+1:
+            dxy_med_200_s = 0
+        if self.nf >= self.min_1*3/2+1:
+            med_200_x = self.df.ix[self.nf - 20:self.nf - 1, "dxy_200_medi"]
+            y_stime = self.df.ix[self.nf - 20:self.nf - 1, "stime"]
+            dxy_med_200_s = regr.fit(y_stime.values.reshape(-1, 1), med_200_x.values.reshape(-1, 1)).coef_[0][0]*1000
+        self.df.at[self.nf, "dxy_med_200_s"] = dxy_med_200_s
+
         # dxx_20, dyy_20 slope
         if self.nf < self.sec_30+1:
             s_x_20 = 0
@@ -555,7 +564,7 @@ class Nprob:
             if self.nf >  self.min_1*3/2+1 :
                 if self.piox != 2 and self.piox != -2.5:
                     # if dxy_200_medi>0 and cvol_c_med>10 and abs(cvol_t)<5:
-                    if count_m > 10 and count_m < 25 and dxy_200_medi < -100 * 10000:
+                    if count_m > 10 and count_m < 25 and dxy_med_200_s>0 and dxy_200_medi < -100 * 10000:
                         self.sig_1 = 1
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "b"
@@ -565,7 +574,7 @@ class Nprob:
 
                 if self.piox != -2 and self.piox != 2.5:
                     # if dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<5:
-                    if count_m > 10 and count_m < 25 and dxy_200_medi > 100 * 10000:
+                    if count_m > 10 and count_m < 25 and dxy_med_200_s<0 and dxy_200_medi > 100 * 10000:
                         self.sig_1 = -1
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "s"
@@ -841,7 +850,7 @@ class Nprob:
 
         if self.nf>10:
             # print self.df.ix[self.nf-9:self.nf-1,['dt', 'count_s', 'cvol_t', 'cvol_s', 'in_str', 'OrgMain', 'inp','profit']]
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'dxy_200_medi', 'cvol_t', 'OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'dxy_200_medi', 'dxy_med_200_s', 'OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
