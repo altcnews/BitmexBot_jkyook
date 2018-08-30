@@ -871,7 +871,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'dxy_200_medi', 'dxy_med_200_s', 'OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'dxy_200_medi', 'OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
