@@ -48,6 +48,10 @@ class Nprob:
         self.cvol_t_low_act = 5
         self.cvol_s_act = 10
         self.cvol_s_low_act = 5
+        self.dxy_200_medi_cri = 100*10000
+        self.slope_act = 30
+        self.slope_overact = 200
+        self.fee_rate = 0.00075 / 2
         print 'init Nprob', self.nf
         a = pd.read_csv("index_mex.csv").columns.values.tolist()
         self.df = pd.DataFrame()
@@ -514,7 +518,7 @@ class Nprob:
                         self.sig_3 = 0
                         self.in_str_1 = 0
                     if count_m>self.count_m_deact:
-                        if cvol_s < 0 and cvol_t < -5:
+                        if cvol_s < 0 and cvol_t < self.cvol_t_low_act * -1:
                             self.sig_3 = 1
                             if self.OrgMain == 'n' and self.piox==0:
                                 self.in_str_1 = 1
@@ -537,7 +541,7 @@ class Nprob:
                         self.sig_3 = 0
                         self.in_str_1 = 0
                     if count_m > self.count_m_deact:
-                        if cvol_s > 0 and cvol_t > 5:
+                        if cvol_s > 0 and cvol_t > self.cvol_t_low_act:
                             self.sig_3 = -1
                             if self.OrgMain == 'n' and self.piox == 0:
                                 self.in_str_1 = -1
@@ -554,7 +558,7 @@ class Nprob:
             # Keep-going
             if 1==1:
                 self.sig_2 = 0
-                if count_m<self.count_m_overact and abs(slope)<200 and ee_s<2.5:
+                if count_m<self.count_m_overact and abs(slope)<self.slope_overact and ee_s<2.5:
                     if cvol_t>self.cvol_t_act and cvol_s>self.cvol_s_act:
                         if self.df.at[self.nf-1, "cvol_t"]>self.cvol_t_act:
                             self.sig_2 = 2
@@ -581,8 +585,8 @@ class Nprob:
         if 1==1:
             self.sig_1 = 0
             if self.nf >  self.min_1*3/2+1 :
-                if self.piox != 2 and self.piox != -2.5 and ee_s<2 and count_m<self.count_m_act:
-                    if dxy_200_medi>0 and cvol_c_med>10 and abs(cvol_t)<5:
+                if self.piox != 2 and self.piox != -2.5 and ee_s<2 and count_m<self.count_m_overact:
+                    if dxy_200_medi>0 and cvol_c_med>10 and abs(cvol_t)<self.cvol_t_low_act:
                     # if count_m > self.count_m_act and count_m < self.count_m_overact and dxy_med_200_s>0 and dxy_200_medi < -100 * 10000:
                         self.sig_1 = 1
                         if self.OrgMain == 'n' and self.piox==0:
@@ -592,7 +596,7 @@ class Nprob:
                             self.inp = float(lblShoga1v)
 
                 if self.piox != -2 and self.piox != 2.5:
-                    if dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<5:
+                    if dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<self.cvol_t_low_act:
                     # if count_m > self.count_m_act and count_m < self.count_m_overact and dxy_med_200_s<0 and dxy_200_medi > 100 * 10000:
                         self.sig_1 = -1
                         if self.OrgMain == 'n' and self.piox==0:
@@ -653,18 +657,18 @@ class Nprob:
         # #  Trend_Out
         if 1 == 1:
             if self.OrgMain == "b":
-                if self.in_str == 1 and count_m>self.count_m_overact and dxy_200_medi < -100*10000:
+                if self.in_str == 1 and count_m>self.count_m_overact and dxy_200_medi < self.dxy_200_medi_cri * -1:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
-                        float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
+                        float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                     self.OrgMain = 'n'
                     self.piox = 5
                     self.in_str = 0
                     self.turnover += 1
 
             if self.OrgMain == "s":
-                if self.in_str == -1 and count_m>self.count_m_overact and dxy_200_medi > 100*10000:
+                if self.in_str == -1 and count_m>self.count_m_overact and dxy_200_medi > self.dxy_200_medi_cri:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
-                            float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
+                            float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                     self.OrgMain = 'n'
                     self.piox = -5
                     self.in_str = 0
@@ -688,7 +692,7 @@ class Nprob:
                 if self.in_str == 1:
                     if self.prf_able == 1 and cvol_s < self.cvol_s_low_act * -1  and cvol_t < 0:  # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
-                            float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
+                            float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = 1
                         self.in_str = 0
                         self.OrgMain = 'n'
@@ -696,16 +700,16 @@ class Nprob:
 
                 #  high peak (slope_s conversion)
                 if self.in_str == 2:
-                    if cvol_s < self.cvol_s_low_act * -1 and cvol_t<0 and slope>30: # or y1_ss >0:
+                    if cvol_s < self.cvol_s_low_act * -1 and cvol_t<0 and slope>self.slope_act: # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
-                                float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = 2
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
                     if self.sig_3 == 1:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
-                                float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = 2.5
                         self.in_str = 0
                         self.OrgMain = 'n'
@@ -713,9 +717,9 @@ class Nprob:
 
                 #  after - peak
                 if  self.in_str_1 == -1:
-                    if cvol_s < 0 and cvol_t < -0.5:
+                    if cvol_s < 0 and cvol_t < self.cvol_t_act * -1 / 10 :
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
-                                float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = 3
                         self.in_str_1 = 0
                         self.OrgMain = 'n'
@@ -771,7 +775,7 @@ class Nprob:
                 if self.in_str == -1:
                     if self.prf_able == 1 and cvol_s > self.cvol_t_low_act  and cvol_t > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
-                                float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = -1
                         self.in_str = 0
                         self.OrgMain = 'n'
@@ -779,16 +783,16 @@ class Nprob:
 
                 #  high peak (slope_s conversion)
                 if self.in_str == -2:
-                    if cvol_s > self.cvol_t_low_act and cvol_t>0 and slope<-30: # or x1_ss > 0:
+                    if cvol_s > self.cvol_t_low_act and cvol_t>0 and slope<self.slope_overact * -1: # or x1_ss > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
-                                float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = -2
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
                     if self.sig_3 == -1:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
-                                float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = -2.5
                         self.in_str = 0
                         self.OrgMain = 'n'
@@ -796,9 +800,9 @@ class Nprob:
 
                 #  after - peak
                 if  self.in_str_1 == 1:
-                    if cvol_s > 0 and cvol_t > 0.5:
+                    if cvol_s > 0 and cvol_t > self.cvol_t_act / 10:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
-                                float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = -3
                         self.in_str_1 = 0
                         self.OrgMain = 'n'
