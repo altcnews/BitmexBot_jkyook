@@ -41,6 +41,13 @@ class Nprob:
         self.min_1 = int(60 / self.loop)  # = 300  ststPXY, pindex2, ee_s_ave, ee_s_ox, s3_m_m, dt_main1,2, org_in_2, cri, cri_r, ee_s_cri
         self.min_3 = int(180 / self.loop) # = 900  ee_s_ave_long
         self.min_5 = int(300 / self.loop)
+        self.count_m_act = 10
+        self.count_m_deact = 5
+        self.count_m_overact = 25
+        self.cvol_t_act = 15
+        self.cvol_t_low_act = 5
+        self.cvol_s_act = 10
+        self.cvol_s_low_act = 5
         print 'init Nprob', self.nf
         a = pd.read_csv("index_mex.csv").columns.values.tolist()
         self.df = pd.DataFrame()
@@ -423,10 +430,10 @@ class Nprob:
         #  // PIOX //
         ###############################
 
-        if count_m < 15:
+        if count_m < self.count_m_overact:
             if self.piox > 0:
                 if self.piox == 1:
-                    if cvol_t > 0:
+                    if cvol_t > 0  and count_m<self.count_m_deact:
                        self.piox = 0
                 if self.piox == 2:
                     if cvol_s > 0 and cvol_t > 0:
@@ -435,12 +442,12 @@ class Nprob:
                     if cvol_t > 0:
                        self.piox = 0
                 if self.piox == 5:
-                    if count_m < 5:
+                    if count_m < self.count_m_deact:
                        self.piox = 0
 
             if self.piox < 0:
                 if self.piox == -1:
-                    if cvol_t < 0 and count_m<5:
+                    if cvol_t < 0 and count_m<self.count_m_deact:
                        self.piox = 0
                 if self.piox == -2:
                     if cvol_s < 0 and cvol_t < 0:
@@ -449,7 +456,7 @@ class Nprob:
                     if cvol_t < 0:
                        self.piox = 0
                 if self.piox == 3:
-                    if count_m < 5:
+                    if count_m < self.count_m_deact:
                        self.piox = 0
 
         # # treding_out
@@ -498,15 +505,15 @@ class Nprob:
             # After-peak
             if 1==1:
                 self.sig_3 = 0
-                if cvol_t > 15:
+                if count_m>self.count_m_act:
                     self.sig_3 = 0.5
                     if self.in_str_1 == 0:
                         self.in_str_1 = 0.5
                 if self.in_str_1 == 0.5 or self.piox == 5 or self.piox == 2 or self.piox == 2.5:
-                    if count_m<5:
+                    if count_m<self.count_m_deact:
                         self.sig_3 = 0
                         self.in_str_1 = 0
-                    if count_m>5:
+                    if count_m>self.count_m_deact:
                         if cvol_s < 0 and cvol_t < -5:
                             self.sig_3 = 1
                             if self.OrgMain == 'n' and self.piox==0:
@@ -515,15 +522,15 @@ class Nprob:
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
 
-                if cvol_t < -15:
+                if count_m < self.count_m_act * -1:
                     self.sig_3 = -0.5
                     if self.in_str_1 == 0:
                         self.in_str_1 = -0.5
                 if self.in_str_1 == -0.5 or self.piox == -5 or self.piox == -2 or self.piox == -2.5:
-                    if count_m < 5:
+                    if count_m < self.count_m_deact:
                         self.sig_3 = 0
                         self.in_str_1 = 0
-                    if count_m > 5:
+                    if count_m > self.count_m_deact:
                         if cvol_s > 0 and cvol_t > 5:
                             self.sig_3 = -1
                             if self.OrgMain == 'n' and self.piox == 0:
@@ -534,9 +541,9 @@ class Nprob:
             # Keep-going
             if 1==1:
                 self.sig_2 = 0
-                if count_m<30 and abs(slope)<200 and ee_s<2.5:
-                    if cvol_t>15 and cvol_s>10:
-                        if self.df.at[self.nf-1, "cvol_t"]>10:
+                if count_m<self.count_m_overact and abs(slope)<200 and ee_s<2.5:
+                    if cvol_t>self.cvol_t_act and cvol_s>self.cvol_s_act:
+                        if self.df.at[self.nf-1, "cvol_t"]>self.cvol_t_act:
                             self.sig_2 = 2
                             if self.in_str == 1:
                                 self.in_str = 2
@@ -545,8 +552,8 @@ class Nprob:
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
-                    if cvol_t<-15 and cvol_s<-10:
-                        if self.df.at[self.nf-1, "cvol_t"]<-10:
+                    if cvol_t<self.cvol_t_act * -1 and cvol_s<self.cvol_t_act*-1:
+                        if self.df.at[self.nf-1, "cvol_t"]<self.cvol_t_act*-1:
                             self.sig_2 = -2
                             if self.in_str == -1:
                                 self.in_str = -2
@@ -563,7 +570,7 @@ class Nprob:
             if self.nf >  self.min_1*3/2+1 :
                 if self.piox != 2 and self.piox != -2.5:
                     # if dxy_200_medi>0 and cvol_c_med>10 and abs(cvol_t)<5:
-                    if count_m > 10 and count_m < 25 and dxy_med_200_s>0 and dxy_200_medi < -100 * 10000:
+                    if count_m > self.count_m_act / 2 and count_m < self.count_m_overact and dxy_med_200_s>0 and dxy_200_medi < -100 * 10000 / 2:
                         self.sig_1 = 1
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "b"
@@ -573,7 +580,7 @@ class Nprob:
 
                 if self.piox != -2 and self.piox != 2.5:
                     # if dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<5:
-                    if count_m > 10 and count_m < 25 and dxy_med_200_s<0 and dxy_200_medi > 100 * 10000:
+                    if count_m > self.count_m_act / 2 and count_m < self.count_m_overact and dxy_med_200_s<0 and dxy_200_medi > 100 * 10000 / 2:
                         self.sig_1 = -1
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "s"
@@ -619,11 +626,11 @@ class Nprob:
                 self.prf_able = -1
         self.df.at[self.nf, "prf_able"] = self.prf_able
 
-            # cvol_peak
-        if cvol_s>50:
-            self.hit_peak = 6
-        if cvol_s<-50:
-            self.hit_peak = -6
+        #     # cvol_peak
+        # if cvol_s>50:
+        #     self.hit_peak = 6
+        # if cvol_s<-50:
+        #     self.hit_peak = -6
 
         ###############################
         #  // Out Decision //
@@ -634,7 +641,7 @@ class Nprob:
         # #  Trend_Out
         if 1 == 1:
             if self.OrgMain == "b":
-                if self.in_str == 1 and count_m>25 and dxy_200_medi < -100*10000:
+                if self.in_str == 1 and count_m>self.count_m_overact and dxy_200_medi < -100*10000:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                     self.OrgMain = 'n'
@@ -643,7 +650,7 @@ class Nprob:
                     self.turnover += 1
 
             if self.OrgMain == "s":
-                if self.in_str == -1 and count_m>25 and dxy_200_medi > 100*10000:
+                if self.in_str == -1 and count_m>self.count_m_overact and dxy_200_medi > 100*10000:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.OrgMain = 'n'
@@ -667,7 +674,7 @@ class Nprob:
 
                 # mid peak (dxy_20 orderbook)
                 if self.in_str == 1:
-                    if self.prf_able == 1 and cvol_s < -5  and cvol_t < 0:  # or y1_ss >0:
+                    if self.prf_able == 1 and cvol_s < self.cvol_s_low_act * -1  and cvol_t < 0:  # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                         self.piox = 1
@@ -677,7 +684,7 @@ class Nprob:
 
                 #  high peak (slope_s conversion)
                 if self.in_str == 2:
-                    if cvol_s < -5 and cvol_t<0 and y1>100000 and slope>30: # or y1_ss >0:
+                    if cvol_s < self.cvol_s_low_act * -1 and cvol_t<0 and slope>30: # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
                         self.piox = 2
@@ -750,7 +757,7 @@ class Nprob:
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
-                    if self.prf_able == 1 and cvol_s > 5  and cvol_t > 0:
+                    if self.prf_able == 1 and cvol_s > self.cvol_t_low_act  and cvol_t > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                         self.piox = -1
@@ -760,7 +767,7 @@ class Nprob:
 
                 #  high peak (slope_s conversion)
                 if self.in_str == -2:
-                    if cvol_s > 5 and cvol_t>0 and x1>100000 and slope<-30: # or x1_ss > 0:
+                    if cvol_s > self.cvol_t_low_act and cvol_t>0 and slope<-30: # or x1_ss > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                         self.piox = -2
