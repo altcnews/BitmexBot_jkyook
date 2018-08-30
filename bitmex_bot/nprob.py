@@ -493,10 +493,9 @@ class Nprob:
         #  // In Decision //
         ###############################
 
-        # Peak_In
         if self.nf >  self.min_1+1 :
 
-            # after-peak
+            # After-peak
             if 1==1:
                 self.sig_3 = 0
                 if cvol_t > 15:
@@ -532,7 +531,7 @@ class Nprob:
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
-            # keep-going
+            # Keep-going
             if 1==1:
                 self.sig_2 = 0
                 if count_m<30 and abs(slope)<200 and ee_s<2.5:
