@@ -486,31 +486,6 @@ class Nprob:
         # Peak_In
         if self.nf >  self.min_1+1 :
 
-            # keep-going
-            if 1==1:
-                self.sig_2 = 0
-                if count_m<30 and abs(slope)<200:
-                    if cvol_t>15 and cvol_s>10:
-                        if self.df.at[self.nf-1, "cvol_t"]>10:
-                            self.sig_2 = 2
-                            if self.in_str == 1:
-                                self.in_str = 2
-                            if self.OrgMain == 'n' and self.piox==0:
-                                self.in_str = 2
-                                self.OrgMain = "b"
-                                self.nfset = self.nf
-                                self.inp = float(lblShoga1v)
-                    if cvol_t<-15 and cvol_s<-10:
-                        if self.df.at[self.nf-1, "cvol_t"]<-10:
-                            self.sig_2 = -2
-                            if self.in_str == -1:
-                                self.in_str = -2
-                            if self.OrgMain == 'n' and self.piox==0:
-                                self.in_str= -2
-                                self.OrgMain = "s"
-                                self.nfset = self.nf
-                                self.inp = float(lblBhoga1v)
-
             # after-peak
             if 1==1:
                 self.sig_3 = 0
@@ -534,19 +509,43 @@ class Nprob:
                 if cvol_t < -15:
                     self.sig_3 = -0.5
                     if self.in_str_1 == 0:
-                        self.in_str_1= -0.5
-                if self.in_str_1 == -0.5  or self.piox == -5 or self.piox == -2:
-                    if count_m<5:
+                        self.in_str_1 = -0.5
+                if self.in_str_1 == -0.5 or self.piox == -5 or self.piox == -2:
+                    if count_m < 5:
                         self.sig_3 = 0
                         self.in_str_1 = 0
-                    if count_m>5:
+                    if count_m > 5:
                         if cvol_s > 0 and cvol_t > 5:
                             self.sig_3 = -1
-                            if self.OrgMain == 'n' and self.piox==0:
+                            if self.OrgMain == 'n' and self.piox == 0:
                                 self.in_str_1 = -1
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
+            # keep-going
+            if 1==1:
+                self.sig_2 = 0
+                if count_m<30 and abs(slope)<200 and ee_s<2.5:
+                    if cvol_t>15 and cvol_s>10:
+                        if self.df.at[self.nf-1, "cvol_t"]>10:
+                            self.sig_2 = 2
+                            if self.in_str == 1:
+                                self.in_str = 2
+                            if self.OrgMain == 'n' and self.piox==0:
+                                self.in_str = 2
+                                self.OrgMain = "b"
+                                self.nfset = self.nf
+                                self.inp = float(lblShoga1v)
+                    if cvol_t<-15 and cvol_s<-10:
+                        if self.df.at[self.nf-1, "cvol_t"]<-10:
+                            self.sig_2 = -2
+                            if self.in_str == -1:
+                                self.in_str = -2
+                            if self.OrgMain == 'n' and self.piox==0:
+                                self.in_str= -2
+                                self.OrgMain = "s"
+                                self.nfset = self.nf
+                                self.inp = float(lblBhoga1v)
 
 
         # Trend_In_200
@@ -672,7 +671,13 @@ class Nprob:
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
-
+                    if self.sig_3 == 1:
+                        self.profit += ((float(lblBhoga1v) - self.inp) - (
+                                float(lblBhoga1v) + self.inp) * 0.00075 /2) * self.ord_count
+                        self.piox = 2.5
+                        self.in_str = 0
+                        self.OrgMain = 'n'
+                        self.turnover += 1
 
                 #  after - peak
                 if  self.in_str_1 == -1:
@@ -743,6 +748,13 @@ class Nprob:
                 #  high peak (slope_s conversion)
                 if self.in_str == -2:
                     if cvol_s > 5 and cvol_t>0 and x1>100000 and slope<-30: # or x1_ss > 0:
+                        self.profit += ((self.inp - float(lblBhoga1v)) - (
+                                float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
+                        self.piox = -2
+                        self.in_str = 0
+                        self.OrgMain = 'n'
+                        self.turnover += 1
+                    if self.sig_3 == -1:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                         self.piox = -2
