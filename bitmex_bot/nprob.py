@@ -54,7 +54,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print 'nf: %d  /prc: %0.1f /in: %d /out: %d /prf: %d /turn_over: %d' % (self.nf, price, self.in_str, self.piox, self.prf_able, self.turnover)
+        print 'nf: %d  /prc: %0.1f /in: %d /out: %d /prf: %d /turn: %d' % (self.nf, price, self.in_str, self.piox, self.prf_able, self.turnover)
         # nowtime=time.time()
 
         if self.nf!=0 and self.nf%500==0: # and self.nf>self.min_5
@@ -585,8 +585,8 @@ class Nprob:
 
         # prf_able
         self.prf_able = 0
-        profit_band = price * 0.0015 * 1.5 * ee_s
-        loss_band = price * 0.0015 * 1.5 * ee_s
+        profit_band = 10 * ee_s
+        loss_band = 20 * ee_s
         if profit_band>40:
             profit_band=40
         if profit_band<15:
@@ -596,14 +596,14 @@ class Nprob:
         if loss_band<40:
             loss_band=40
         if self.OrgMain == "b":
-            if price >= self.inp + profit_band:
+            if price >= self.inp + self.tick * profit_band:
                 self.prf_able = 1
-            if price <= self.inp - loss_band:
+            if price <= self.inp - self.tick * loss_band:
                 self.prf_able = -1
         if self.OrgMain == "s":
-            if price <= self.inp - profit_band:
+            if price <= self.inp - self.tick * profit_band:
                 self.prf_able = 1
-            if price >= self.inp + loss_band:
+            if price >= self.inp + self.tick * loss_band:
                 self.prf_able = -1
         self.df.at[self.nf, "prf_able"] = self.prf_able
 
@@ -810,7 +810,7 @@ class Nprob:
         self.df.at[self.nf, "piox"] = self.piox
         self.df.at[self.nf, "profit"] = self.profit
         self.df.at[self.nf, "ord_count"] = self.ord_count
-        print 'piox = ', self.piox
+        # print 'piox = ', self.piox
 
         ###############################
         #  // RESET & ETC //
@@ -831,7 +831,7 @@ class Nprob:
 
         self.df.at[self.nf, "d_OMain"] = self.d_OMain
         self.df.at[self.nf, "OrgMain"] = self.OrgMain
-        print "OrgMain", self.OrgMain
+        # print "OrgMain", self.OrgMain
 
         self.nf+=1
 
