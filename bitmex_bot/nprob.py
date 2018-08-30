@@ -587,14 +587,14 @@ class Nprob:
         self.prf_able = 0
         profit_band = 10 * ee_s
         loss_band = 20 * ee_s
-        if profit_band>40:
-            profit_band=40
-        if profit_band<15:
-            profit_band=15
-        if loss_band>60:
-            loss_band=60
-        if loss_band<40:
-            loss_band=40
+        if profit_band>60:
+            profit_band=60
+        if profit_band<20:
+            profit_band=20
+        if loss_band>80:
+            loss_band=80
+        if loss_band<50:
+            loss_band=50
         if self.OrgMain == "b":
             if price >= self.inp + self.tick * profit_band:
                 self.prf_able = 1
@@ -655,7 +655,7 @@ class Nprob:
 
                 # mid peak (dxy_20 orderbook)
                 if self.in_str == 1:
-                    if self.prf_able == 1 and count_m<10 and cvol_s < -5  and cvol_t < 0:  # or y1_ss >0:
+                    if self.prf_able == 1 and cvol_s < -5  and cvol_t < 0:  # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                         self.piox = 1
@@ -738,7 +738,7 @@ class Nprob:
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
-                    if self.prf_able == 1 and count_m<10 and cvol_s > 5  and cvol_t > 0:
+                    if self.prf_able == 1 and cvol_s > 5  and cvol_t > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * 0.00075/2) * self.ord_count
                         self.piox = -1
