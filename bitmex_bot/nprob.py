@@ -562,7 +562,7 @@ class Nprob:
                     if cvol_t>self.cvol_t_act and cvol_s>self.cvol_s_act:
                         if self.df.at[self.nf-1, "cvol_t"]>self.cvol_t_act:
                             self.sig_2 = 2
-                            if self.in_str == 1 or self.in_str == -1:
+                            if self.in_str == 1:
                                 self.in_str = 2
                             if self.OrgMain == 'n' and self.piox==0:
                                 self.in_str = 2
@@ -572,20 +572,20 @@ class Nprob:
                     if cvol_t<self.cvol_t_act * -1 and cvol_s<self.cvol_t_act*-1:
                         if self.df.at[self.nf-1, "cvol_t"]<self.cvol_t_act*-1:
                             self.sig_2 = -2
-                            if self.in_str == -1 or self.in_str == 1:
+                            if self.in_str == -1:
                                 self.in_str = -2
                             if self.OrgMain == 'n' and self.piox==0:
                                 self.in_str= -2
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
-                if self.piox == -1.5:
+                if self.piox == 1.5:
                     if self.OrgMain == 'n':
                         self.in_str = -2
                         self.OrgMain = "s"
                         self.nfset = self.nf
                         self.inp = float(lblBhoga1v)
-                if self.piox == 1.5:
+                if self.piox == -1.5:
                     if self.OrgMain == 'n':
                         self.in_str = 2
                         self.OrgMain = "b"
