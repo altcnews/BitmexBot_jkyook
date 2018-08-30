@@ -434,7 +434,7 @@ class Nprob:
         #  // PIOX //
         ###############################
 
-        if count_m < self.count_m_overact:
+        if count_m < self.count_m_overact and self.piox !=1.5 and self.piox !=2.5:
             if self.piox > 0:
                 if self.piox == 1:
                     if cvol_t > 0  and count_m<self.count_m_deact:
@@ -526,7 +526,7 @@ class Nprob:
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
                 if self.piox == 2.5:
-                    if self.OrgMain == 'n' and self.piox==0:
+                    if self.OrgMain == 'n':
                         self.in_str_1 = 1
                         self.OrgMain = "s"
                         self.nfset = self.nf
@@ -549,7 +549,7 @@ class Nprob:
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
                 if self.piox == 2.5:
-                    if self.OrgMain == 'n' and self.piox == 0:
+                    if self.OrgMain == 'n':
                         self.in_str_1 = -1
                         self.OrgMain = "b"
                         self.nfset = self.nf
@@ -579,7 +579,18 @@ class Nprob:
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
-
+                if self.piox == -1.5:
+                    if self.OrgMain == 'n':
+                        self.in_str = -2
+                        self.OrgMain = "s"
+                        self.nfset = self.nf
+                        self.inp = float(lblBhoga1v)
+                if self.piox == 1.5:
+                    if self.OrgMain == 'n':
+                        self.in_str = 2
+                        self.OrgMain = "b"
+                        self.nfset = self.nf
+                        self.inp = float(lblShoga1v)
 
         # Trend_In_200
         if 1==1:
@@ -697,6 +708,13 @@ class Nprob:
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
+                    if self.sig_2 == -2:
+                        self.profit += ((float(lblBhoga1v) - self.inp) - (
+                            float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                        self.piox = 1.5
+                        self.in_str = 0
+                        self.OrgMain = 'n'
+                        self.turnover += 1
 
                 #  high peak (slope_s conversion)
                 if self.in_str == 2:
@@ -777,6 +795,13 @@ class Nprob:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = -1
+                        self.in_str = 0
+                        self.OrgMain = 'n'
+                        self.turnover += 1
+                    if self.sig_2 == 2:
+                        self.profit += ((self.inp - float(lblBhoga1v)) - (
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                        self.piox = -1.5
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
