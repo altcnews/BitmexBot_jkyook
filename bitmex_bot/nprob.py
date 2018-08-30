@@ -315,44 +315,44 @@ class Nprob:
         # self.df.at[self.nf, "nPXY"] = nPXY
         # self.df.at[self.nf, "nPXY_d"] = nPXY_d
 
-        # x1_m, y1_m
-        if self.nf < self.min_1+1:
-            x1_m = 0
-            y1_m = 0
-            nPXY_d_m = 0
-        if self.nf >= self.min_1+1:
-            x1_m = self.df.ix[self.nf - int(self.min_1*0.75):self.nf - 1, "x1"].mean()
-            y1_m = self.df.ix[self.nf - int(self.min_1*0.75):self.nf - 1, "y1"].mean()
-            # nXY_d_m = self.df.ix[self.nf - int(self.min_1*0.75):self.nf - 1, "nPXY_d"].mean()
-        self.df.at[self.nf, "x1_m"] = x1_m
-        self.df.at[self.nf, "y1_m"] = y1_m
-        # self.df.at[self.nf, "nXY_d_m"] = nXY_d_m
+        # # x1_m, y1_m
+        # if self.nf < self.min_1+1:
+        #     x1_m = 0
+        #     y1_m = 0
+        #     nPXY_d_m = 0
+        # if self.nf >= self.min_1+1:
+        #     x1_m = self.df.ix[self.nf - int(self.min_1*0.75):self.nf - 1, "x1"].mean()
+        #     y1_m = self.df.ix[self.nf - int(self.min_1*0.75):self.nf - 1, "y1"].mean()
+        #     # nXY_d_m = self.df.ix[self.nf - int(self.min_1*0.75):self.nf - 1, "nPXY_d"].mean()
+        # self.df.at[self.nf, "x1_m"] = x1_m
+        # self.df.at[self.nf, "y1_m"] = y1_m
+        # # self.df.at[self.nf, "nXY_d_m"] = nXY_d_m
 
-        # x1_s, y1_s
-        if self.nf >= self.min_1+1:
-            r_ny = self.df.ix[self.nf - self.sec_15:self.nf - 1, "y1"]
-            r_nx = self.df.ix[self.nf - self.sec_15:self.nf - 1, "x1"]
-            r_t = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stime"]
-            y1_s = regr.fit(r_t.values.reshape(-1, 1), r_ny.values.reshape(-1, 1)).coef_[0][0]
-            x1_s = regr.fit(r_t.values.reshape(-1, 1), r_nx.values.reshape(-1, 1)).coef_[0][0]
-        else:
-            y1_s = 0
-            x1_s = 0
-        self.df.at[self.nf, "y1_s"] = y1_s
-        self.df.at[self.nf, "x1_s"] = x1_s
-
-        # x1_ss, y1_ss
-        if self.nf >= self.min_1+1:
-            r_ny_s = self.df.ix[self.nf - 7:self.nf - 1, "y1_s"] #.iloc[c]
-            r_nx_s = self.df.ix[self.nf - 7:self.nf - 1, "x1_s"] #.iloc[c]
-            r_t = self.df.ix[self.nf - 7:self.nf - 1, "stime"] #.iloc[c]
-            y1_ss = regr.fit(r_t.values.reshape(-1, 1), r_ny_s.values.reshape(-1, 1)).coef_[0][0]*1000
-            x1_ss = regr.fit(r_t.values.reshape(-1, 1), r_nx_s.values.reshape(-1, 1)).coef_[0][0]*1000
-        else:
-            y1_ss = 0
-            x1_ss = 0
-        self.df.at[self.nf, "y1_ss"] = y1_ss
-        self.df.at[self.nf, "x1_ss"] = x1_ss
+        # # x1_s, y1_s
+        # if self.nf >= self.min_1+1:
+        #     r_ny = self.df.ix[self.nf - self.sec_15:self.nf - 1, "y1"]
+        #     r_nx = self.df.ix[self.nf - self.sec_15:self.nf - 1, "x1"]
+        #     r_t = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stime"]
+        #     y1_s = regr.fit(r_t.values.reshape(-1, 1), r_ny.values.reshape(-1, 1)).coef_[0][0]
+        #     x1_s = regr.fit(r_t.values.reshape(-1, 1), r_nx.values.reshape(-1, 1)).coef_[0][0]
+        # else:
+        #     y1_s = 0
+        #     x1_s = 0
+        # self.df.at[self.nf, "y1_s"] = y1_s
+        # self.df.at[self.nf, "x1_s"] = x1_s
+        #
+        # # x1_ss, y1_ss
+        # if self.nf >= self.min_1+1:
+        #     r_ny_s = self.df.ix[self.nf - 7:self.nf - 1, "y1_s"] #.iloc[c]
+        #     r_nx_s = self.df.ix[self.nf - 7:self.nf - 1, "x1_s"] #.iloc[c]
+        #     r_t = self.df.ix[self.nf - 7:self.nf - 1, "stime"] #.iloc[c]
+        #     y1_ss = regr.fit(r_t.values.reshape(-1, 1), r_ny_s.values.reshape(-1, 1)).coef_[0][0]*1000
+        #     x1_ss = regr.fit(r_t.values.reshape(-1, 1), r_nx_s.values.reshape(-1, 1)).coef_[0][0]*1000
+        # else:
+        #     y1_ss = 0
+        #     x1_ss = 0
+        # self.df.at[self.nf, "y1_ss"] = y1_ss
+        # self.df.at[self.nf, "x1_ss"] = x1_ss
         #
         # # stXY
         # if self.nf < self.sec_30+1:
@@ -570,7 +570,7 @@ class Nprob:
             if self.nf >  self.min_1*3/2+1 :
                 if self.piox != 2 and self.piox != -2.5:
                     # if dxy_200_medi>0 and cvol_c_med>10 and abs(cvol_t)<5:
-                    if count_m > self.count_m_act / 2 and count_m < self.count_m_overact and dxy_med_200_s>0 and dxy_200_medi < -100 * 10000 / 2:
+                    if count_m > self.count_m_act and count_m < self.count_m_overact and dxy_med_200_s>0 and dxy_200_medi < -100 * 10000:
                         self.sig_1 = 1
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "b"
@@ -580,7 +580,7 @@ class Nprob:
 
                 if self.piox != -2 and self.piox != 2.5:
                     # if dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<5:
-                    if count_m > self.count_m_act / 2 and count_m < self.count_m_overact and dxy_med_200_s<0 and dxy_200_medi > 100 * 10000 / 2:
+                    if count_m > self.count_m_act and count_m < self.count_m_overact and dxy_med_200_s<0 and dxy_200_medi > 100 * 10000:
                         self.sig_1 = -1
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "s"
