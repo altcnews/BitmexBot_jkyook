@@ -626,7 +626,7 @@ class Nprob:
         # #  Trend_Out
         if 1 == 1:
             if self.OrgMain == "b":
-                if self.in_str == 1 and count_m>10 and count_m<25 and dxy_200_medi < -100*10000:
+                if self.in_str == 1 and count_m>25 and dxy_200_medi < -100*10000:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * 0.00075 / 2) * self.ord_count
                     self.OrgMain = 'n'
@@ -635,7 +635,7 @@ class Nprob:
                     self.turnover += 1
 
             if self.OrgMain == "s":
-                if self.in_str == -1 and count_m>10 and count_m<25 and dxy_200_medi > 100*10000:
+                if self.in_str == -1 and count_m>25 and dxy_200_medi > 100*10000:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * 0.00075) * self.ord_count
                     self.OrgMain = 'n'
