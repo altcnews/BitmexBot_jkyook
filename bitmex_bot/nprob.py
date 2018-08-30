@@ -509,7 +509,7 @@ class Nprob:
                     self.sig_3 = 0.5
                     if self.in_str_1 == 0:
                         self.in_str_1 = 0.5
-                if self.in_str_1 == 0.5 or self.piox == 5 or self.piox == 2 or self.piox == 2.5:
+                if self.in_str_1 == 0.5 or self.piox == 5 or self.piox == 2:
                     if count_m<self.count_m_deact:
                         self.sig_3 = 0
                         self.in_str_1 = 0
@@ -521,12 +521,18 @@ class Nprob:
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
+                if self.piox == 2.5:
+                    if self.OrgMain == 'n' and self.piox==0:
+                        self.in_str_1 = 1
+                        self.OrgMain = "s"
+                        self.nfset = self.nf
+                        self.inp = float(lblBhoga1v)
 
                 if count_m < self.count_m_act * -1:
                     self.sig_3 = -0.5
                     if self.in_str_1 == 0:
                         self.in_str_1 = -0.5
-                if self.in_str_1 == -0.5 or self.piox == -5 or self.piox == -2 or self.piox == -2.5:
+                if self.in_str_1 == -0.5 or self.piox == -5 or self.piox == -2:
                     if count_m < self.count_m_deact:
                         self.sig_3 = 0
                         self.in_str_1 = 0
@@ -538,6 +544,13 @@ class Nprob:
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
+                if self.piox == 2.5:
+                    if self.OrgMain == 'n' and self.piox == 0:
+                        self.in_str_1 = -1
+                        self.OrgMain = "b"
+                        self.nfset = self.nf
+                        self.inp = float(lblShoga1v)
+
             # Keep-going
             if 1==1:
                 self.sig_2 = 0
@@ -569,8 +582,8 @@ class Nprob:
             self.sig_1 = 0
             if self.nf >  self.min_1*3/2+1 :
                 if self.piox != 2 and self.piox != -2.5:
-                    # if dxy_200_medi>0 and cvol_c_med>10 and abs(cvol_t)<5:
-                    if count_m > self.count_m_act and count_m < self.count_m_overact and dxy_med_200_s>0 and dxy_200_medi < -100 * 10000:
+                    if dxy_200_medi>0 and cvol_c_med>10 and abs(cvol_t)<5:
+                    # if count_m > self.count_m_act and count_m < self.count_m_overact and dxy_med_200_s>0 and dxy_200_medi < -100 * 10000:
                         self.sig_1 = 1
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "b"
@@ -579,15 +592,14 @@ class Nprob:
                             self.inp = float(lblShoga1v)
 
                 if self.piox != -2 and self.piox != 2.5:
-                    # if dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<5:
-                    if count_m > self.count_m_act and count_m < self.count_m_overact and dxy_med_200_s<0 and dxy_200_medi > 100 * 10000:
+                    if dxy_200_medi<0 and cvol_c_med<10 and abs(cvol_t)<5:
+                    # if count_m > self.count_m_act and count_m < self.count_m_overact and dxy_med_200_s<0 and dxy_200_medi > 100 * 10000:
                         self.sig_1 = -1
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "s"
                             self.in_str = -1
                             self.nfset = self.nf
                             self.inp = float(lblBhoga1v)
-
 
         self.df.at[self.nf, "inp"] = self.inp
         # self.df.at[self.nf, "inp_preset"] = self.inp_preset
