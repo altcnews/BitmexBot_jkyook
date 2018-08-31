@@ -16,7 +16,34 @@ class Nprob:
         # global df , nf
         self.nf=0
         self.nfset=0
-        self.tick = 0.5
+
+        if 1==1:
+            self.tick = 0.5
+            self.count_m_act = 10
+            self.count_m_deact = 5
+            self.count_m_overact = 25
+            self.cvol_t_act = 15
+            self.cvol_t_low_act = 5
+            self.cvol_s_act = 10
+            self.cvol_s_low_act = 5
+            self.dxy_200_medi_cri = 100*10000
+            self.slope_act = 30
+            self.slope_overact = 200
+            self.fee_rate = 0.00075 * 2
+        if 1==0:
+            self.tick = 0.02
+            self.count_m_act = 10
+            self.count_m_deact = 5
+            self.count_m_overact = 25
+            self.cvol_t_act = 5000
+            self.cvol_t_low_act = 1500
+            self.cvol_s_act = 0.003
+            self.cvol_s_low_act = 0.0015
+            self.dxy_200_medi_cri = 150
+            self.slope_act = 0.1
+            self.slope_overact = 0.3
+            self.fee_rate = 0.00003 * 2
+
         self.inp=0
         self.profit=0
         self.startime=time.time()
@@ -41,17 +68,6 @@ class Nprob:
         self.min_1 = int(60 / self.loop)  # = 300  ststPXY, pindex2, ee_s_ave, ee_s_ox, s3_m_m, dt_main1,2, org_in_2, cri, cri_r, ee_s_cri
         self.min_3 = int(180 / self.loop) # = 900  ee_s_ave_long
         self.min_5 = int(300 / self.loop)
-        self.count_m_act = 10
-        self.count_m_deact = 5
-        self.count_m_overact = 25
-        self.cvol_t_act = 15
-        self.cvol_t_low_act = 5
-        self.cvol_s_act = 10
-        self.cvol_s_low_act = 5
-        self.dxy_200_medi_cri = 100*10000
-        self.slope_act = 30
-        self.slope_overact = 200
-        self.fee_rate = 0.00075
         print 'init Nprob', self.nf
         a = pd.read_csv("index_mex.csv").columns.values.tolist()
         self.df = pd.DataFrame()
