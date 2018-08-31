@@ -17,7 +17,7 @@ class Nprob:
         self.nf=0
         self.nfset=0
 
-        if 1==1:
+        if 1==1:  # Bit
             self.tick = 0.5
             self.count_m_act = 10
             self.count_m_deact = 5
@@ -30,7 +30,7 @@ class Nprob:
             self.slope_act = 30
             self.slope_overact = 200
             self.fee_rate = 0.00075 * 2
-        if 1==0:
+        if 1==0:  # Kospi
             self.tick = 0.02
             self.count_m_act = 10
             self.count_m_deact = 5
@@ -525,7 +525,7 @@ class Nprob:
             # After-peak
             if 1==1:
                 self.sig_3 = 0
-                if count_m>self.count_m_act:
+                if count_m > self.count_m_act:
                     self.sig_3 = 0.5
                     if self.in_str_1 == 0:
                         self.in_str_1 = 0.5
@@ -548,7 +548,7 @@ class Nprob:
                         self.nfset = self.nf
                         self.inp = float(lblBhoga1v)
 
-                if count_m < self.count_m_act * -1:
+                if count_m > self.count_m_act:
                     self.sig_3 = -0.5
                     if self.in_str_1 == 0:
                         self.in_str_1 = -0.5
@@ -564,7 +564,7 @@ class Nprob:
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
-                if self.piox == 2.5:
+                if self.piox == -2.5:
                     if self.OrgMain == 'n':
                         self.in_str_1 = -1
                         self.OrgMain = "b"
