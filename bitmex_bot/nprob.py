@@ -30,6 +30,8 @@ class Nprob:
             self.slope_act = 30
             self.slope_overact = 200
             self.fee_rate = 0.00075 * 2
+            self.profit_min_tick = 25
+            self.loss_max_tick = 80
         if 1==0:  # Kospi
             self.tick = 0.02
             self.count_m_act = 10
@@ -43,6 +45,8 @@ class Nprob:
             self.slope_act = 0.1
             self.slope_overact = 0.3
             self.fee_rate = 0.00003 * 2
+            self.profit_min_tick = 5
+            self.loss_max_tick = 20
 
         self.inp=0
         self.profit=0
@@ -647,16 +651,16 @@ class Nprob:
 
         # prf_able
         self.prf_able = 0
-        profit_band = 10 * ee_s
-        loss_band = 20 * ee_s
-        if profit_band>60:
-            profit_band=60
-        if profit_band<20:
-            profit_band=20
-        if loss_band>80:
-            loss_band=80
-        if loss_band<50:
-            loss_band=50
+        profit_band = self.profit_min_tick * ee_s
+        loss_band = self.loss_max_tick * ee_s
+        if profit_band>self.profit_min_tick*3:
+            profit_band=self.profit_min_tick*3
+        if profit_band<self.profit_min_tick:
+            profit_band=self.profit_min_tick
+        if loss_band>self.loss_max_tick:
+            loss_band=self.loss_max_tick
+        if loss_band<self.loss_max_tick/2:
+            loss_band=self.loss_max_tick/2
         if self.OrgMain == "b":
             if price >= self.inp + self.tick * profit_band:
                 self.prf_able = 1
@@ -912,7 +916,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'dxy_200_medi', 'OrgMain', 'inp','profit']]
+            print self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'cvol_s', 'dxy_200_medi', 'OrgMain', 'inp','profit']]
             print '-----------'
 
         elap = time.time() - t_start
