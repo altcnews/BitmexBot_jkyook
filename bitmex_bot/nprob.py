@@ -51,7 +51,7 @@ class Nprob:
         self.dxy_200_medi_cri = 100*10000
         self.slope_act = 30
         self.slope_overact = 200
-        self.fee_rate = 0.00075 / 2
+        self.fee_rate = 0.00075
         print 'init Nprob', self.nf
         a = pd.read_csv("index_mex.csv").columns.values.tolist()
         self.df = pd.DataFrame()
