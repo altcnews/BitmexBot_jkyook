@@ -40,13 +40,13 @@ class Nprob:
             self.cvol_t_act = 0.005 #5000
             self.cvol_t_low_act = 0.0015 #1500
             self.cvol_s_act = 0.003
-            self.cvol_s_low_act = 0.0015
+            self.cvol_s_low_act = 0.0005
             self.dxy_200_medi_cri = 150
             self.slope_act = 0.1
             self.slope_overact = 0.3
             self.fee_rate = 0.00003 * 2
-            self.profit_min_tick = 3
-            self.loss_max_tick = 10
+            self.profit_min_tick = 4
+            self.loss_max_tick = 15
 
         self.inp=0
         self.profit=0
@@ -57,15 +57,15 @@ class Nprob:
         self.in_str_1 = 0
         self.in_str = 0
         self.piox = 0
-        self.inp_preset=0
+        # self.inp_preset=0
         self.OrgMain='n'
         self.ord_count = 1
         self.turnover=0
-        self.org_in_2=0
-        self.cri=0
-        self.cri_r=0
+        # self.org_in_2=0
+        # self.cri=0
+        # self.cri_r=0
         self.prf_able = 0
-        self.hit_peak=0
+        # self.hit_peak=0
         self.loop=0.5           #Loop_interval(0.25)
         self.sec_15 = int(15 / self.loop)  # = 75  ns, nPXY, stPXY, a~e, ee_s, bump, abump, s1, s2_s, s3, s3_m_m
         self.sec_30 = int(30 / self.loop)  # = 150  mtm, PXYm, stXY, pindex, slope, ee_s_slope, s2_c_m, s3_c, s3_m_short
@@ -589,7 +589,7 @@ class Nprob:
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
-                    if cvol_t<self.cvol_t_act * -1 and cvol_s<self.cvol_t_act*-1:
+                    if cvol_t<self.cvol_t_act * -1 and cvol_s<self.cvol_s_act*-1:
                         if self.df.at[self.nf-1, "cvol_t"]<self.cvol_t_act*-1:
                             self.sig_2 = -2
                             if self.in_str == -1:
@@ -811,7 +811,7 @@ class Nprob:
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
-                    if self.prf_able == 1 and cvol_s > self.cvol_t_low_act  and cvol_t > 0:
+                    if self.prf_able == 1 and cvol_s > self.cvol_s_low_act  and cvol_t > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = -1
@@ -828,7 +828,7 @@ class Nprob:
 
                 #  high peak (slope_s conversion)
                 if self.in_str == -2:
-                    if cvol_s > self.cvol_t_low_act and cvol_t>0: # and slope<self.slope_overact * -1: # or x1_ss > 0:
+                    if cvol_s > self.cvol_s_low_act and cvol_t>0: # and slope<self.slope_overact * -1: # or x1_ss > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = -2
@@ -905,7 +905,7 @@ class Nprob:
         elif self.OrgMain == "n":
             self.d_OMain = 0
             self.ord_count = 1
-            self.hit_peak = 0
+            # self.hit_peak = 0
             self.inp = 0
             self.nfset = 0
 
