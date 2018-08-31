@@ -33,7 +33,7 @@ class Nprob:
             self.profit_min_tick = 25
             self.loss_max_tick = 80
         if 1==0:  # Kospi
-            self.tick = 0.02
+            self.tick = 0.05
             self.count_m_act = 10
             self.count_m_deact = 5
             self.count_m_overact = 25
@@ -45,8 +45,8 @@ class Nprob:
             self.slope_act = 0.1
             self.slope_overact = 0.3
             self.fee_rate = 0.00003 * 2
-            self.profit_min_tick = 5
-            self.loss_max_tick = 20
+            self.profit_min_tick = 3
+            self.loss_max_tick = 10
 
         self.inp=0
         self.profit=0
@@ -85,7 +85,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print 'nf: %d  /prc: %0.1f /in: %d /out: %d /prf: %d /turn: %d' % (self.nf, price, self.in_str, self.piox, self.prf_able, self.turnover)
+        print 'nf: %d  /prc: %0.2f /in: %d /out: %d /prf: %d /turn: %d' % (self.nf, price, self.in_str, self.piox, self.prf_able, self.turnover)
         # nowtime=time.time()
 
         if self.nf!=0 and self.nf%500==0: # and self.nf>self.min_5
