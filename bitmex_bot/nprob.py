@@ -579,8 +579,8 @@ class Nprob:
             if 1==1:
                 self.sig_2 = 0
                 if count_m<self.count_m_overact and abs(slope)<self.slope_overact and ee_s<2.5:
-                    if cvol_t>self.cvol_t_act and cvol_s>self.cvol_s_act:
-                        if self.df.at[self.nf-1, "cvol_t"]>self.cvol_t_act:
+                    if cvol_t>self.cvol_t_act or cvol_s>self.cvol_s_act:
+                        # if self.df.at[self.nf-1, "cvol_t"]>self.cvol_t_act:
                             self.sig_2 = 2
                             if self.in_str == 1:
                                 self.in_str = 2
@@ -589,8 +589,8 @@ class Nprob:
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
-                    if cvol_t<self.cvol_t_act * -1 and cvol_s<self.cvol_s_act*-1:
-                        if self.df.at[self.nf-1, "cvol_t"]<self.cvol_t_act*-1:
+                    if cvol_t<self.cvol_t_act * -1 or cvol_s<self.cvol_s_act*-1:
+                        # if self.df.at[self.nf-1, "cvol_t"]<self.cvol_t_act*-1:
                             self.sig_2 = -2
                             if self.in_str == -1:
                                 self.in_str = -2
