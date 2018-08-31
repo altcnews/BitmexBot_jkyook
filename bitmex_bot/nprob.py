@@ -37,8 +37,8 @@ class Nprob:
             self.count_m_act = 10
             self.count_m_deact = 5
             self.count_m_overact = 25
-            self.cvol_t_act = 5000
-            self.cvol_t_low_act = 1500
+            self.cvol_t_act = 0.005 #5000
+            self.cvol_t_low_act = 0.0015 #1500
             self.cvol_s_act = 0.003
             self.cvol_s_low_act = 0.0015
             self.dxy_200_medi_cri = 150
