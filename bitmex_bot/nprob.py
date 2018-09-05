@@ -138,9 +138,9 @@ class Nprob:
         self.df.at[self.nf, "cvol_c_med"] = cvol_c_med
 
         # cvol_s
-        if self.nf < self.min_1+1:
+        if self.nf < self.sec_30+1:
             cvol_s = 0
-        if self.nf >= self.min_1+1:
+        if self.nf >= self.sec_30+1:
             c_y = self.df.ix[self.nf - 9:self.nf - 1, "cvol_m"]
             c_x = self.df.ix[self.nf - 9:self.nf - 1, "stime"]
             cvol_s = regr.fit(c_x.values.reshape(-1, 1), c_y.values.reshape(-1, 1)).coef_[0][0]
