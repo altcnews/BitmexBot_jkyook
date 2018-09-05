@@ -72,11 +72,11 @@ class Nprob:
         self.min_1 = int(60 / self.loop)  # = 300  ststPXY, pindex2, ee_s_ave, ee_s_ox, s3_m_m, dt_main1,2, org_in_2, cri, cri_r, ee_s_cri
         self.min_3 = int(180 / self.loop) # = 900  ee_s_ave_long
         self.min_5 = int(300 / self.loop)
-        print 'init Nprob', self.nf
+        print ('init Nprob', self.nf)
         a = pd.read_csv("index_mex.csv").columns.values.tolist()
         self.df = pd.DataFrame()
         self.df = pd.DataFrame(index=range(0, 1), columns=a)
-        print self.df
+        print (self.df)
         # self.thread_plot = multiprocessing.Process(target=self.btnPlot_Clicked, args=())
 
 
@@ -85,7 +85,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print 'nf: %d  /prc: %0.2f /in: %d /out: %d /prf: %d /turn: %d' % (self.nf, price, self.in_str, self.piox, self.prf_able, self.turnover)
+        print ('nf: %d  /prc: %0.2f /in: %d /out: %d /prf: %d /turn: %d' % (self.nf, price, self.in_str, self.piox, self.prf_able, self.turnover))
         # nowtime=time.time()
 
         if self.nf!=0 and self.nf%500==0: # and self.nf>self.min_5
@@ -128,7 +128,7 @@ class Nprob:
         if self.nf >= self.sec_15+1:
             cvol_c = self.df[self.nf - 20:self.nf - 1][self.df.cvolume[self.nf - 20:self.nf - 1]>0].count()[0]
         self.df.at[self.nf, "cvol_c"] = cvol_c
-        print 'cvol_c: ', cvol_c
+        # print 'cvol_c: ', cvol_c
 
         # cvol_c_med
         if self.nf < self.min_1+1:
@@ -145,6 +145,15 @@ class Nprob:
             c_x = self.df.ix[self.nf - 9:self.nf - 1, "stime"]
             cvol_s = regr.fit(c_x.values.reshape(-1, 1), c_y.values.reshape(-1, 1)).coef_[0][0]
         self.df.at[self.nf, "cvol_s"] = cvol_s
+
+        # cvol_s_30
+        if self.nf < self.min_1+1:
+            cvol_s_30 = 0
+        if self.nf >= self.min_1+1:
+            c_y_3 = self.df.ix[self.nf - 29:self.nf - 1, "cvol_m"]
+            c_x_3 = self.df.ix[self.nf - 29:self.nf - 1, "stime"]
+            cvol_s_30 = regr.fit(c_x_3.values.reshape(-1, 1), c_y_3.values.reshape(-1, 1)).coef_[0][0]
+        self.df.at[self.nf, "cvol_s_30"] = cvol_s_30
 
         # cvol_t
         if self.nf < self.sec_15+1:
@@ -916,12 +925,12 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'cvol_s', 'dxy_200_medi', 'OrgMain', 'inp','profit']]
-            print '-----------'
+            print (self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'cvol_s', 'dxy_200_medi', 'OrgMain', 'inp','profit']])
+            print ('-----------')
 
         elap = time.time() - t_start
         self.df.at[self.nf, "elap"] = elap
-        print "elap", elap
+        print ("elap", elap)
 
         return self.d_OMain
 
@@ -975,7 +984,7 @@ class Nprob:
 
         # show
         plt.legend(loc='upper left', frameon=False)
-        print 'a'
+        # print 'a'
         # plt.ion()
         plt.show()
         time.sleep(4)
@@ -989,7 +998,7 @@ class Nprob:
         ts = datetime.now().strftime("%m-%d-%H-%M")
         filename = "EDB__%s.csv" %  (ts)
         self.df.to_csv('%s' % filename)  # + time.strftime("%m-%d") + '.csv')
-        print 'Saved'
+        # print 'Saved'
 
 
 def ynet(p, t, W, sw, a, b, c, d):

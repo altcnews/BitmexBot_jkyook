@@ -60,8 +60,8 @@ p9 = df.ix[plot_start:plot_last, "dt"]
 ax9.plot(p9, 'r')
 p10 = df.ix[plot_start:plot_last, "count_m"]
 ax10.plot(p10, 'g')
-# p11 = df.ix[plot_start:plot_last, "sig_2"]
-# ax11.plot(p11, 'r')
+p11 = df.ix[plot_start:plot_last, "cvol_c"]
+ax11.plot(p11, 'r')
 # p12 = df.ix[plot_start:plot_last, "sig_3"]
 # ax12.plot(p12, 'g')
 
