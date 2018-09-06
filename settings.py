@@ -23,9 +23,10 @@ TICK_INTERVAL = '1m'
 
 STOP_LOSS_FACTOR = 0.007
 STOP_PROFIT_FACTOR = 0.01
+
 # There is two mode one is TESTING and other is LIVE
-# MODE = "TESTING"
-MODE = "LIVE"
+MODE = "TESTING"
+# MODE = "LIVE"
 
 INTERVAL = 0.005
 
@@ -67,8 +68,8 @@ BASE_URL = "https://testnet.bitmex.com/api/v1/"
 ########################################################################################################################
 ########################################################################################################################
 if MODE == "TESTING":
-    API_KEY = "3_9ozC36G73tuqLP9pEaUg9b"
-    API_SECRET = "ZwXjgm5bGiQlZBiTgEQRDt7BTQQrHeWPSMnla0JkztydScoG"
+    API_KEY = "pCc8eZGCheuKP8VGVrD4LwKm"
+    API_SECRET = "qzW8kcwJGiHu6dx4HRxy7gtBjiwpzFppHzSlB4NlH_EUL4hq"
 if MODE == "LIVE":
     API_KEY = "bo2BJHht8Q9V3m5VjwGB28aN"
     API_SECRET = "HGk6sysF_xUyIu1kQZCejUP1BmpFdZuepyRyi0O4afYR2dXQ"
