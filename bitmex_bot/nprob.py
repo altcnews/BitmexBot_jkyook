@@ -932,10 +932,14 @@ class Nprob:
         self.df.at[self.nf, "elap"] = elap
         print ("elap", elap)
 
-        if self.d_OMain - self.df.at[self.nf-1, "d_OMain"] > 0:
-            return 1
-        if self.d_OMain - self.df.at[self.nf-1, "d_OMain"] < 0:
-            return -1
+        return self.d_OMain
+
+        # if self.d_OMain - self.df.at[self.nf-1, "d_OMain"] > 0:
+        #     return 1
+        # elif self.d_OMain - self.df.at[self.nf-1, "d_OMain"] < 0:
+        #     return -1
+        # else:
+        #     return 0
 
     def btnSave_Clicked(self):
         #df.to_sql("Main_DB", con, if_exists='replace', index=True) #, index_label=None, chunksize=None, dtype=None)

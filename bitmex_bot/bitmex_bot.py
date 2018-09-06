@@ -73,7 +73,7 @@ class ExchangeInterface:
         # print tickLog
 
         orders_1 = self.bitmex.http_open_orders()
-        # print len(orders_1)
+        print 'orders_1: ', orders_1
 
         for order in orders_1:
             logger.info("Canceling: %s %d @ %.*f" % (order['side'], order['orderQty'], tickLog, order['price']))
@@ -234,9 +234,7 @@ class ExchangeInterface:
 
 class OrderManager:
     UP = "up"
-    UP2 = "up2"
     DOWN = "down"
-    DOWN2 = "down2"
     SELL = "sell"
     BUY = "buy"
 
@@ -363,16 +361,14 @@ class OrderManager:
 
             # t_start=time.time()
             if last_trade_raw != None:
+
                 np = self.np.nprob(price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v)
+                print 'np: ',np
 
                 if np == 1:
                     self.macd_signal = self.UP
-                if np == 2:
-                    self.macd_signal = self.UP2
                 if np == -1:
                     self.macd_signal = self.DOWN
-                if np == -2:
-                    self.macd_signal = self.DOWN2
                 if np == 0:
                     self.macd_signal = False
 
@@ -450,14 +446,14 @@ class OrderManager:
 
         if not self.is_trade:
             if self.macd_signal:
-                if self.macd_signal == self.UP or self.macd_signal == self.UP2:
+                if self.macd_signal == self.UP:
                     logger.info("Buy Trade Signal {}".format(self.last_price))
                     logger.info("-----------------------------------------")
                     self.is_trade = True
                     self.sequence = self.BUY
 
                     # place order
-                    if 1==0:
+                    if 1==1:
                         if not self.initial_order:
                             order = self.place_orders(side=self.BUY, orderType='Market', quantity=self.amount)
                             self.trade_signal = self.macd_signal
@@ -479,14 +475,14 @@ class OrderManager:
                                 sleep(settings.API_REST_INTERVAL)
                             self.close_order = True
 
-                elif self.macd_signal == self.DOWN or self.macd_signal == self.DOWN2:
+                elif self.macd_signal == self.DOWN:
                     logger.info("Sell Trade Signal {}".format(self.last_price))
                     logger.info("-----------------------------------------")
                     self.is_trade = True
                     self.sequence = self.SELL
 
                     # place order
-                    if 1==0:
+                    if 1==1:
                         if not self.initial_order:
                             order = self.place_orders(side=self.SELL, orderType='Market', quantity=self.amount)
                             self.trade_signal = self.macd_signal
@@ -513,6 +509,7 @@ class OrderManager:
         else:
             if self.macd_signal and self.macd_signal != self.trade_signal and self.trade_signal:
                 # TODO close all positions on market price immediately and cancel ALL open orders(including stops).
+                print 'Clear Position'
                 self.exchange.close_position()
                 # sleep(settings.API_REST_INTERVAL)
                 self.exchange.cancel_all_orders()
