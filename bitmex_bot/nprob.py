@@ -747,7 +747,7 @@ class Nprob:
 
                 #  high peak (slope_s conversion)
                 if self.in_str == 2:
-                    if cvol_s < self.cvol_s_act * -1 and cvol_t<0 and cvol_c<15: # and slope>self.slope_act: # or y1_ss >0:
+                    if cvol_s < self.cvol_s_act * -1 and cvol_t<0 and cvol_c<=17: # and slope>self.slope_act: # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                                 float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = 2
@@ -837,7 +837,7 @@ class Nprob:
 
                 #  high peak (slope_s conversion)
                 if self.in_str == -2:
-                    if cvol_s > self.cvol_s_act and cvol_t>0 and cvol_c>5: # and slope<self.slope_overact * -1: # or x1_ss > 0:
+                    if cvol_s > self.cvol_s_act and cvol_t>0 and cvol_c>=3: # and slope<self.slope_overact * -1: # or x1_ss > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = -2
