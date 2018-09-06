@@ -20,7 +20,7 @@ ax9 = plt.subplot(615)
 ax10 = ax9.twinx()
 ax11 = plt.subplot(616)
 ax12 = ax11.twinx()
-#/
+
 file_loaded = 0
 
 root = Tk.Tk()
@@ -62,8 +62,8 @@ p10 = df.ix[plot_start:plot_last, "count_m"]
 ax10.plot(p10, 'g')
 p11 = df.ix[plot_start:plot_last, "cvol_c"]
 ax11.plot(p11, 'r')
-# p12 = df.ix[plot_start:plot_last, "sig_3"]
-# ax12.plot(p12, 'g')
+p12 = df.ix[plot_start:plot_last, "cvol_s_30"]
+ax12.plot(p12, 'g')
 
 # if p3_t != "None":
 #     p3 = df.ix[plot_start:plot_last, p3_t]
