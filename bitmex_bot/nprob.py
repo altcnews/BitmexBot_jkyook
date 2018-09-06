@@ -932,66 +932,10 @@ class Nprob:
         self.df.at[self.nf, "elap"] = elap
         print ("elap", elap)
 
-        return self.d_OMain
-
-    def threadme(self):
-        thread_plot = threading.Thread(target=self.btnPlot_Clicked, args=())
-        thread_plot.start()
-
-    def btnPlot_Clicked(self):
-        global plt
-
-        ax1 = plt.subplot(511)
-        ax2 = ax1.twinx()
-        ax3 = plt.subplot(512)
-        ax4 = ax3.twinx()
-        ax5 = plt.subplot(513)
-        ax6 = ax5.twinx()
-        ax7 = plt.subplot(514)
-        ax8 = ax7.twinx()
-        ax9 = plt.subplot(515)
-        ax10 = ax9.twinx()
-
-        # Plot range
-        plot_start = 1
-        plot_last = self.nf - 1
-
-        # plot
-        p1 = self.df.ix[plot_start:plot_last, "sXY"]
-        ax1.plot(p1, 'r')
-        p2 = self.df.ix[plot_start:plot_last, "d_OMain"]
-        ax2.plot(p2, 'g')
-
-        p3 = self.df.ix[plot_start:plot_last, "ee_s"]
-        ax3.plot(p3, 'r')
-        p4 = self.df.ix[plot_start:plot_last, "ee_s_ave"]
-        ax4.plot(p4, 'g')
-
-        p5 = self.df.ix[plot_start:plot_last, "apindex_s"]
-        ax7.plot(p5, 'r')
-        p6 = self.df.ix[plot_start:plot_last, "pindex"]
-        ax6.plot(p6, 'g')
-
-        p7 = self.df.ix[plot_start:plot_last, "profit_o"]
-        ax7.plot(p7, 'r')
-        p8 = self.df.ix[plot_start:plot_last, "org_in_2"]
-        ax8.plot(p8, 'g')
-
-        p9 = self.df.ix[plot_start:plot_last, "cri"]
-        ax9.plot(p9, 'r')
-        p10 = self.df.ix[plot_start:plot_last, "cri_r"]
-        ax10.plot(p10, 'g')
-
-        # show
-        plt.legend(loc='upper left', frameon=False)
-        # print 'a'
-        # plt.ion()
-        plt.show()
-        time.sleep(4)
-
-    def btnPlot_Close(self):
-        global plt
-        plt.clf()
+        if self.d_OMain - self.df.at[self.nf-1, "d_OMain"] > 0:
+            return 1
+        if self.d_OMain - self.df.at[self.nf-1, "d_OMain"] < 0:
+            return -1
 
     def btnSave_Clicked(self):
         #df.to_sql("Main_DB", con, if_exists='replace', index=True) #, index_label=None, chunksize=None, dtype=None)
