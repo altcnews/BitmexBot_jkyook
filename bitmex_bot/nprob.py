@@ -730,7 +730,7 @@ class Nprob:
 
                 # mid peak (dxy_20 orderbook)
                 if self.in_str == 1:
-                    if self.prf_able == 1 and cvol_s < self.cvol_s_low_act * -1  and cvol_t < 0:  # or y1_ss >0:
+                    if self.prf_able == 1 and cvol_s < self.cvol_s_low_act * -1/2 and cvol_t < 0:  # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = 1
@@ -743,7 +743,7 @@ class Nprob:
                         self.piox = 1.5
                         self.in_str = 0
                         self.OrgMain = 'n'
-                        self.turnover += 1
+                        self.turnover += 10
 
                 #  high peak (slope_s conversion)
                 if self.in_str == 2:
@@ -820,7 +820,7 @@ class Nprob:
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
-                    if self.prf_able == 1 and cvol_s > self.cvol_s_low_act  and cvol_t > 0:
+                    if self.prf_able == 1 and cvol_s > self.cvol_s_low_act/2  and cvol_t > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = -1
