@@ -464,15 +464,15 @@ class OrderManager:
                                 self.stop_price = order['price'] - (order['price'] * settings.STOP_LOSS_FACTOR)
                             print("Order price {} \tStop Price {} \tProfit Price {} ".
                                   format(order['price'], self.stop_price, self.profit_price))
-                            sleep(settings.API_REST_INTERVAL)
-                            if settings.STOP_LOSS_FACTOR != "":
-                                self.place_orders(side=self.SELL, orderType='StopLimit', quantity=self.amount,
-                                                  price=int(self.stop_price), stopPx=int(self.stop_price) - 5.0)
-                                sleep(settings.API_REST_INTERVAL)
-                            if settings.STOP_PROFIT_FACTOR != "":
-                                self.place_orders(side=self.SELL, orderType='Limit', quantity=self.amount,
-                                                  price=int(self.profit_price))
-                                sleep(settings.API_REST_INTERVAL)
+                            # sleep(settings.API_REST_INTERVAL)
+                            # if settings.STOP_LOSS_FACTOR != "":
+                            #     self.place_orders(side=self.SELL, orderType='StopLimit', quantity=self.amount,
+                            #                       price=int(self.stop_price), stopPx=int(self.stop_price) - 5.0)
+                            #     sleep(settings.API_REST_INTERVAL)
+                            # if settings.STOP_PROFIT_FACTOR != "":
+                            #     self.place_orders(side=self.SELL, orderType='Limit', quantity=self.amount,
+                            #                       price=int(self.profit_price))
+                            #     sleep(settings.API_REST_INTERVAL)
                             self.close_order = True
 
                 elif self.macd_signal == self.DOWN:
@@ -494,15 +494,15 @@ class OrderManager:
 
                             print("Order price {} \tStop Price {} \tProfit Price {} ".
                                   format(order['price'], self.stop_price, self.profit_price))
-                            sleep(settings.API_REST_INTERVAL)
-                            if settings.STOP_LOSS_FACTOR != "":
-                                self.place_orders(side=self.BUY, orderType='StopLimit', quantity=self.amount,
-                                                  price=int(self.stop_price), stopPx=int(self.stop_price) - 5.0)
-                                sleep(settings.API_REST_INTERVAL)
-                            if settings.STOP_PROFIT_FACTOR != "":
-                                self.place_orders(side=self.BUY, orderType='Limit', quantity=self.amount,
-                                                  price=int(self.profit_price))
-                                sleep(settings.API_REST_INTERVAL)
+                            # sleep(settings.API_REST_INTERVAL)
+                            # if settings.STOP_LOSS_FACTOR != "":
+                            #     self.place_orders(side=self.BUY, orderType='StopLimit', quantity=self.amount,
+                            #                       price=int(self.stop_price), stopPx=int(self.stop_price) - 5.0)
+                            #     sleep(settings.API_REST_INTERVAL)
+                            # if settings.STOP_PROFIT_FACTOR != "":
+                            #     self.place_orders(side=self.BUY, orderType='Limit', quantity=self.amount,
+                            #                       price=int(self.profit_price))
+                            #     sleep(settings.API_REST_INTERVAL)
                             self.close_order = True
                             # set cross margin for the trade
 
