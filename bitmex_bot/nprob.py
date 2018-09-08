@@ -693,7 +693,7 @@ class Nprob:
         ###############################
 
         # self.piox=0
-        if self.nfset!=0 and self.nfs >= self.nfset + 5:
+        if self.nfset!=0 and self.nf >= self.nfset + 5:
 
             # #  Trend_Out
             if 1 == 1:

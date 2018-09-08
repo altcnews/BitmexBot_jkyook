@@ -444,6 +444,11 @@ class OrderManager:
         # logger.info("Current Price is {} MACD signal {}".format(self.last_price, self.macd_signal))
 
         if not self.is_trade:
+
+            if self.exchange.get_position() != 0:
+                print '>>> Closing Position while not trading'
+                self.exchange.close_position()
+
             if self.macd_signal:
                 if self.macd_signal == self.UP:
                     logger.info("Buy Trade Signal {}".format(self.last_price))
@@ -516,7 +521,7 @@ class OrderManager:
                 # TODO close all positions on market price immediately and cancel ALL open orders(including stops).
                 print 'Clear Position'
                 self.exchange.close_position()
-                # sleep(settings.API_REST_INTERVAL)
+                sleep(settings.API_REST_INTERVAL)
                 self.exchange.cancel_all_orders()
                 self.is_trade = False
                 self.close_order = False
