@@ -16,7 +16,7 @@ API_SECRET = "ZwXjgm5bGiQlZBiTgEQRDt7BTQQrHeWPSMnla0JkztydScoG"
 SYMBOL = "XBTUSD"
 
 # order amount for bitmex in USD
-POSITION = 1000
+POSITION = 10
 
 # tick interval used for mcad data
 TICK_INTERVAL = '1m'
@@ -34,9 +34,9 @@ DRY_RUN = True
 
 RELIST_INTERVAL = 0.01
 
-CHECK_POSITION_LIMITS = False
-MIN_POSITION = -10000
-MAX_POSITION = 10000
+CHECK_POSITION_LIMITS = True
+MIN_POSITION = -500
+MAX_POSITION = 500
 
 LOOP_INTERVAL = 5
 
@@ -131,8 +131,8 @@ RELIST_INTERVAL = 0.01
 # Position limits - set to True to activate. Values are in contracts.
 # If you exceed a position limit, the bot will log and stop quoting that side.
 CHECK_POSITION_LIMITS = False
-MIN_POSITION = -10000
-MAX_POSITION = 10000
+MIN_POSITION = -500
+MAX_POSITION = 500
 
 # If True, will only send orders that rest in the book (ExecInst: ParticipateDoNotInitiate).
 # Use to guarantee a maker rebate.

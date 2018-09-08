@@ -530,7 +530,7 @@ class OrderManager:
                 self.profit_price = 0
                 self.stop_price = 0
                 self.trade_signal = False
-                sleep(5)
+                sleep(1)
 
             elif self.close_order and self.exchange.get_position() == 0 and len(self.exchange.get_orders()) == 0:
                 self.is_trade = False
