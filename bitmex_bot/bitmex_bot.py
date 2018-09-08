@@ -507,8 +507,8 @@ class OrderManager:
                             # set cross margin for the trade
 
         else:
-            print 'trade-signal:', self.trade_signal
-            print 'macd-signal', self.macd_signal
+            # print 'trade-signal:', self.trade_signal
+            # print 'macd-signal', self.macd_signal
             if self.macd_signal != self.trade_signal and self.trade_signal:
                 # TODO close all positions on market price immediately and cancel ALL open orders(including stops).
                 print 'Clear Position'
