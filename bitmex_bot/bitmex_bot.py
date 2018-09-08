@@ -445,9 +445,9 @@ class OrderManager:
 
         if not self.is_trade:
 
-            if self.exchange.get_position() != 0:
-                print '>>> Closing Position while not trading'
-                self.exchange.close_position()
+            # if self.exchange.get_position() != 0:
+            #     print '>>> Closing Position while not trading'
+            #     self.exchange.close_position()
 
             if self.macd_signal:
                 if self.macd_signal == self.UP:
