@@ -300,29 +300,29 @@ class OrderManager:
         # logger.info("Contracts Traded This Run by BOT: %d" % (self.running_qty - self.starting_qty1))
         # logger.info("Total Contract Delta: %.4f XBT" % self.exchange.calc_delta()['spot'])
 
-    def macd_check(self):
-        # print("yes macd")
-        # as latest price is last one
-        # print 'macd_check'
-        up_vote = 0
-        down_vote = 0
-        data = Bitmex().get_historical_data(tick=settings.TICK_INTERVAL)
-        # print 'data', data
-
-        if data:
-            price_list = list(map(lambda i: i['close'], data))
-            data = indicators.macd(price_list)
-            status = data[-1]
-            if status > 0:
-                up_vote += 1
-                self.macd_signal = self.UP
-            elif status < 0:
-                down_vote += 1
-                self.macd_signal = self.DOWN
-            else:
-                self.macd_signal = False
-        else:
-            logger.error("Tick interval not supported")
+    # def macd_check(self):
+    #     # print("yes macd")
+    #     # as latest price is last one
+    #     # print 'macd_check'
+    #     up_vote = 0
+    #     down_vote = 0
+    #     data = Bitmex().get_historical_data(tick=settings.TICK_INTERVAL)
+    #     # print 'data', data
+    #
+    #     if data:
+    #         price_list = list(map(lambda i: i['close'], data))
+    #         data = indicators.macd(price_list)
+    #         status = data[-1]
+    #         if status > 0:
+    #             up_vote += 1
+    #             self.macd_signal = self.UP
+    #         elif status < 0:
+    #             down_vote += 1
+    #             self.macd_signal = self.DOWN
+    #         else:
+    #             self.macd_signal = False
+    #     else:
+    #         logger.error("Tick interval not supported")
 
     def nprob_check(self):
 
@@ -436,12 +436,11 @@ class OrderManager:
         # Ensure market is still open.
         self.exchange.check_market_open()
 
+        ## - NProb
         self.get_exchange_price()         # => macd_check = npob()
         print 'MACD: ', self.macd_signal
 
         # logger.info("current BITMEX price is {}".format(self.last_price))
-
-        # self.get_exchange_price()
         # logger.info("Current Price is {} MACD signal {}".format(self.last_price, self.macd_signal))
 
         if not self.is_trade:
@@ -458,6 +457,8 @@ class OrderManager:
                             order = self.place_orders(side=self.BUY, orderType='Market', quantity=self.amount)
                             self.trade_signal = self.macd_signal
                             self.initial_order = True
+                            print 'self.trade_signal : ', self.trade_signal
+                            print 'self.initial_order : ', self.initial_order
                             if settings.STOP_PROFIT_FACTOR != "":
                                 self.profit_price = order['price'] + (order['price'] * settings.STOP_PROFIT_FACTOR)
                             if settings.STOP_LOSS_FACTOR != "":
@@ -487,6 +488,8 @@ class OrderManager:
                             order = self.place_orders(side=self.SELL, orderType='Market', quantity=self.amount)
                             self.trade_signal = self.macd_signal
                             self.initial_order = True
+                            print 'self.trade_signal : ', self.trade_signal
+                            print 'self.initial_order : ', self.initial_order
                             if settings.STOP_PROFIT_FACTOR != "":
                                 self.profit_price = order['price'] - (order['price'] * settings.STOP_PROFIT_FACTOR)
                             if settings.STOP_LOSS_FACTOR != "":
