@@ -25,8 +25,8 @@ STOP_LOSS_FACTOR = 0.007
 STOP_PROFIT_FACTOR = 0.01
 
 # There is two mode one is TESTING and other is LIVE
-MODE = "TESTING"
-# MODE = "LIVE"
+#MODE = "TESTING"
+MODE = "LIVE"
 
 INTERVAL = 0.005
 
@@ -71,8 +71,8 @@ if MODE == "TESTING":
     API_KEY = "pCc8eZGCheuKP8VGVrD4LwKm"
     API_SECRET = "qzW8kcwJGiHu6dx4HRxy7gtBjiwpzFppHzSlB4NlH_EUL4hq"
 if MODE == "LIVE":
-    API_KEY = "bo2BJHht8Q9V3m5VjwGB28aN"
-    API_SECRET = "HGk6sysF_xUyIu1kQZCejUP1BmpFdZuepyRyi0O4afYR2dXQ"
+    API_KEY = "6gNIGCxr_rKYj-Lh5nhlqH2a"
+    API_SECRET = "ZLNid7vLcQjt4VFyG0ZVbLdYFt2TT9kOB5U92bK9jrHqum-g"
 
 
 
