@@ -15,9 +15,6 @@ API_SECRET = "ZwXjgm5bGiQlZBiTgEQRDt7BTQQrHeWPSMnla0JkztydScoG"
 # Instrument to market make on BitMEX.
 SYMBOL = "XBTUSD"
 
-# order amount for bitmex in USD
-POSITION = 10
-
 # tick interval used for mcad data
 TICK_INTERVAL = '1m'
 
@@ -182,3 +179,6 @@ WATCHED_FILES = [join("bitmex_bot", f) for f in ["bitmex_bot.py", "bitmex_histor
 
 # Specify the contracts that you hold. These will be used in portfolio calculations.
 CONTRACTS = ['XBTUSD']
+
+# order amount for bitmex in USD
+POSITION = 10
