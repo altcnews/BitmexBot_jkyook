@@ -262,6 +262,7 @@ class OrderManager:
         self.stop_price = 0
         self.profit_price = 0
         self.trade_signal = False
+        self.nf = 0
         logger.info("Using symbol %s." % self.exchange.symbol)
 
     def init(self):
@@ -445,9 +446,9 @@ class OrderManager:
 
         if not self.is_trade:
 
-            # if self.exchange.get_position() != 0:
-            #     print '>>> Closing Position while not trading'
-            #     self.exchange.close_position()
+            if self.exchange.get_position() != 0 and self.nf == 0 :
+                print '>>> Closing Position while not trading'
+                self.exchange.close_position()
 
             if self.macd_signal:
                 if self.macd_signal == self.UP:
@@ -600,6 +601,7 @@ class OrderManager:
             # print 'sanity_check'
             self.sanity_check()  # Ensures health of mm - several cut-out points here
             self.print_status()  # Print skew, delta, etc
+            self.nf +=1
 
     def restart(self):
         logger.info("Restarting the bitmex bot...")
