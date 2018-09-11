@@ -256,7 +256,7 @@ class BitMEX(object):
         # or you could change the clOrdID (set {"clOrdID": "new", "origClOrdID": "old"}) so that an amend
         # can't erroneously be applied twice.
         if max_retries is None:
-            max_retries = 0 if verb in ['POST', 'PUT'] else 3
+            max_retries = 1 if verb in ['POST', 'PUT'] else 3
 
         # Auth: API Key/Secret
         # print self.apiKey, self.apiSecret

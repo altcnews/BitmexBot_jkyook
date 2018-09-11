@@ -62,7 +62,7 @@ p10 = df.ix[plot_start:plot_last, "count_m"]
 ax10.plot(p10, 'g')
 p11 = df.ix[plot_start:plot_last, "cvol_c"]
 ax11.plot(p11, 'r')
-p12 = df.ix[plot_start:plot_last, "cvol_s_30"]
+p12 = df.ix[plot_start:plot_last, "dxy_20_medi"]
 ax12.plot(p12, 'g')
 
 # if p3_t != "None":
