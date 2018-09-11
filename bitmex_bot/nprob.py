@@ -17,7 +17,7 @@ class Nprob:
         self.nf=0
         self.nfset=0
 
-        if 1==1:  # Bit
+        if 1==0:  # Bit
             self.tick = 0.5
             self.count_m_act = 10
             self.count_m_deact = 5
@@ -32,19 +32,19 @@ class Nprob:
             self.fee_rate = 0.00075 /2
             self.profit_min_tick = 25
             self.loss_max_tick = 80
-        if 1==0:  # UPBIT
+        if 1==1:  # UPBIT
             self.tick = 1000
-            self.count_m_act = 10
-            self.count_m_deact = 5
-            self.count_m_overact = 25
-            self.cvol_t_act = 15
+            self.count_m_act = 5
+            self.count_m_deact = 2
+            self.count_m_overact = 15
+            self.cvol_t_act = 10
             self.cvol_t_low_act = 5
-            self.cvol_s_act = 10
-            self.cvol_s_low_act = 5
-            self.dxy_200_medi_cri = 100
+            self.cvol_s_act = 30
+            self.cvol_s_low_act = 15
+            self.dxy_200_medi_cri = 1 * 10 ** 7
             self.slope_act = 30
             self.slope_overact = 200
-            self.fee_rate = 0.00075 * 2
+            self.fee_rate = 0.0005 * 2
             self.profit_min_tick = 10
             self.loss_max_tick = 40
         if 1==0:  # Kospi
@@ -80,6 +80,7 @@ class Nprob:
         # self.cri=0
         # self.cri_r=0
         self.prf_able = 0
+        self.prf_hit = 0
         # self.hit_peak=0
         self.loop=0.5           #Loop_interval(0.25)
         self.sec_15 = int(15 / self.loop)  # = 75  ns, nPXY, stPXY, a~e, ee_s, bump, abump, s1, s2_s, s3, s3_m_m
@@ -160,6 +161,7 @@ class Nprob:
             c_x = self.df.ix[self.nf - 9:self.nf - 1, "stime"]
             cvol_s = regr.fit(c_x.values.reshape(-1, 1), c_y.values.reshape(-1, 1)).coef_[0][0]
         self.df.at[self.nf, "cvol_s"] = cvol_s
+        print 'cvol_s: ', cvol_s
 
         # cvol_s_30
         if self.nf < self.min_1+1:
@@ -480,7 +482,7 @@ class Nprob:
 
         if count_m < self.count_m_overact and self.piox !=1.5 and self.piox !=2.5:
             if self.piox > 0:
-                if self.piox == 1:
+                if self.piox == 1 or self.piox == 0.5:
                     if cvol_t > 0  and count_m<self.count_m_deact:
                        self.piox = 0
                 if self.piox == 2:
@@ -494,7 +496,7 @@ class Nprob:
                        self.piox = 0
 
             if self.piox < 0:
-                if self.piox == -1:
+                if self.piox == -1 or self.piox == -0.5:
                     if cvol_t < 0 and count_m<self.count_m_deact:
                        self.piox = 0
                 if self.piox == -2:
@@ -688,11 +690,13 @@ class Nprob:
         if self.OrgMain == "b":
             if price >= self.inp + self.tick * profit_band:
                 self.prf_able = 1
+                self.prf_hit = 1
             if price <= self.inp - self.tick * loss_band:
                 self.prf_able = -1
         if self.OrgMain == "s":
             if price <= self.inp - self.tick * profit_band:
                 self.prf_able = 1
+                self.prf_hit = 1
             if price >= self.inp + self.tick * loss_band:
                 self.prf_able = -1
         self.df.at[self.nf, "prf_able"] = self.prf_able
@@ -752,10 +756,10 @@ class Nprob:
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
-                    if self.prf_able == 1 and cvol_t < 0 and count_m<self.count_m_deact/2:
+                    if self.prf_hit == 1 and cvol_t < 0 and count_m<self.count_m_deact/2:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
-                        self.piox = 1
+                        self.piox = 0.5
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
@@ -849,10 +853,10 @@ class Nprob:
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
-                    if self.prf_able == 1 and cvol_t > 0 and count_m < self.count_m_deact / 2:
+                    if self.prf_hit == 1 and cvol_t > 0 and count_m < self.count_m_deact / 2:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
-                        self.piox = -1
+                        self.piox = -0.5
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
@@ -946,6 +950,7 @@ class Nprob:
             # self.hit_peak = 0
             self.inp = 0
             self.nfset = 0
+            self.prf_hit = 0
 
         self.df.at[self.nf, "d_OMain"] = self.d_OMain
         self.df.at[self.nf, "OrgMain"] = self.OrgMain
@@ -954,7 +959,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print (self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'cvol_s', 'dxy_200_medi', 'OrgMain', 'inp','profit']])
+            print (self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'cvol_t', 'cvol_s', 'dxy_200_medi', 'OrgMain']]) #, 'inp','profit'
             print ('-----------')
 
         elap = time.time() - t_start
