@@ -17,7 +17,7 @@ class Nprob:
         self.nf=0
         self.nfset=0
 
-        if 1==0:  # Bit
+        if 1==1:  # Bit
             self.tick = 0.5
             self.count_m_act = 10
             self.count_m_deact = 5
@@ -32,15 +32,15 @@ class Nprob:
             self.fee_rate = 0.00075 /2
             self.profit_min_tick = 25
             self.loss_max_tick = 80
-        if 1==1:  # UPBIT
+        if 1==0:  # UPBIT
             self.tick = 1000
-            self.count_m_act = 5
-            self.count_m_deact = 2
-            self.count_m_overact = 15
+            self.count_m_act = 2
+            self.count_m_deact = 1
+            self.count_m_overact = 3
             self.cvol_t_act = 10
             self.cvol_t_low_act = 5
-            self.cvol_s_act = 30
-            self.cvol_s_low_act = 15
+            self.cvol_s_act = 20
+            self.cvol_s_low_act = 10
             self.dxy_200_medi_cri = 1 * 10 ** 7
             self.slope_act = 30
             self.slope_overact = 200
@@ -716,7 +716,7 @@ class Nprob:
         # #  Trend_Out
         if 1 == 1:
             if self.OrgMain == "b":
-                if self.in_str == 1 and count_m>self.count_m_overact and dxy_200_medi < self.dxy_200_medi_cri * -1:
+                if self.in_str == 1 and count_m>self.count_m_act and dxy_200_medi < self.dxy_200_medi_cri * -1:
                     self.profit += ((float(lblBhoga1v) - self.inp) - (
                         float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                     self.OrgMain = 'n'
@@ -725,7 +725,7 @@ class Nprob:
                     self.turnover += 1
 
             if self.OrgMain == "s":
-                if self.in_str == -1 and count_m>self.count_m_overact and dxy_200_medi > self.dxy_200_medi_cri:
+                if self.in_str == -1 and count_m>self.count_m_act and dxy_200_medi > self.dxy_200_medi_cri:
                     self.profit += ((self.inp - float(lblBhoga1v)) - (
                             float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                     self.OrgMain = 'n'
@@ -964,7 +964,7 @@ class Nprob:
 
         elap = time.time() - t_start
         self.df.at[self.nf, "elap"] = elap
-        print ("elap", elap)
+        print ("elap %0.5" % (elap))
 
         return self.d_OMain
 
