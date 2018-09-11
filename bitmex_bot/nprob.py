@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import threading
 import multiprocessing
 
+which_market = 1 #(1:bitmex, 2:upbit, 3:kospi)
+
 class Nprob:
 
     def __init__(self):
@@ -17,7 +19,7 @@ class Nprob:
         self.nf=0
         self.nfset=0
 
-        if 1==1:  # Bit
+        if which_market == 1:  # Bit
             self.tick = 0.5
             self.count_m_act = 10
             self.count_m_deact = 5
@@ -32,7 +34,7 @@ class Nprob:
             self.fee_rate = 0.00075 /2
             self.profit_min_tick = 25
             self.loss_max_tick = 80
-        if 1==0:  # UPBIT
+        elif which_market == 2:  # UPBIT
             self.tick = 1000
             self.count_m_act = 2
             self.count_m_deact = 1
@@ -47,7 +49,7 @@ class Nprob:
             self.fee_rate = 0.0005 * 2
             self.profit_min_tick = 10
             self.loss_max_tick = 40
-        if 1==0:  # Kospi
+        elif which_market == 3:  # Kospi
             self.tick = 0.05
             self.count_m_act = 10
             self.count_m_deact = 5
@@ -959,12 +961,12 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print (self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'cvol_t', 'cvol_s', 'dxy_200_medi', 'OrgMain']]) #, 'inp','profit'
+            print (self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'cvol_t', 'cvol_s', 'dxy_200_medi', 'OrgMain', 'inp','profit']]) #
             print ('-----------')
 
         elap = time.time() - t_start
         self.df.at[self.nf, "elap"] = elap
-        print ("elap %0.5" % (elap))
+        print ("elap %0.5f" % (elap))
 
         return self.d_OMain
 
