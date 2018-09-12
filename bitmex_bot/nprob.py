@@ -561,14 +561,14 @@ class Nprob:
                     self.sig_3 = 0.5
                     if self.in_str_1 == 0:
                         self.in_str_1 = 0.5
-                if self.in_str_1 == 0.5 or self.piox == 5 or self.piox == 2:
+                if self.in_str_1 == 0.5 or self.piox == 5 or self.piox == 2 or self.piox == 1.5:
                     if count_m<self.count_m_deact:
                         self.sig_3 = 0
                         self.in_str_1 = 0
                     if count_m>self.count_m_deact:
                         if cvol_s < 0 and cvol_t < self.cvol_t_low_act * -1:
                             self.sig_3 = 1
-                            if self.OrgMain == 'n' and self.piox==0:
+                            if self.OrgMain == 'n':
                                 self.in_str_1 = 1
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
@@ -584,14 +584,14 @@ class Nprob:
                     self.sig_3 = -0.5
                     if self.in_str_1 == 0:
                         self.in_str_1 = -0.5
-                if self.in_str_1 == -0.5 or self.piox == -5 or self.piox == -2:
+                if self.in_str_1 == -0.5 or self.piox == -5 or self.piox == -2 or self.piox == 1.5:
                     if count_m < self.count_m_deact:
                         self.sig_3 = 0
                         self.in_str_1 = 0
                     if count_m > self.count_m_deact:
                         if cvol_s > 0 and cvol_t > self.cvol_t_low_act:
                             self.sig_3 = -1
-                            if self.OrgMain == 'n' and self.piox == 0:
+                            if self.OrgMain == 'n':
                                 self.in_str_1 = -1
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
