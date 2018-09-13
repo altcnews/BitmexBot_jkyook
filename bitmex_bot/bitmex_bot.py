@@ -335,7 +335,7 @@ class OrderManager:
             cvolume_sum = last_trade_raw[-3]
             mt = last_trade_raw[-2]
             count = last_trade_raw[-1]
-            price = last_trade['price']
+            price = float(last_trade['price'])
             cgubun = str(last_trade['side'])
             cvolume = last_trade['size']
             volume = last_trade['grossValue']
@@ -365,6 +365,9 @@ class OrderManager:
 
                 np = self.np.nprob(price, timestamp, mt, count, cgubun_sum, cvolume_sum/price, volume,  lblSqty2v/price, lblSqty1v/price, lblShoga1v, lblBqty1v/price, lblBhoga1v, lblBqty2v/price)
                 print 'np: ',np
+                # print 'price: ',type(price)
+                # print 'cvol_bitmex: ', type(cvolume_sum)
+                # print 'cvol/price: ', float(cvolume_sum/price)
 
                 if np == 1:
                     self.macd_signal = self.UP
