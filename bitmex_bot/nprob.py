@@ -3,7 +3,6 @@ import pandas as pd
 import scipy.stats as stat
 from datetime import datetime
 from sklearn import datasets, linear_model
-import matplotlib.pyplot as plt
 
 which_market = 1 #(1:bitmex, 2:upbit, 3:kospi)
 
@@ -15,6 +14,7 @@ class Nprob:
         self.nfset=0
 
         if which_market == 1:  # Bit
+            self.cvol_adj = 3600
             self.tick = 0.5
             self.count_m_act = 10
             self.count_m_deact = 5
@@ -24,27 +24,25 @@ class Nprob:
             self.cvol_s_act = 10
             self.cvol_s_low_act = 5
             self.dxy_200_medi_cri = 100*10000
-            self.slope_act = 30
-            self.slope_overact = 200
             self.fee_rate = 0.00075
             self.profit_min_tick = 25
             self.loss_max_tick = 80
         elif which_market == 2:  # UPBIT
+            self.cvol_adj = 3600
             self.tick = 1000
-            self.count_m_act = 2
+            self.count_m_act = 3
             self.count_m_deact = 1
-            self.count_m_overact = 3
-            self.cvol_t_act = 10
-            self.cvol_t_low_act = 5
-            self.cvol_s_act = 20
-            self.cvol_s_low_act = 10
+            self.count_m_overact = 10
+            self.cvol_t_act = 100
+            self.cvol_t_low_act = 50
+            self.cvol_s_act = 100
+            self.cvol_s_low_act = 30
             self.dxy_200_medi_cri = 1 * 10 ** 7
-            self.slope_act = 30
-            self.slope_overact = 200
             self.fee_rate = 0.0005 * 2
             self.profit_min_tick = 10
             self.loss_max_tick = 40
         elif which_market == 3:  # Kospi
+            self.cvol_adj = 3600
             self.tick = 0.05
             self.count_m_act = 20
             self.count_m_deact = 10
@@ -54,8 +52,6 @@ class Nprob:
             self.cvol_s_act = 0.003
             self.cvol_s_low_act = 0.0005
             self.dxy_200_medi_cri = 200
-            self.slope_act = 0.01
-            self.slope_overact = 0.03
             self.fee_rate = 0.00003 * 2
             self.profit_min_tick = 4
             self.loss_max_tick = 15
@@ -76,7 +72,7 @@ class Nprob:
         self.prf_hit = 0
         self.loop=0.5           #Loop_interval(0.25)
         self.sec_15 = int(15 / self.loop)  # = 75  ns, nPXY, stPXY, a~e, ee_s, bump, abump, s1, s2_s, s3, s3_m_m
-        self.sec_30 = int(30 / self.loop)  # = 150  mtm, PXYm, stXY, pindex, slope, ee_s_slope, s2_c_m, s3_c, s3_m_short
+        self.sec_30 = int(30 / self.loop)  # = 150  mtm, PXYm, stXY, pindex, sXY_s, ee_s_slope, s2_c_m, s3_c, s3_m_short
         self.min_1 = int(60 / self.loop)  # = 300  ststPXY, pindex2, ee_s_ave, ee_s_ox, s3_m_m, dt_main1,2, org_in_2, cri, cri_r, ee_s_cri
         self.min_3 = int(180 / self.loop) # = 900  ee_s_ave_long
         self.min_5 = int(300 / self.loop)
@@ -88,6 +84,8 @@ class Nprob:
 
 
     def nprob(self, price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v): # lblShoga2v,, lblBhoga2v
+
+        # cvolume_sum = cvolume_sum * self.cvol_adj
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
@@ -112,58 +110,6 @@ class Nprob:
         self.df.at[self.nf, "x1"] = int(lblBqty1v)
         self.df.at[self.nf, "px1"] = float(lblBhoga1v)
         self.df.at[self.nf, "x2"] = int(lblBqty2v)
-
-        # mt
-        if mt ==0:
-            mt = self.df.at[self.nf-1, "mt"]
-
-        # cvol_m
-        if self.nf < self.sec_15+1:
-            cvol_m = 0
-        if self.nf >= self.sec_15+1:
-            cvol_m = self.df.ix[self.nf - self.sec_15:self.nf - 1, "cvolume"].mean()
-        self.df.at[self.nf, "cvol_m"] = cvol_m
-
-        # cvol_c
-        if self.nf < self.sec_15+1:
-            cvol_c = 0
-        if self.nf >= self.sec_15+1:
-            cvol_c = self.df[self.nf - 20:self.nf - 1][self.df.cvolume[self.nf - 20:self.nf - 1]>0].count()[0]
-        self.df.at[self.nf, "cvol_c"] = cvol_c
-        # print 'cvol_c: ', cvol_c
-
-        # cvol_c_med
-        if self.nf < self.min_1+1:
-            cvol_c_med = 0
-        if self.nf >= self.min_1+1:
-            cvol_c_med = self.df.ix[self.nf - 100:self.nf - 1, "cvol_c"].median()
-        self.df.at[self.nf, "cvol_c_med"] = cvol_c_med
-
-        # cvol_s
-        if self.nf < self.sec_30+1:
-            cvol_s = 0
-        if self.nf >= self.sec_30+1:
-            c_y = self.df.ix[self.nf - 9:self.nf - 1, "cvol_m"]
-            c_x = self.df.ix[self.nf - 9:self.nf - 1, "stime"]
-            cvol_s = regr.fit(c_x.values.reshape(-1, 1), c_y.values.reshape(-1, 1)).coef_[0][0]
-        self.df.at[self.nf, "cvol_s"] = cvol_s
-        # print 'cvol_s: ', cvol_s
-
-        # cvol_s_30
-        if self.nf < self.min_1+1:
-            cvol_s_30 = 0
-        if self.nf >= self.min_1+1:
-            c_y_3 = self.df.ix[self.nf - 29:self.nf - 1, "cvol_m"]
-            c_x_3 = self.df.ix[self.nf - 29:self.nf - 1, "stime"]
-            cvol_s_30 = regr.fit(c_x_3.values.reshape(-1, 1), c_y_3.values.reshape(-1, 1)).coef_[0][0]
-        self.df.at[self.nf, "cvol_s_30"] = cvol_s_30
-
-        # cvol_t
-        if self.nf < self.sec_15+1:
-            cvol_t = 0
-        if self.nf >= self.sec_15+1:
-            cvol_t = cvolume_sum / mt /1000000
-        self.df.at[self.nf, "cvol_t"] = cvol_t
 
         # xnet, ynet
         if self.nf < 2:
@@ -270,21 +216,69 @@ class Nprob:
         self.df.at[self.nf, "count_m"] = count_m
 
         # mt
-        if self.nf==0:
+        if self.nf == 0:
             mt = 0.5
         self.df.at[self.nf, "mt"] = mt
 
-        # slope = slope
+        # cvol_c
+        if self.nf < self.sec_15+1:
+            cvol_c = 0
+        if self.nf >= self.sec_15+1:
+            cvol_c = self.df[self.nf - 20:self.nf - 1][self.df.cvolume[self.nf - 20:self.nf - 1]>0].count()[0]
+        self.df.at[self.nf, "cvol_c"] = cvol_c
+        # print 'cvol_c: ', cvol_c
+
+        # cvol_c_med
+        if self.nf < self.min_1+1:
+            cvol_c_med = 0
+        if self.nf >= self.min_1+1:
+            cvol_c_med = self.df.ix[self.nf - 100:self.nf - 1, "cvol_c"].median()
+        self.df.at[self.nf, "cvol_c_med"] = cvol_c_med
+
+        # cvol_m
+        if self.nf < self.sec_15+1:
+            cvol_m = 0
+        if self.nf >= self.sec_15+1:
+            cvol_m = self.df.ix[self.nf - self.sec_15:self.nf - 1, "cvolume"].mean()
+        self.df.at[self.nf, "cvol_m"] = cvol_m
+
+        # cvol_s
+        if self.nf < self.sec_30+1:
+            cvol_s = 0
+        if self.nf >= self.sec_30+1:
+            c_y = self.df.ix[self.nf - 9:self.nf - 1, "cvol_m"]
+            c_x = self.df.ix[self.nf - 9:self.nf - 1, "stime"]
+            cvol_s = regr.fit(c_x.values.reshape(-1, 1), c_y.values.reshape(-1, 1)).coef_[0][0]
+        self.df.at[self.nf, "cvol_s"] = cvol_s * 3600
+        # print 'cvol_s: ', cvol_s
+
+        # cvol_s_15
+        if self.nf < self.min_1+1:
+            cvol_s_15 = 0
+        if self.nf >= self.min_1+1:
+            c_y_3 = self.df.ix[self.nf - self.sec_15:self.nf - 1, "cvol_m"]
+            c_x_3 = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stime"]
+            cvol_s_15 = regr.fit(c_x_3.values.reshape(-1, 1), c_y_3.values.reshape(-1, 1)).coef_[0][0]
+        self.df.at[self.nf, "cvol_s_15"] = cvol_s_15
+
+        # cvol_t
+        if self.nf < self.sec_15+1:
+            cvol_t = 0
+        if self.nf >= self.sec_15+1:
+            cvol_t = cvolume_sum / mt
+        self.df.at[self.nf, "cvol_t"] = cvol_t
+
+        # sXY_s
         if self.nf >= self.sec_15+1:
             # c = range(0, 300, 5)
             ry = self.df.ix[self.nf - self.sec_15:self.nf - 1, "sXY"] #.iloc[c]
             rx = self.df.ix[self.nf - self.sec_15:self.nf - 1, "stime"] #.iloc[c]
-            slope = regr.fit(rx.values.reshape(-1, 1), ry.values.reshape(-1, 1)).coef_[0][0]
+            sXY_s = regr.fit(rx.values.reshape(-1, 1), ry.values.reshape(-1, 1)).coef_[0][0]
         else:
-            slope = 0
+            sXY_s = 0
             p_value = 0
             std_err = 0
-        self.df.at[self.nf, "slope"] = slope
+        self.df.at[self.nf, "sXY_s"] = sXY_s
 
         # ee
         if self.nf >= self.sec_15+1:
@@ -396,9 +390,8 @@ class Nprob:
             # Keep-going
             if 1==1:
                 self.sig_2 = 0
-                if count_m<self.count_m_overact and abs(slope)<self.slope_overact and ee_s<2.5:
+                if count_m<self.count_m_overact and ee_s<2.5:
                     if cvol_t>self.cvol_t_act and cvol_s>self.cvol_s_act:
-                        # if self.df.at[self.nf-1, "cvol_t"]>self.cvol_t_act:
                             self.sig_2 = 2
                             if self.in_str == 1:
                                 self.in_str = 2
@@ -408,7 +401,6 @@ class Nprob:
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
                     if cvol_t<self.cvol_t_act * -1 and cvol_s<self.cvol_s_act*-1:
-                        # if self.df.at[self.nf-1, "cvol_t"]<self.cvol_t_act*-1:
                             self.sig_2 = -2
                             if self.in_str == -1:
                                 self.in_str = -2
@@ -548,9 +540,9 @@ class Nprob:
                         self.OrgMain = 'n'
                         self.turnover += 10
 
-                #  high peak (slope_s conversion)
+                #  high peak
                 if self.in_str == 2:
-                    if cvol_s < self.cvol_s_act * -1 and cvol_t<0 and cvol_c<=17: # and slope>self.slope_act: # or y1_ss >0:
+                    if cvol_s < self.cvol_s_act * -1 and cvol_t<0 and cvol_c<=17:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                                 float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = 2
@@ -601,9 +593,9 @@ class Nprob:
                         self.OrgMain = 'n'
                         self.turnover += 1
 
-                #  high peak (slope_s conversion)
+                #  high peak
                 if self.in_str == -2:
-                    if cvol_s > self.cvol_s_act and cvol_t>0 and cvol_c>=3: # and slope<self.slope_overact * -1: # or x1_ss > 0:
+                    if cvol_s > self.cvol_s_act and cvol_t>0 and cvol_c>=3:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = -2
@@ -658,7 +650,7 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print (self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'cvol_t', 'cvol_s', 'cvol_c', 'slope', 'dxy_200_medi', 'OrgMain', 'inp','profit']]) #
+            print (self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'cvol_t', 'cvol_s', 'cvol_c', 'sXY_s', 'dxy_200_medi', 'OrgMain', 'inp','profit']]) #
             print ('-----------')
 
         elap = time.time() - t_start

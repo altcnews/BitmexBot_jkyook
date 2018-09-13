@@ -363,7 +363,7 @@ class OrderManager:
             # t_start=time.time()
             if last_trade_raw != None:
 
-                np = self.np.nprob(price, timestamp, mt, count, cgubun_sum, cvolume_sum, volume,  lblSqty2v, lblSqty1v, lblShoga1v, lblBqty1v, lblBhoga1v, lblBqty2v)
+                np = self.np.nprob(price, timestamp, mt, count, cgubun_sum, cvolume_sum/price, volume,  lblSqty2v/price, lblSqty1v/price, lblShoga1v, lblBqty1v/price, lblBhoga1v, lblBqty2v/price)
                 print 'np: ',np
 
                 if np == 1:
@@ -458,7 +458,7 @@ class OrderManager:
                     self.sequence = self.BUY
 
                     # place order
-                    if 1==1:
+                    if 1==0:
                         if not self.initial_order:
                             order = self.place_orders(side=self.BUY, orderType='Market', quantity=self.amount)
                             self.trade_signal = self.macd_signal
@@ -489,7 +489,7 @@ class OrderManager:
                     self.sequence = self.SELL
 
                     # place order
-                    if 1==1:
+                    if 1==0:
                         if not self.initial_order:
                             order = self.place_orders(side=self.SELL, orderType='Market', quantity=self.amount)
                             self.trade_signal = self.macd_signal
@@ -518,7 +518,7 @@ class OrderManager:
         else:
             # print 'trade-signal:', self.trade_signal
             # print 'macd-signal', self.macd_signal
-            if self.macd_signal != self.trade_signal and self.trade_signal:
+            if 1==0  and self.macd_signal != self.trade_signal and self.trade_signal:
                 # TODO close all positions on market price immediately and cancel ALL open orders(including stops).
                 print 'Clear Position'
                 self.exchange.close_position()
