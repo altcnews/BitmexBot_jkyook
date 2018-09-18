@@ -529,10 +529,11 @@ class Nprob:
                             self.OrgMain = 'n'
                             self.turnover += 1
                         else:
-                            if self.ord_count <= 3 and self.inp>float(lblShoga1v):
+                            if self.ord_count <= 3 and self.piox != 5.5 and self.inp>float(lblShoga1v):
                                 self.ord_count += 1
                                 self.piox = 5.5
-                                self.inp = (self.inp + float(lblShoga1v)) / self.ord_count
+                                self.inp = (self.inp * (self.ord_count -1) + float(lblShoga1v)) / self.ord_count
+                                print('ord_count', self.ord_count)
 
                 # mid peak (dxy_20 orderbook)
                 if self.in_str == 1:
@@ -597,10 +598,11 @@ class Nprob:
                             self.OrgMain = 'n'
                             self.turnover += 1
                         else:
-                            if self.ord_count <= 3 and self.inp<float(lblBhoga1v):
+                            if self.ord_count <= 3 and self.piox != -5.5 and self.inp<float(lblBhoga1v):
                                 self.ord_count += 1
                                 self.piox = -5.5
-                                self.inp = (self.inp + float(lblBhoga1v)) / self.ord_count
+                                self.inp = (self.inp * (self.ord_count -1) + float(lblBhoga1v)) / self.ord_count
+                                print('ord_count', self.ord_count)
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
@@ -671,15 +673,16 @@ class Nprob:
         elif self.OrgMain == "n":
             self.d_OMain = 0
             self.ord_count = 1
-            # self.hit_peak = 0
             self.inp = 0
             self.nfset = 0
             self.prf_hit = 0
 
         if self.piox == 5.5:
             self.d_OMain = 2
+            print "OrgMain", self.OrgMain
         if self.piox == -5.5:
             self.d_OMain = -2
+            print "OrgMain", self.OrgMain
 
         self.df.at[self.nf, "d_OMain"] = self.d_OMain
         self.df.at[self.nf, "OrgMain"] = self.OrgMain
