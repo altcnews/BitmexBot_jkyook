@@ -19,11 +19,12 @@ class Nprob:
             self.count_m_act = 10
             self.count_m_deact = 5
             self.count_m_overact = 25
+            self.dt_overact = self.count_m_overact
             self.cvol_t_act = 5000
             self.cvol_t_low_act = 2000
             self.cvol_s_act = 5
             self.cvol_s_low_act = 3
-            self.fee_rate = 0.00075
+            self.fee_rate = 0.00075 * 2
             self.profit_min_tick = 25
             self.loss_max_tick = 80
         elif which_market == 2:  # UPBIT
@@ -32,10 +33,11 @@ class Nprob:
             self.count_m_act = 3
             self.count_m_deact = 1
             self.count_m_overact = 10
-            self.cvol_t_act = 2.5
-            self.cvol_t_low_act = 1
-            self.cvol_s_act = 0.02
-            self.cvol_s_low_act = 0.01
+            self.dt_overact = self.count_m_overact
+            self.cvol_t_act = 10
+            self.cvol_t_low_act = 3
+            self.cvol_s_act = 0.05
+            self.cvol_s_low_act = 0.02
             self.fee_rate = 0.0005 * 2
             self.profit_min_tick = 10
             self.loss_max_tick = 40
@@ -45,10 +47,11 @@ class Nprob:
             self.count_m_act = 10
             self.count_m_deact = 5
             self.count_m_overact = 20
-            self.cvol_t_act = 1000
-            self.cvol_t_low_act =500
-            self.cvol_s_act = 2
-            self.cvol_s_low_act = 1
+            self.dt_overact = self.count_m_overact
+            self.cvol_t_act = 10000
+            self.cvol_t_low_act = 3000
+            self.cvol_s_act = 10
+            self.cvol_s_low_act = 5
             self.fee_rate = 0.00003 * 2
             self.profit_min_tick = 4
             self.loss_max_tick = 15
@@ -316,7 +319,7 @@ class Nprob:
         #  // PIOX //
         ###############################
 
-        if count_m < self.count_m_overact and self.piox !=1.5 and self.piox !=2.5:
+        if count_m < self.count_m_overact and abs(self.piox) !=1.5 and abs(self.piox) !=2.5:
             if self.piox > 0:
                 if self.piox == 1 or self.piox == 0.5:
                     if cvol_t > 0  and count_m<self.count_m_deact:
@@ -345,8 +348,15 @@ class Nprob:
                     if count_m < self.count_m_deact:
                        self.piox = 0
 
-        if self.piox == 1.5 or self.piox == 2.5:
+        if abs(self.piox) == 1.5 or abs(self.piox) == 2.5:
             if count_m<self.count_m_deact:
+                self.piox = 0
+
+        if self.piox == 5.5:
+            if  self.inp > float(lblShoga1v):
+                self.piox = 0
+        if self.piox == -5.5:
+            if self.inp < float(lblBhoga1v):
                 self.piox = 0
 
         ###############################
@@ -369,13 +379,13 @@ class Nprob:
                     if count_m>self.count_m_deact:
                         if cvol_s < 0 and cvol_t < self.cvol_t_low_act * -1:
                             self.sig_3 = 1
-                            if self.OrgMain == 'n':
+                            if self.OrgMain == 'n' and self.piox==0:
                                 self.in_str_1 = 1
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
                 if self.piox == 2.5:
-                    if self.OrgMain == 'n':
+                    if self.OrgMain == 'n' and self.piox==0:
                         self.in_str_1 = 1
                         self.OrgMain = "s"
                         self.nfset = self.nf
@@ -392,13 +402,13 @@ class Nprob:
                     if count_m > self.count_m_deact:
                         if cvol_s > 0 and cvol_t > self.cvol_t_low_act:
                             self.sig_3 = -1
-                            if self.OrgMain == 'n':
+                            if self.OrgMain == 'n' and self.piox==0:
                                 self.in_str_1 = -1
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
                 if self.piox == -2.5:
-                    if self.OrgMain == 'n':
+                    if self.OrgMain == 'n' and self.piox==0:
                         self.in_str_1 = -1
                         self.OrgMain = "b"
                         self.nfset = self.nf
@@ -510,12 +520,19 @@ class Nprob:
                 # trnd_out
                 if self.in_str == 1:
                     if self.sig_1 == -1 and count_m > self.count_m_deact:
-                        self.profit += ((float(lblBhoga1v) - self.inp) - (
-                            float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
-                        self.piox = 5
-                        self.in_str = 0
-                        self.OrgMain = 'n'
-                        self.turnover += 1
+                        count_cri = self.df[self.nf - 20:self.nf - 1][self.df.dt[self.nf - 20:self.nf - 1]>self.dt_overact].count()[0]
+                        if count_cri>3:
+                            self.profit += ((float(lblBhoga1v) - self.inp) - (
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                            self.piox = 5
+                            self.in_str = 0
+                            self.OrgMain = 'n'
+                            self.turnover += 1
+                        else:
+                            if self.ord_count <= 3 and self.inp>float(lblShoga1v):
+                                self.ord_count += 1
+                                self.piox = 5.5
+                                self.inp = (self.inp + float(lblShoga1v)) / self.ord_count
 
                 # mid peak (dxy_20 orderbook)
                 if self.in_str == 1:
@@ -573,10 +590,17 @@ class Nprob:
                 # trnd_out
                 if self.in_str == -1:
                     if self.sig_1 == 1 and count_m > self.count_m_deact:
-                        self.piox = -5
-                        self.in_str = 0
-                        self.OrgMain = 'n'
-                        self.turnover += 1
+                        count_cri = self.df[self.nf - 20:self.nf - 1][self.df.dt[self.nf - 20:self.nf - 1]>self.dt_overact].count()[0]
+                        if count_cri>3:
+                            self.piox = -5
+                            self.in_str = 0
+                            self.OrgMain = 'n'
+                            self.turnover += 1
+                        else:
+                            if self.ord_count <= 3 and self.inp<float(lblBhoga1v):
+                                self.ord_count += 1
+                                self.piox = -5.5
+                                self.inp = (self.inp + float(lblBhoga1v)) / self.ord_count
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
@@ -651,6 +675,11 @@ class Nprob:
             self.inp = 0
             self.nfset = 0
             self.prf_hit = 0
+
+        if self.piox == 5.5:
+            self.d_OMain = 2
+        if self.piox == -5.5:
+            self.d_OMain = -2
 
         self.df.at[self.nf, "d_OMain"] = self.d_OMain
         self.df.at[self.nf, "OrgMain"] = self.OrgMain
