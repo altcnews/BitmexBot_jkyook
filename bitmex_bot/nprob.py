@@ -30,14 +30,14 @@ class Nprob:
         elif which_market == 2:  # UPBIT
             self.tick = 1000
             self.loop = 1
-            self.count_m_act = 3
-            self.count_m_deact = 1
+            self.count_m_act = 5
+            self.count_m_deact = 2.5
             self.count_m_overact = 10
             self.dt_overact = self.count_m_overact
-            self.cvol_t_act = 10
-            self.cvol_t_low_act = 3
-            self.cvol_s_act = 0.05
-            self.cvol_s_low_act = 0.02
+            self.cvol_t_act = 20
+            self.cvol_t_low_act = 10
+            self.cvol_s_act = 0.1
+            self.cvol_s_low_act = 0.05
             self.fee_rate = 0.0005 * 2
             self.profit_min_tick = 10
             self.loss_max_tick = 40
@@ -57,6 +57,7 @@ class Nprob:
             self.loss_max_tick = 15
 
         self.inp=0
+        self.last_o = 0
         self.profit=0
         self.startime=time.time()
         self.sig_1 = 0
@@ -353,10 +354,10 @@ class Nprob:
                 self.piox = 0
 
         if self.piox == 5.5:
-            if  self.inp > float(lblShoga1v):
+            if  self.last_o > float(lblShoga1v):
                 self.piox = 0
         if self.piox == -5.5:
-            if self.inp < float(lblBhoga1v):
+            if self.last_o < float(lblBhoga1v):
                 self.piox = 0
 
         ###############################
@@ -532,6 +533,7 @@ class Nprob:
                             if self.ord_count <= 3 and self.piox != 5.5 and self.inp>float(lblShoga1v):
                                 self.ord_count += 1
                                 self.piox = 5.5
+                                self.last_o = float(lblShoga1v)
                                 self.inp = (self.inp * (self.ord_count -1) + float(lblShoga1v)) / self.ord_count
                                 print('ord_count', self.ord_count)
 
@@ -601,6 +603,7 @@ class Nprob:
                             if self.ord_count <= 3 and self.piox != -5.5 and self.inp<float(lblBhoga1v):
                                 self.ord_count += 1
                                 self.piox = -5.5
+                                self.last_o = float(lblBhoga1v)
                                 self.inp = (self.inp * (self.ord_count -1) + float(lblBhoga1v)) / self.ord_count
                                 print('ord_count', self.ord_count)
 
@@ -667,22 +670,25 @@ class Nprob:
         if self.OrgMain=="b":
             self.d_OMain = 1
             self.piox = 0
+            print('ord_cout = ', self.ord_count)
         elif self.OrgMain=="s":
             self.d_OMain = -1
             self.piox = 0
+            print('ord_cout = ', self.ord_count)
         elif self.OrgMain == "n":
             self.d_OMain = 0
             self.ord_count = 1
             self.inp = 0
+            self.last_o = 0
             self.nfset = 0
             self.prf_hit = 0
 
         if self.piox == 5.5:
             self.d_OMain = 2
-            print "OrgMain", self.OrgMain
+            print "d_OrgMain", self.d_OrgMain
         if self.piox == -5.5:
             self.d_OMain = -2
-            print "OrgMain", self.OrgMain
+            print "d_OrgMain", self.d_OrgMain
 
         self.df.at[self.nf, "d_OMain"] = self.d_OMain
         self.df.at[self.nf, "OrgMain"] = self.OrgMain
