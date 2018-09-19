@@ -67,6 +67,7 @@ class Nprob:
         self.in_str = 0
         self.piox = 0
         self.OrgMain='n'
+        self.AvePrc = 0
         self.ord_count = 1
         self.turnover=0
         self.prf_able = 0
@@ -354,10 +355,10 @@ class Nprob:
                 self.piox = 0
 
         if self.piox == 5.5:
-            if  self.last_o > float(lblShoga1v):
+            if  self.last_o > float(lblShoga1v) + self.tick*5:
                 self.piox = 0
         if self.piox == -5.5:
-            if self.last_o < float(lblBhoga1v):
+            if self.last_o < float(lblBhoga1v) - self.tick*5:
                 self.piox = 0
 
         ###############################
@@ -385,12 +386,14 @@ class Nprob:
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
+                                self.last_o = float(lblBhoga1v)
                 if self.piox == 2.5:
                     if self.OrgMain == 'n' and self.piox==0:
                         self.in_str_1 = 1
                         self.OrgMain = "s"
                         self.nfset = self.nf
                         self.inp = float(lblBhoga1v)
+                        self.last_o = float(lblBhoga1v)
 
                 if count_m > self.count_m_act:
                     self.sig_3 = -0.5
@@ -408,12 +411,14 @@ class Nprob:
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
+                                self.last_o = float(lblShoga1v)
                 if self.piox == -2.5:
                     if self.OrgMain == 'n' and self.piox==0:
                         self.in_str_1 = -1
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
+                        self.last_o = float(lblShoga1v)
 
             # Keep-going
             if 1==1:
@@ -428,6 +433,7 @@ class Nprob:
                                 self.OrgMain = "b"
                                 self.nfset = self.nf
                                 self.inp = float(lblShoga1v)
+                                self.last_o = float(lblShoga1v)
                     if cvol_t<self.cvol_t_act * -1 and cvol_s<self.cvol_s_act*-1:
                             self.sig_2 = -2
                             if self.in_str == -1:
@@ -437,18 +443,21 @@ class Nprob:
                                 self.OrgMain = "s"
                                 self.nfset = self.nf
                                 self.inp = float(lblBhoga1v)
+                                self.last_o = float(lblBhoga1v)
                 if self.piox == 1.5:
                     if self.OrgMain == 'n':
                         self.in_str = -2
                         self.OrgMain = "s"
                         self.nfset = self.nf
                         self.inp = float(lblBhoga1v)
+                        self.last_o = float(lblBhoga1v)
                 if self.piox == -1.5:
                     if self.OrgMain == 'n':
                         self.in_str = 2
                         self.OrgMain = "b"
                         self.nfset = self.nf
                         self.inp = float(lblShoga1v)
+                        self.last_o = float(lblShoga1v)
 
         # Trend_In_200
         if 1==1:
@@ -462,6 +471,7 @@ class Nprob:
                             self.in_str = 1
                             self.nfset = self.nf
                             self.inp = float(lblShoga1v)
+                            self.last_o = float(lblShoga1v)
 
                 if self.piox != -2 and self.piox != -2.5 and ee_s<2 and count_m<self.count_m_overact:
                     if dxy_200_medi<0 and cvol_c_ave<10 and cvol_c<10 and abs(cvol_t)<self.cvol_t_low_act:
@@ -471,6 +481,7 @@ class Nprob:
                             self.in_str = -1
                             self.nfset = self.nf
                             self.inp = float(lblBhoga1v)
+                            self.last_o = float(lblBhoga1v)
 
         self.df.at[self.nf, "inp"] = self.inp
         self.df.at[self.nf, "in_str_1"] = self.in_str_1
@@ -530,11 +541,13 @@ class Nprob:
                             self.OrgMain = 'n'
                             self.turnover += 1
                         else:
-                            if self.ord_count <= 3 and self.piox != 5.5 and self.inp>float(lblShoga1v):
+                            if self.ord_count <= 3 and self.piox != 5.5 and self.last_o>float(lblShoga1v)+self.tick*5:
                                 self.ord_count += 1
                                 self.piox = 5.5
                                 self.last_o = float(lblShoga1v)
                                 self.inp = (self.inp * (self.ord_count -1) + float(lblShoga1v)) / self.ord_count
+                                print('last_o', self.last_o)
+                                print('now_prc', float(lblShoga1v))
                                 print('ord_count', self.ord_count)
 
                 # mid peak (dxy_20 orderbook)
@@ -546,7 +559,7 @@ class Nprob:
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
-                    if self.prf_hit == 1 and cvol_t < 0 and count_m<self.count_m_deact/2:
+                    if 1==0 and self.prf_hit == 1 and cvol_t < 0 and count_m<self.count_m_deact/2:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
                             float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = 0.5
@@ -600,11 +613,13 @@ class Nprob:
                             self.OrgMain = 'n'
                             self.turnover += 1
                         else:
-                            if self.ord_count <= 3 and self.piox != -5.5 and self.inp<float(lblBhoga1v):
+                            if self.ord_count <= 3 and self.piox != -5.5 and self.last_o<float(lblBhoga1v)-self.tick*5:
                                 self.ord_count += 1
                                 self.piox = -5.5
                                 self.last_o = float(lblBhoga1v)
                                 self.inp = (self.inp * (self.ord_count -1) + float(lblBhoga1v)) / self.ord_count
+                                print('last_o', self.last_o)
+                                print('now_prc', float(lblBhoga1v))
                                 print('ord_count', self.ord_count)
 
                 #  mid peak (dxy_20 orderbook)
@@ -616,7 +631,7 @@ class Nprob:
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
-                    if self.prf_hit == 1 and cvol_t > 0 and count_m < self.count_m_deact / 2:
+                    if 1==0 and self.prf_hit == 1 and cvol_t > 0 and count_m < self.count_m_deact / 2:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
                                 float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
                         self.piox = -0.5
@@ -669,26 +684,27 @@ class Nprob:
 
         if self.OrgMain=="b":
             self.d_OMain = 1
-            self.piox = 0
+            # self.piox = 0
             print('ord_cout = ', self.ord_count)
         elif self.OrgMain=="s":
             self.d_OMain = -1
-            self.piox = 0
+            # self.piox = 0
             print('ord_cout = ', self.ord_count)
         elif self.OrgMain == "n":
             self.d_OMain = 0
             self.ord_count = 1
             self.inp = 0
             self.last_o = 0
+            self.AvePrc = 0
             self.nfset = 0
             self.prf_hit = 0
 
         if self.piox == 5.5:
             self.d_OMain = 2
-            print "d_OrgMain", self.d_OrgMain
+            # print "d_OrgMain", self.d_OMain
         if self.piox == -5.5:
             self.d_OMain = -2
-            print "d_OrgMain", self.d_OrgMain
+            # print "d_OrgMain", self.d_OMain
 
         self.df.at[self.nf, "d_OMain"] = self.d_OMain
         self.df.at[self.nf, "OrgMain"] = self.OrgMain
