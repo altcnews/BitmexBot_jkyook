@@ -541,14 +541,23 @@ class Nprob:
                             self.OrgMain = 'n'
                             self.turnover += 1
                         else:
-                            if self.ord_count <= 3 and self.piox != 5.5 and self.last_o>float(lblShoga1v)+self.tick*5:
-                                self.ord_count += 1
-                                self.piox = 5.5
-                                self.last_o = float(lblShoga1v)
-                                self.inp = (self.inp * (self.ord_count -1) + float(lblShoga1v)) / self.ord_count
+                            if float(lblBhoga1v) > self.last_o + self.tick * 2 and self.ord_count > 1 and self.piox != 4:
+                                self.ord_count -= 1
+                                self.piox = 4
+                                self.last_o = float(lblBhoga1v)
+                                self.inp = (self.inp * (self.ord_count) - float(lblShoga1v)) / (self.ord_count - 1)
                                 print('last_o', self.last_o)
-                                print('now_prc', float(lblShoga1v))
+                                print('now_prc', float(lblBhoga1v))
                                 print('ord_count', self.ord_count)
+                    if self.sig_1 == 1 and count_m > self.count_m_deact:
+                        if float(lblShoga1v) < self.last_o - self.tick*5 and self.piox != 4:
+                            self.ord_count += 1
+                            self.piox = 5.5
+                            self.last_o = float(lblShoga1v)
+                            self.inp = (self.inp * (self.ord_count -1) + float(lblShoga1v)) / self.ord_count
+                            print('last_o', self.last_o)
+                            print('now_prc', float(lblShoga1v))
+                            print('ord_count', self.ord_count)
 
                 # mid peak (dxy_20 orderbook)
                 if self.in_str == 1:
@@ -613,14 +622,23 @@ class Nprob:
                             self.OrgMain = 'n'
                             self.turnover += 1
                         else:
-                            if self.ord_count <= 3 and self.piox != -5.5 and self.last_o<float(lblBhoga1v)-self.tick*5:
-                                self.ord_count += 1
-                                self.piox = -5.5
-                                self.last_o = float(lblBhoga1v)
-                                self.inp = (self.inp * (self.ord_count -1) + float(lblBhoga1v)) / self.ord_count
+                            if float(lblShoga1v) < self.last_o - self.tick * 2 and self.ord_count>1 and self.piox != -4:
+                                self.ord_count -= 1
+                                self.piox = -4
+                                self.last_o = float(lblShoga1v)
+                                self.inp = (self.inp * (self.ord_count) - float(lblShoga1v)) / (self.ord_count -1)
                                 print('last_o', self.last_o)
                                 print('now_prc', float(lblBhoga1v))
                                 print('ord_count', self.ord_count)
+                    if self.sig_1 == -1 and count_m > self.count_m_deact:
+                        if float(lblBhoga1v) > self.last_o + self.tick * 5 and self.piox != -5.5:
+                            self.ord_count += 1
+                            self.piox = -5.5
+                            self.last_o = float(lblBhoga1v)
+                            self.inp = (self.inp * (self.ord_count -1) + float(lblBhoga1v)) / self.ord_count
+                            print('last_o', self.last_o)
+                            print('now_prc', float(lblBhoga1v))
+                            print('ord_count', self.ord_count)
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
@@ -699,11 +717,17 @@ class Nprob:
             self.nfset = 0
             self.prf_hit = 0
 
-        if self.piox == 5.5:
+        if self.piox == 4:
             self.d_OMain = 2
             # print "d_OrgMain", self.d_OMain
-        if self.piox == -5.5:
+        if self.piox == -4:
             self.d_OMain = -2
+
+        if self.piox == 5.5:
+            self.d_OMain = 3
+            # print "d_OrgMain", self.d_OMain
+        if self.piox == -5.5:
+            self.d_OMain = -3
             # print "d_OrgMain", self.d_OMain
 
         self.df.at[self.nf, "d_OMain"] = self.d_OMain

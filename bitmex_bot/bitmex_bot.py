@@ -374,8 +374,12 @@ class OrderManager:
                 if np == -1:
                     self.macd_signal = self.DOWN
                 if np == 2:
-                    self.macd_signal = "2"
+                    self.macd_signal = "1"
                 if np == -2:
+                    self.macd_signal = "2"
+                if np == 3:
+                    self.macd_signal = "2"
+                if np == -3:
                     self.macd_signal = "1"
                 if np == 0:
                     self.macd_signal = False
@@ -461,8 +465,9 @@ class OrderManager:
                 if self.macd_signal == self.UP or self.macd_signal == "2":
                     logger.info("Buy Trade Signal {}".format(self.last_price))
                     logger.info("-----------------------------------------")
-                    self.is_trade = True
-                    self.sequence = self.BUY
+                    if not  self.macd_signal == "2":
+                        self.is_trade = True
+                        self.sequence = self.BUY
 
                     # place order
                     if 1==0:
@@ -492,8 +497,9 @@ class OrderManager:
                 elif self.macd_signal == self.DOWN or self.macd_signal == "1":
                     logger.info("Sell Trade Signal {}".format(self.last_price))
                     logger.info("-----------------------------------------")
-                    self.is_trade = True
-                    self.sequence = self.SELL
+                    if not  self.macd_signal == "1":
+                        self.is_trade = True
+                        self.sequence = self.SELL
 
                     # place order
                     if 1==0:
