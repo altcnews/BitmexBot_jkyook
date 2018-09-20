@@ -30,10 +30,10 @@ class Nprob:
         elif which_market == 2:  # UPBIT
             self.tick = 1000
             self.loop = 1
-            self.count_m_act = 5
-            self.count_m_deact = 2.5
-            self.count_m_overact = 10
-            self.dt_overact = self.count_m_overact
+            self.count_m_act = 10
+            self.count_m_deact = 3
+            self.count_m_overact = 15
+            self.dt_overact = self.count_m_overact * 2
             self.cvol_t_act = 20
             self.cvol_t_low_act = 10
             self.cvol_s_act = 0.1
@@ -90,7 +90,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print ('nf: %d  /prc: %0.2f /in: %d /out: %d /prf: %d /turn: %d' % (self.nf, price, self.in_str, self.piox, self.prf_able, self.turnover))
+        print ('nf: %d  /prc: %0.2f /in: %d /out: %0.1f /prf: %d /turn: %d' % (self.nf, price, self.in_str, self.piox, self.prf_able, self.turnover))
 
         if self.nf!=0 and self.nf%500==0:
             self.btnSave_Clicked()
@@ -355,10 +355,10 @@ class Nprob:
                 self.piox = 0
 
         if self.piox == 5.5:
-            if  self.last_o > float(lblShoga1v) + self.tick*5:
+            if self.d_OMain == 2:
                 self.piox = 0
         if self.piox == -5.5:
-            if self.last_o < float(lblBhoga1v) - self.tick*5:
+            if  self.d_OMain == -2:
                 self.piox = 0
 
         ###############################

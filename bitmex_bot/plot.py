@@ -58,11 +58,11 @@ p8 = df.ix[plot_start:plot_last, "cvol_t"]
 ax8.plot(p8, 'g')
 p9 = df.ix[plot_start:plot_last, "dt"]
 ax9.plot(p9, 'r')
-p10 = df.ix[plot_start:plot_last, "count_m"]
+p10 = df.ix[plot_start:plot_last, "ord_count"]
 ax10.plot(p10, 'g')
-p11 = df.ix[plot_start:plot_last, "cvol_c"]
+p11 = df.ix[plot_start:plot_last, "sig_1"]
 ax11.plot(p11, 'r')
-p12 = df.ix[plot_start:plot_last, "dxy_20_medi"]
+p12 = df.ix[plot_start:plot_last, "inp"]
 ax12.plot(p12, 'g')
 
 # if p3_t != "None":

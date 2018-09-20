@@ -373,6 +373,10 @@ class OrderManager:
                     self.macd_signal = self.UP
                 if np == -1:
                     self.macd_signal = self.DOWN
+                if np == 2:
+                    self.macd_signal = "2"
+                if np == -2:
+                    self.macd_signal = "1"
                 if np == 0:
                     self.macd_signal = False
 
@@ -454,7 +458,7 @@ class OrderManager:
                 self.exchange.close_position()
 
             if self.macd_signal:
-                if self.macd_signal == self.UP:
+                if self.macd_signal == self.UP or self.macd_signal == "2":
                     logger.info("Buy Trade Signal {}".format(self.last_price))
                     logger.info("-----------------------------------------")
                     self.is_trade = True
@@ -485,7 +489,7 @@ class OrderManager:
                             #     sleep(settings.API_REST_INTERVAL)
                             self.close_order = True
 
-                elif self.macd_signal == self.DOWN:
+                elif self.macd_signal == self.DOWN or self.macd_signal == "1":
                     logger.info("Sell Trade Signal {}".format(self.last_price))
                     logger.info("-----------------------------------------")
                     self.is_trade = True
@@ -493,6 +497,9 @@ class OrderManager:
 
                     # place order
                     if 1==0:
+                        if self.initial_order:
+                            order = self.place_orders(side=self.SELL, orderType='Market', quantity=self.amount)
+
                         if not self.initial_order:
                             order = self.place_orders(side=self.SELL, orderType='Market', quantity=self.amount)
                             self.trade_signal = self.macd_signal
@@ -517,6 +524,7 @@ class OrderManager:
                             #     sleep(settings.API_REST_INTERVAL)
                             self.close_order = True
                             # set cross margin for the trade
+
 
         else:
             # print 'trade-signal:', self.trade_signal
