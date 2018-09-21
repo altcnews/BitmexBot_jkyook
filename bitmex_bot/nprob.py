@@ -68,7 +68,9 @@ class Nprob:
         self.piox = 0
         self.OrgMain='n'
         self.AvePrc = 0
-        self.ord_count = 1
+        self.ExedQty = 0
+        self.add_count = 1
+        self.minus_count = 1
         self.turnover=0
         self.prf_able = 0
         self.prf_hit = 0
@@ -90,7 +92,7 @@ class Nprob:
 
         t_start = time.time()
         self.df.at[self.nf, "nf"] = self.nf
-        print ('nf: %d  /prc: %0.2f /in: %d /out: %0.1f /prf: %d /turn: %d' % (self.nf, price, self.in_str, self.piox, self.prf_able, self.turnover))
+        print ('nf: %d  /prc: %0.2f /in: %d /out: %0.1f /prf: %d /piox: %d  /last_o %0.2f  /turn: %d' % (self.nf, price, self.in_str, self.piox, self.prf_able, self.piox, self.last_o, self.turnover))
 
         if self.nf!=0 and self.nf%500==0:
             self.btnSave_Clicked()
@@ -535,49 +537,49 @@ class Nprob:
                         count_cri = self.df[self.nf - 20:self.nf - 1][self.df.dt[self.nf - 20:self.nf - 1]>self.dt_overact].count()[0]
                         if count_cri>3:
                             self.profit += ((float(lblBhoga1v) - self.inp) - (
-                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                             self.piox = 5
                             self.in_str = 0
                             self.OrgMain = 'n'
                             self.turnover += 1
                         else:
-                            if float(lblBhoga1v) > self.last_o + self.tick * 2 and self.ord_count > 1 and self.piox != 4:
-                                self.ord_count -= 1
+                            if float(lblBhoga1v) > self.last_o and abs(self.ExedQty) > 1 and self.piox != 4:
+                                self.minus_count += 1
                                 self.piox = 4
                                 self.last_o = float(lblBhoga1v)
-                                self.inp = (self.inp * (self.ord_count) - float(lblShoga1v)) / (self.ord_count - 1)
+                                self.inp = (self.inp * (abs(self.ExedQty)) - float(lblShoga1v)) / (abs(self.ExedQty) - 1)
                                 print('last_o', self.last_o)
                                 print('now_prc', float(lblBhoga1v))
-                                print('ord_count', self.ord_count)
+                                print('minus_count', self.minus_count)
                     if self.sig_1 == 1 and count_m > self.count_m_deact:
-                        if float(lblShoga1v) < self.last_o - self.tick*5 and self.piox != 4:
-                            self.ord_count += 1
+                        if float(lblShoga1v) < self.last_o - self.tick*5 and self.piox != 5.5:
+                            self.add_count += 1
                             self.piox = 5.5
                             self.last_o = float(lblShoga1v)
-                            self.inp = (self.inp * (self.ord_count -1) + float(lblShoga1v)) / self.ord_count
+                            self.inp = (self.inp * (abs(self.ExedQty) -1) + float(lblShoga1v)) / abs(self.ExedQty)
                             print('last_o', self.last_o)
                             print('now_prc', float(lblShoga1v))
-                            print('ord_count', self.ord_count)
+                            print('add_count', self.add_count)
 
                 # mid peak (dxy_20 orderbook)
                 if self.in_str == 1:
                     if self.prf_able == 1 and cvol_s < self.cvol_s_low_act * -1/2 and cvol_t < 0:  # or y1_ss >0:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
-                            float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                            float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = 1
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
                     if 1==0 and self.prf_hit == 1 and cvol_t < 0 and count_m<self.count_m_deact/2:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
-                            float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                            float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = 0.5
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
                     if self.sig_2 == -2:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
-                            float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                            float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = 1.5
                         self.in_str = 0
                         self.OrgMain = 'n'
@@ -587,14 +589,14 @@ class Nprob:
                 if self.in_str == 2:
                     if cvol_s < self.cvol_s_act * -1 and cvol_t<0 and cvol_c<=17:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
-                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = 2
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
                     if self.sig_3 == 1:
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
-                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = 2.5
                         self.in_str = 0
                         self.OrgMain = 'n'
@@ -604,7 +606,7 @@ class Nprob:
                 if  self.in_str_1 == -1:
                     if cvol_s < 0 and cvol_t < self.cvol_t_act * -1 / 10 :
                         self.profit += ((float(lblBhoga1v) - self.inp) - (
-                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = 3
                         self.in_str_1 = 0
                         self.OrgMain = 'n'
@@ -622,43 +624,43 @@ class Nprob:
                             self.OrgMain = 'n'
                             self.turnover += 1
                         else:
-                            if float(lblShoga1v) < self.last_o - self.tick * 2 and self.ord_count>1 and self.piox != -4:
-                                self.ord_count -= 1
+                            if float(lblShoga1v) < self.last_o and abs(self.ExedQty)>1 and self.piox != -4:
+                                self.minus_count += 1
                                 self.piox = -4
                                 self.last_o = float(lblShoga1v)
-                                self.inp = (self.inp * (self.ord_count) - float(lblShoga1v)) / (self.ord_count -1)
+                                self.inp = (self.inp * (abs(self.ExedQty)) - float(lblShoga1v)) / (abs(self.ExedQty) -1)
                                 print('last_o', self.last_o)
                                 print('now_prc', float(lblBhoga1v))
-                                print('ord_count', self.ord_count)
+                                print('minus_count', self.minus_count)
                     if self.sig_1 == -1 and count_m > self.count_m_deact:
                         if float(lblBhoga1v) > self.last_o + self.tick * 5 and self.piox != -5.5:
-                            self.ord_count += 1
+                            self.add_count += 1
                             self.piox = -5.5
                             self.last_o = float(lblBhoga1v)
-                            self.inp = (self.inp * (self.ord_count -1) + float(lblBhoga1v)) / self.ord_count
+                            self.inp = (self.inp * (abs(self.ExedQty) -1) + float(lblBhoga1v)) / abs(self.ExedQty)
                             print('last_o', self.last_o)
                             print('now_prc', float(lblBhoga1v))
-                            print('ord_count', self.ord_count)
+                            print('add_count', self.add_count)
 
                 #  mid peak (dxy_20 orderbook)
                 if self.in_str == -1:
                     if self.prf_able == 1 and cvol_s > self.cvol_s_low_act/2  and cvol_t > 0:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
-                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = -1
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
                     if 1==0 and self.prf_hit == 1 and cvol_t > 0 and count_m < self.count_m_deact / 2:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
-                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = -0.5
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
                     if self.sig_2 == 2:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
-                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = -1.5
                         self.in_str = 0
                         self.OrgMain = 'n'
@@ -668,14 +670,14 @@ class Nprob:
                 if self.in_str == -2:
                     if cvol_s > self.cvol_s_act and cvol_t>0 and cvol_c>=3:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
-                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = -2
                         self.in_str = 0
                         self.OrgMain = 'n'
                         self.turnover += 1
                     if self.sig_3 == -1:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
-                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = -2.5
                         self.in_str = 0
                         self.OrgMain = 'n'
@@ -685,7 +687,7 @@ class Nprob:
                 if  self.in_str_1 == 1:
                     if cvol_s > 0 and cvol_t > self.cvol_t_act / 10:
                         self.profit += ((self.inp - float(lblBhoga1v)) - (
-                                float(lblBhoga1v) + self.inp) * self.fee_rate) * self.ord_count
+                                float(lblBhoga1v) + self.inp) * self.fee_rate) * abs(self.ExedQty)
                         self.piox = -3
                         self.in_str_1 = 0
                         self.OrgMain = 'n'
@@ -693,7 +695,8 @@ class Nprob:
 
         self.df.at[self.nf, "piox"] = self.piox
         self.df.at[self.nf, "profit"] = self.profit
-        self.df.at[self.nf, "ord_count"] = self.ord_count
+        self.df.at[self.nf, "add_count"] = self.add_count
+        self.df.at[self.nf, "minus_count"] = self.minus_count
         # print 'piox = ', self.piox
 
         ###############################
@@ -703,19 +706,22 @@ class Nprob:
         if self.OrgMain=="b":
             self.d_OMain = 1
             # self.piox = 0
-            print('ord_cout = ', self.ord_count)
+            print('add_count %d  /minus_count %d  /AvePrc %0.2f  /Profit %0.2f' % (self.add_count, self.minus_count, self.AvePrc, self.profit))
         elif self.OrgMain=="s":
             self.d_OMain = -1
             # self.piox = 0
-            print('ord_cout = ', self.ord_count)
+            print('add_count %d  /minus_count %d  /AvePrc %0.2f  /Profit %0.2f' % (self.add_count, self.minus_count, self.AvePrc, self.profit))
         elif self.OrgMain == "n":
             self.d_OMain = 0
-            self.ord_count = 1
+            self.add_count = 1
+            self.minus_count = 1
             self.inp = 0
             self.last_o = 0
             self.AvePrc = 0
+            self.ExedQty = 0
             self.nfset = 0
             self.prf_hit = 0
+            print('/Profit %0.2f' %  (self.profit))
 
         if self.piox == 4:
             self.d_OMain = 2
@@ -737,13 +743,13 @@ class Nprob:
         self.nf+=1
 
         if self.nf>10:
-            print (self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'cvol_t', 'cvol_s', 'cvol_c', 'dxy_200_medi', 'OrgMain', 'inp','profit']]) #
+            print (self.df.ix[self.nf-9:self.nf-1,['dt', 'count_m', 'cvol_t', 'cvol_s', 'cvol_c', 'dxy_200_medi', 'sig_1', 'OrgMain', 'inp']]) #
             print ('-----------')
 
         elap = time.time() - t_start
         self.df.at[self.nf, "elap"] = elap
         print ("elap %0.5f" % (elap))
-
+        print ('-----------')
         return self.d_OMain
 
     def btnSave_Clicked(self):
