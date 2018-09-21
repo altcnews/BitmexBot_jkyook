@@ -706,11 +706,11 @@ class Nprob:
         if self.OrgMain=="b":
             self.d_OMain = 1
             # self.piox = 0
-            print('add_count %d  /minus_count %d  /AvePrc %0.2f  /Profit %0.2f' % (self.add_count, self.minus_count, self.AvePrc, self.profit))
+            print('add_count %d  /minus_count %d  /AvePrc %0.2f  /Profit %0.2f' % (self.add_count-1, self.minus_count-1, self.AvePrc, self.profit))
         elif self.OrgMain=="s":
             self.d_OMain = -1
             # self.piox = 0
-            print('add_count %d  /minus_count %d  /AvePrc %0.2f  /Profit %0.2f' % (self.add_count, self.minus_count, self.AvePrc, self.profit))
+            print('add_count %d  /minus_count %d  /AvePrc %0.2f  /Profit %0.2f' % (self.add_count-1, self.minus_count-1, self.AvePrc, self.profit))
         elif self.OrgMain == "n":
             self.d_OMain = 0
             self.add_count = 1
