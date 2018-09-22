@@ -24,6 +24,7 @@ class Nprob:
             self.cvol_t_low_act = 2000
             self.cvol_s_act = 5
             self.cvol_s_low_act = 3
+            self.dxy_200_medi_bottom = 250
             self.fee_rate = 0.00075 * 2
             self.profit_min_tick = 25
             self.loss_max_tick = 80
@@ -38,6 +39,7 @@ class Nprob:
             self.cvol_t_low_act = 10
             self.cvol_s_act = 0.1
             self.cvol_s_low_act = 0.05
+            self.dxy_200_medi_bottom = 100000
             self.fee_rate = 0.0005 * 2
             self.profit_min_tick = 10
             self.loss_max_tick = 40
@@ -52,6 +54,7 @@ class Nprob:
             self.cvol_t_low_act = 3000
             self.cvol_s_act = 10
             self.cvol_s_low_act = 5
+            self.dxy_200_medi_bottom = 250
             self.fee_rate = 0.00003 * 2
             self.profit_min_tick = 4
             self.loss_max_tick = 15
@@ -204,6 +207,15 @@ class Nprob:
         if self.nf >= self.min_1*3/2+1:
             dxy_200_medi = self.df.ix[self.nf - 200:self.nf - 1, "dxy_20_medi"].median()
         self.df.at[self.nf, "dxy_200_medi"] = dxy_200_medi
+
+        # dxy med_200_s
+        if self.nf >= self.sec_30+1 and dxy_200_medi != 0:
+            d_y = self.df.ix[self.nf - self.sec_30:self.nf - 1, "dxy_200_medi"]
+            d_x = self.df.ix[self.nf - self.sec_30:self.nf - 1, "stime"]
+            dxy_med_200_s = regr.fit(d_x.values.reshape(-1, 1), d_y.values.reshape(-1, 1)).coef_[0][0]
+        else:
+            dxy_med_200_s = 0
+        self.df.at[self.nf, "dxy_med_200_s"] = dxy_med_200_s
 
         # sX, sY, sXY
         if self.nf == 0:
@@ -466,7 +478,7 @@ class Nprob:
             self.sig_1 = 0
             if self.nf >  self.min_1*3/2+1 :
                 if self.piox != 2 and self.piox != 2.5 and ee_s<2 and count_m<self.count_m_overact:
-                    if dxy_200_medi>0 and cvol_c_ave>10 and cvol_c>10 and abs(cvol_t)<self.cvol_t_low_act:
+                    if dxy_200_medi>self.dxy_200_medi_bottom * -1 and dxy_med_200_s>0 and cvol_c_ave>10 and cvol_c>10 and abs(cvol_t)<self.cvol_t_low_act:
                         self.sig_1 = 1
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "b"
@@ -476,7 +488,7 @@ class Nprob:
                             self.last_o = float(lblShoga1v)
 
                 if self.piox != -2 and self.piox != -2.5 and ee_s<2 and count_m<self.count_m_overact:
-                    if dxy_200_medi<0 and cvol_c_ave<10 and cvol_c<10 and abs(cvol_t)<self.cvol_t_low_act:
+                    if dxy_200_medi<self.dxy_200_medi_bottom and dxy_med_200_s<0 and cvol_c_ave<10 and cvol_c<10 and abs(cvol_t)<self.cvol_t_low_act:
                         self.sig_1 = -1
                         if self.OrgMain == 'n' and self.piox==0:
                             self.OrgMain = "s"
